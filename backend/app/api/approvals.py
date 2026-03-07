@@ -314,6 +314,20 @@ async def _resolve_mission_for_approval(
     )
 
 
+def _build_rejection_recommendation(approval: Approval) -> str:
+    payload = approval.payload if isinstance(approval.payload, dict) else {}
+    anomalies = payload.get("anomalies")
+    if isinstance(anomalies, list):
+        hints = [str(item).strip() for item in anomalies if str(item).strip()]
+        if hints:
+            short = "; ".join(hints[:3])
+            return f"Review anomalies and retry mission: {short}"
+    summary = payload.get("summary")
+    if isinstance(summary, str) and summary.strip():
+        return f"Review mission summary and retry: {summary[:160]}"
+    return "Review failed subtasks and retry mission with corrected inputs."
+
+
 async def _apply_mission_state_from_approval(
     *,
     session: AsyncSession,
@@ -330,13 +344,17 @@ async def _apply_mission_state_from_approval(
 
     approved = approval.status == "approved"
     mission.status = "completed" if approved else "failed"
+    rejection_recommendation = _build_rejection_recommendation(approval)
     mission.error_message = None if approved else "Mission review rejected by approver."
+    mission.result_next_action = mission.result_next_action if approved else rejection_recommendation
     mission.updated_at = utcnow()
     session.add(mission)
 
     task = await Task.objects.by_id(mission.task_id).first(session)
     if task is not None:
         task.status = "done" if approved else "inbox"
+        if not approved:
+            task.result_next_action = rejection_recommendation
         task.updated_at = utcnow()
         session.add(task)
 

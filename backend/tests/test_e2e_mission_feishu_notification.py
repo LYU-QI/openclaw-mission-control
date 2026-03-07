@@ -507,6 +507,86 @@ async def _run_approval_resolution_flow(monkeypatch: pytest.MonkeyPatch) -> None
         await ctx.engine.dispose()
 
 
+async def _run_approval_rejection_flow(monkeypatch: pytest.MonkeyPatch) -> None:
+    ctx = await _bootstrap(monkeypatch)
+    try:
+        async with AsyncClient(
+            transport=ASGITransport(app=ctx.app),
+            base_url="http://testserver",
+        ) as client:
+            await _create_and_trigger_feishu_sync(client, ctx)
+
+            async with ctx.session_maker() as session:
+                task = (
+                    await session.exec(
+                        select(Task).where(Task.external_id == "rec-e2e-1"),
+                    )
+                ).first()
+                assert task is not None
+                task_id = task.id
+
+            mission_resp = await client.post(
+                "/api/v1/missions",
+                json={
+                    "task_id": str(task_id),
+                    "board_id": str(ctx.board_id),
+                    "goal": "Approval rejection should fail mission",
+                    "approval_policy": "post_review",
+                },
+            )
+            assert mission_resp.status_code == 201
+            mission_id = mission_resp.json()["id"]
+
+            dispatch_resp = await client.post(
+                f"/api/v1/missions/{mission_id}/dispatch",
+                json={"force": False},
+            )
+            assert dispatch_resp.status_code == 200
+
+            subtasks_resp = await client.get(f"/api/v1/missions/{mission_id}/subtasks")
+            assert subtasks_resp.status_code == 200
+            first_subtask_id = subtasks_resp.json()[0]["id"]
+            failed_subtask_resp = await client.patch(
+                f"/api/v1/missions/subtasks/{first_subtask_id}",
+                json={"status": "failed", "error_message": "reject path test", "result_risk": "high"},
+            )
+            assert failed_subtask_resp.status_code == 200
+
+            pending_resp = await client.post(f"/api/v1/missions/{mission_id}/complete", json={})
+            assert pending_resp.status_code == 200
+            pending_payload = pending_resp.json()
+            assert pending_payload["status"] == "pending_approval"
+            approval_id = pending_payload["approval_id"]
+            assert approval_id is not None
+
+            reject_resp = await client.patch(
+                f"/api/v1/boards/{ctx.board_id}/approvals/{approval_id}",
+                json={"status": "rejected"},
+            )
+            assert reject_resp.status_code == 200
+            assert reject_resp.json()["status"] == "rejected"
+
+            mission_after = await client.get(f"/api/v1/missions/{mission_id}")
+            assert mission_after.status_code == 200
+            mission_after_payload = mission_after.json()
+            assert mission_after_payload["status"] == "failed"
+            assert mission_after_payload["error_message"] is not None
+            assert mission_after_payload["result_next_action"] is not None
+
+        async with ctx.session_maker() as session:
+            task = (
+                await session.exec(
+                    select(Task).where(Task.external_id == "rec-e2e-1"),
+                )
+            ).first()
+            assert task is not None
+            assert task.status == "inbox"
+            assert task.result_next_action is not None
+            assert "retry" in task.result_next_action.lower()
+    finally:
+        await ctx.engine.dispose()
+
+
 def test_feishu_sync_creates_task_and_history(monkeypatch: pytest.MonkeyPatch) -> None:
     asyncio.run(_run_feishu_sync_flow(monkeypatch))
 
@@ -525,3 +605,7 @@ def test_failed_subtask_triggers_pending_approval(monkeypatch: pytest.MonkeyPatc
 
 def test_approved_pending_mission_becomes_completed(monkeypatch: pytest.MonkeyPatch) -> None:
     asyncio.run(_run_approval_resolution_flow(monkeypatch))
+
+
+def test_rejected_pending_mission_becomes_failed(monkeypatch: pytest.MonkeyPatch) -> None:
+    asyncio.run(_run_approval_rejection_flow(monkeypatch))
