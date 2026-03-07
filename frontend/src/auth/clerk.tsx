@@ -3,7 +3,7 @@
 // NOTE: We intentionally keep this file very small and dependency-free.
 // It provides CI/secretless-build safe fallbacks for Clerk hooks/components.
 
-import { ReactNode, ComponentProps, useEffect, useState } from "react";
+import { ReactNode, ComponentProps, useSyncExternalStore } from "react";
 
 import {
   ClerkProvider,
@@ -27,12 +27,17 @@ export function isClerkEnabled(): boolean {
   );
 }
 
+const noopSubscribe = () => () => {};
+
+function useIsClient(): boolean {
+  return useSyncExternalStore(noopSubscribe, () => true, () => false);
+}
+
 export function SignedIn(props: { children: ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const isClient = useIsClient();
 
   if (isLocalAuthMode()) {
-    if (!mounted) return null;
+    if (!isClient) return null;
     return getLocalAuthToken() ? <>{props.children}</> : null;
   }
   if (!isClerkEnabled()) return null;
@@ -40,11 +45,10 @@ export function SignedIn(props: { children: ReactNode }) {
 }
 
 export function SignedOut(props: { children: ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const isClient = useIsClient();
 
   if (isLocalAuthMode()) {
-    if (!mounted) return null;
+    if (!isClient) return null;
     return getLocalAuthToken() ? null : <>{props.children}</>;
   }
   if (!isClerkEnabled()) return <>{props.children}</>;
@@ -65,13 +69,12 @@ export function SignOutButton(
 }
 
 export function useUser() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const isClient = useIsClient();
 
   if (isLocalAuthMode()) {
-    const hasToken = mounted ? Boolean(getLocalAuthToken()) : false;
+    const hasToken = isClient ? Boolean(getLocalAuthToken()) : false;
     return {
-      isLoaded: mounted,
+      isLoaded: isClient,
       isSignedIn: hasToken,
       user: null,
     } as const;
@@ -79,18 +82,16 @@ export function useUser() {
   if (!isClerkEnabled()) {
     return { isLoaded: true, isSignedIn: false, user: null } as const;
   }
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   return clerkUseUser();
 }
 
 export function useAuth() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const isClient = useIsClient();
 
   if (isLocalAuthMode()) {
-    const token = mounted ? getLocalAuthToken() : null;
+    const token = isClient ? getLocalAuthToken() : null;
     return {
-      isLoaded: mounted,
+      isLoaded: isClient,
       isSignedIn: Boolean(token),
       userId: token ? "local-user" : null,
       sessionId: token ? "local-session" : null,
@@ -106,7 +107,6 @@ export function useAuth() {
       getToken: async () => null,
     } as const;
   }
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   return clerkUseAuth();
 }
 

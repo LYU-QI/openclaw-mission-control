@@ -7,11 +7,14 @@ import {
   BarChart3,
   Bot,
   Boxes,
+  Bell,
   CheckCircle2,
   Folder,
+  GitFork,
   Building2,
   LayoutGrid,
   Network,
+  RefreshCw,
   Settings,
   Store,
   Tags,
@@ -163,6 +166,50 @@ export function DashboardSidebar() {
                   Custom fields
                 </Link>
               ) : null}
+            </div>
+          </div>
+
+          <div>
+            <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              Orchestration
+            </p>
+            <div className="mt-1 space-y-1">
+              <Link
+                href="/missions"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-700 transition",
+                  pathname.startsWith("/missions")
+                    ? "bg-blue-100 text-blue-800 font-medium"
+                    : "hover:bg-slate-100",
+                )}
+              >
+                <GitFork className="h-4 w-4" />
+                Missions
+              </Link>
+              <Link
+                href="/feishu-sync"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-700 transition",
+                  pathname.startsWith("/feishu-sync")
+                    ? "bg-blue-100 text-blue-800 font-medium"
+                    : "hover:bg-slate-100",
+                )}
+              >
+                <RefreshCw className="h-4 w-4" />
+                Feishu sync
+              </Link>
+              <Link
+                href="/notifications"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-700 transition",
+                  pathname.startsWith("/notifications")
+                    ? "bg-blue-100 text-blue-800 font-medium"
+                    : "hover:bg-slate-100",
+                )}
+              >
+                <Bell className="h-4 w-4" />
+                Notifications
+              </Link>
             </div>
           </div>
 

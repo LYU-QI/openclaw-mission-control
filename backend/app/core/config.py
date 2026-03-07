@@ -67,6 +67,22 @@ class Settings(BaseSettings):
     rq_dispatch_retry_base_seconds: float = 10.0
     rq_dispatch_retry_max_seconds: float = 120.0
 
+    # Feishu sync scheduler
+    feishu_sync_enabled: bool = True
+    feishu_sync_default_interval_minutes: int = 15
+    feishu_sync_scheduler_interval_seconds: float = 30.0
+
+    # Context loading controls
+    context_loader_max_tokens: int = 8000
+    context_loader_timeout_seconds: int = 30
+
+    # LLM decomposition controls
+    llm_provider: str = "openai"
+    llm_api_key: str = ""
+    llm_model: str = "gpt-4"
+    llm_base_url: str = "https://api.openai.com/v1"
+    llm_api_version: str = "2024-10-21"
+
     # OpenClaw gateway runtime compatibility
     gateway_min_version: str = "2026.02.9"
 
@@ -74,6 +90,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_format: str = "text"
     log_use_utc: bool = False
+    app_secret_encryption_key: str = ""
     request_log_slow_ms: int = Field(default=1000, ge=0)
     request_log_include_health: bool = False
 

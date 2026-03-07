@@ -48,6 +48,7 @@ class Task(TenantScoped, table=True):
 
     # AI execution result fields
     result_summary: str | None = None
+    result_evidence_link: str | None = None
     result_risk: str | None = None
     result_next_action: str | None = None
 

@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlmodel import SQLModel
+from sqlmodel import Field, SQLModel
 
 RUNTIME_ANNOTATION_TYPES = (datetime, UUID)
 
@@ -17,8 +17,8 @@ class NotificationConfigCreate(SQLModel):
     organization_id: UUID
     board_id: UUID | None = None
     channel_type: str = "feishu_bot"
-    channel_config: dict[str, Any] = {}
-    notify_on_events: list[str] = []
+    channel_config: dict[str, Any] = Field(default_factory=dict)
+    notify_on_events: list[str] = Field(default_factory=list)
     notify_interval_minutes: int = 0
     enabled: bool = True
 
@@ -67,4 +67,19 @@ class NotificationTestResponse(SQLModel):
     """Response from a test notification send."""
 
     ok: bool
+    message: str = ""
+
+
+class NotificationConfirmRequest(SQLModel):
+    """Payload for confirming a pending notification action."""
+
+    action: str = "confirmed"
+    comment: str | None = None
+
+
+class NotificationConfirmResponse(SQLModel):
+    """Response after handling a confirmation callback."""
+
+    ok: bool
+    status: str
     message: str = ""

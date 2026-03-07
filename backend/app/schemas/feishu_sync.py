@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlmodel import SQLModel
+from sqlmodel import Field, SQLModel
 
 RUNTIME_ANNOTATION_TYPES = (datetime, UUID)
 
@@ -20,7 +20,7 @@ class FeishuSyncConfigCreate(SQLModel):
     app_secret: str  # plaintext; encrypted before storage
     bitable_app_token: str
     bitable_table_id: str
-    field_mapping: dict[str, Any] = {}
+    field_mapping: dict[str, Any] = Field(default_factory=dict)
     sync_direction: str = "bidirectional"
     sync_interval_minutes: int = 15
 

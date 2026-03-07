@@ -26,6 +26,8 @@ from app.db.pagination import paginate
 from app.db.session import async_session_maker, get_session
 from app.models.agents import Agent
 from app.models.approvals import Approval
+from app.models.feishu_sync import FeishuSyncConfig
+from app.models.missions import Mission
 from app.models.tasks import Task
 from app.schemas.approvals import ApprovalCreate, ApprovalRead, ApprovalStatus, ApprovalUpdate
 from app.schemas.pagination import DefaultLimitOffsetPage
@@ -38,6 +40,8 @@ from app.services.approval_task_links import (
     replace_approval_task_links,
     task_counts_for_board,
 )
+from app.services.feishu.writeback_service import WritebackService
+from app.services.notification.notification_service import NotificationService
 from app.services.openclaw.gateway_dispatch import GatewayDispatchService
 
 if TYPE_CHECKING:
@@ -280,6 +284,94 @@ async def _notify_lead_on_approval_resolution(
     await session.commit()
 
 
+def _extract_payload_mission_id(approval: Approval) -> UUID | None:
+    payload = approval.payload
+    if not isinstance(payload, dict):
+        return None
+    raw = payload.get("mission_id")
+    if not isinstance(raw, str):
+        return None
+    try:
+        return UUID(raw)
+    except ValueError:
+        return None
+
+
+async def _resolve_mission_for_approval(
+    session: AsyncSession,
+    *,
+    approval: Approval,
+) -> Mission | None:
+    mission_id = _extract_payload_mission_id(approval)
+    if mission_id is not None:
+        mission = await Mission.objects.by_id(mission_id).first(session)
+        if mission is not None:
+            return mission
+    return (
+        await Mission.objects.filter_by(approval_id=approval.id)
+        .order_by(col(Mission.updated_at).desc())
+        .first(session)
+    )
+
+
+async def _apply_mission_state_from_approval(
+    *,
+    session: AsyncSession,
+    board: Board,
+    approval: Approval,
+) -> None:
+    if approval.action_type != "mission_result_review":
+        return
+    if approval.status not in {"approved", "rejected"}:
+        return
+    mission = await _resolve_mission_for_approval(session, approval=approval)
+    if mission is None or mission.board_id != board.id:
+        return
+
+    approved = approval.status == "approved"
+    mission.status = "completed" if approved else "failed"
+    mission.error_message = None if approved else "Mission review rejected by approver."
+    mission.updated_at = utcnow()
+    session.add(mission)
+
+    task = await Task.objects.by_id(mission.task_id).first(session)
+    if task is not None:
+        task.status = "done" if approved else "inbox"
+        task.updated_at = utcnow()
+        session.add(task)
+
+    event_type = "approval_granted" if approved else "approval_rejected"
+    record_activity(
+        session,
+        event_type=event_type,
+        message=(
+            f"Mission approval {approval.status}: mission {mission.id}"
+        ),
+        task_id=mission.task_id,
+        board_id=mission.board_id,
+        agent_id=mission.agent_id,
+    )
+    await session.commit()
+
+    if approved and task is not None and task.external_source == "feishu":
+        config = (
+            await FeishuSyncConfig.objects.filter_by(board_id=mission.board_id, enabled=True)
+            .order_by(FeishuSyncConfig.updated_at.desc())
+            .first(session)
+        )
+        if config is not None:
+            await WritebackService(session, config).push_task_result(task.id)
+
+    await NotificationService(session).notify(
+        organization_id=board.organization_id,
+        board_id=board.id,
+        event_type=event_type,
+        message=f"Mission approval decision: {approval.status}",
+        extra={"approval_id": str(approval.id), "mission_id": str(mission.id)},
+    )
+    await session.commit()
+
+
 async def _fetch_approval_events(
     session: AsyncSession,
     board_id: UUID,
@@ -437,7 +529,7 @@ async def create_approval(
 
 @router.patch("/{approval_id}", response_model=ApprovalRead)
 async def update_approval(
-    approval_id: str,
+    approval_id: UUID,
     payload: ApprovalUpdate,
     board: Board = BOARD_USER_WRITE_DEP,
     session: AsyncSession = SESSION_DEP,
@@ -470,6 +562,19 @@ async def update_approval(
     await session.commit()
     await session.refresh(approval)
     if approval.status in {"approved", "rejected"} and approval.status != prior_status:
+        try:
+            await _apply_mission_state_from_approval(
+                session=session,
+                board=board,
+                approval=approval,
+            )
+        except Exception:
+            logger.exception(
+                "approval.mission_sync_unexpected board_id=%s approval_id=%s status=%s",
+                board.id,
+                approval.id,
+                approval.status,
+            )
         try:
             await _notify_lead_on_approval_resolution(
                 session=session,

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from typing import Any
 from uuid import UUID
@@ -10,10 +9,7 @@ from uuid import UUID
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.core.time import utcnow
-from app.models.missions import Mission
 from app.models.notifications import NotificationConfig, NotificationLog
-from app.services.feishu.client import FeishuClient
 
 logger = logging.getLogger(__name__)
 

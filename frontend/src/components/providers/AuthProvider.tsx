@@ -1,7 +1,7 @@
 "use client";
 
 import { ClerkProvider } from "@clerk/nextjs";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 
 import { isLikelyValidClerkPublishableKey } from "@/auth/clerkKey";
 import {
@@ -12,17 +12,20 @@ import {
 import { LocalAuthLogin } from "@/components/organisms/LocalAuthLogin";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [mounted, setMounted] = useState(false);
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const localMode = isLocalAuthMode();
 
   useEffect(() => {
-    setMounted(true);
     if (!localMode) {
       clearLocalAuthToken();
     }
   }, [localMode]);
 
-  if (!mounted) {
+  if (!isClient) {
     // Return a stable shell if possible, or just null.
     // Given the previous error "Expected server HTML to contain a matching <div> in <a>",
     // Returning null is safer to ensure it's empty on SSR.

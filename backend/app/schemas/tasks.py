@@ -29,6 +29,9 @@ class TaskBase(SQLModel):
     priority: str = "medium"
     due_at: datetime | None = None
     assigned_agent_id: UUID | None = None
+    owner_name: str | None = None
+    owner_feishu_id: str | None = None
+    milestone: str | None = None
     depends_on_task_ids: list[UUID] = Field(default_factory=list)
     tag_ids: list[UUID] = Field(default_factory=list)
 
@@ -49,6 +52,15 @@ class TaskUpdate(SQLModel):
     priority: str | None = None
     due_at: datetime | None = None
     assigned_agent_id: UUID | None = None
+    owner_name: str | None = None
+    owner_feishu_id: str | None = None
+    milestone: str | None = None
+    external_source: str | None = None
+    external_id: str | None = None
+    result_summary: str | None = None
+    result_evidence_link: str | None = None
+    result_risk: str | None = None
+    result_next_action: str | None = None
     depends_on_task_ids: list[UUID] | None = None
     tag_ids: list[UUID] | None = None
     custom_field_values: TaskCustomFieldValues | None = None
@@ -78,6 +90,12 @@ class TaskRead(TaskBase):
     id: UUID
     board_id: UUID | None
     created_by_user_id: UUID | None
+    external_source: str | None = None
+    external_id: str | None = None
+    result_summary: str | None = None
+    result_evidence_link: str | None = None
+    result_risk: str | None = None
+    result_next_action: str | None = None
     in_progress_at: datetime | None
     created_at: datetime
     updated_at: datetime

@@ -5,16 +5,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from sqlmodel import select
 
 from app.api.deps import AUTH_DEP, SESSION_DEP
 from app.core.time import utcnow
+from app.models.activity_events import ActivityEvent
 from app.models.missions import Mission, MissionSubtask
 from app.schemas.missions import (
     MissionCreate,
     MissionDispatchRequest,
     MissionRead,
+    MissionTimelineEntry,
     MissionUpdate,
     SubtaskCreate,
     SubtaskRead,
@@ -107,10 +109,12 @@ async def update_mission(
 @router.post("/{mission_id}/dispatch", response_model=MissionRead)
 async def dispatch_mission(
     mission_id: UUID,
+    payload: MissionDispatchRequest | None = None,
     session: AsyncSession = SESSION_DEP,
     auth: AuthContext = AUTH_DEP,
 ) -> Mission:
     """Dispatch a mission to the OpenClaw execution engine."""
+    _ = payload
     orchestrator = MissionOrchestrator(session)
     try:
         return await orchestrator.dispatch_mission(mission_id)
@@ -183,6 +187,111 @@ async def cancel_mission(
         return await orchestrator.cancel_mission(mission_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.get("/{mission_id}/timeline", response_model=list[MissionTimelineEntry])
+async def mission_timeline(
+    mission_id: UUID,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> list[MissionTimelineEntry]:
+    """Return a mission execution timeline built from activity events."""
+    mission = await Mission.objects.by_id(mission_id).first(session)
+    if mission is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    stmt = (
+        select(ActivityEvent)
+        .where(ActivityEvent.board_id == mission.board_id)
+        .where(ActivityEvent.task_id == mission.task_id)
+        .where(
+            ActivityEvent.event_type.in_(
+                [
+                    "mission_created",
+                    "mission_dispatched",
+                    "mission_started",
+                    "mission_completed",
+                    "mission_failed",
+                    "mission_cancelled",
+                    "subtask_created",
+                    "subtask_started",
+                    "subtask_completed",
+                    "subtask_failed",
+                    "approval_requested",
+                    "approval_granted",
+                    "approval_rejected",
+                ],
+            ),
+        )
+        .order_by(ActivityEvent.created_at.asc())  # type: ignore[attr-defined]
+    )
+    events = list((await session.exec(stmt)).all())
+    return [
+        MissionTimelineEntry(
+            timestamp=event.created_at,
+            event_type=event.event_type,
+            message=event.message,
+            agent_id=event.agent_id,
+        )
+        for event in events
+    ]
+
+
+@router.post("/{mission_id}/approve", response_model=MissionRead)
+async def approve_mission(
+    mission_id: UUID,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> Mission:
+    """Approve a mission waiting for pre-approval and continue dispatch."""
+    mission = await Mission.objects.by_id(mission_id).first(session)
+    if mission is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if mission.status != "pending_approval":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Mission is not in pending_approval state",
+        )
+    mission.status = "pending"
+    mission.updated_at = utcnow()
+    session.add(mission)
+    await session.commit()
+    orchestrator = MissionOrchestrator(session)
+    return await orchestrator.dispatch_mission(mission_id)
+
+
+@router.post("/{mission_id}/review", response_model=MissionRead)
+async def review_mission(
+    mission_id: UUID,
+    payload: MissionUpdate,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> Mission:
+    """Review a post-review mission and finalize as completed/failed."""
+    mission = await Mission.objects.by_id(mission_id).first(session)
+    if mission is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if mission.status not in {"pending_approval", "completed", "failed"}:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Mission is not ready for review",
+        )
+
+    if payload.status == "failed":
+        mission.status = "failed"
+        mission.error_message = payload.error_message or mission.error_message
+    else:
+        mission.status = "completed"
+        mission.result_summary = payload.result_summary or mission.result_summary
+        mission.result_evidence = payload.result_evidence or mission.result_evidence
+        mission.result_risk = payload.result_risk or mission.result_risk
+        mission.result_next_action = payload.result_next_action or mission.result_next_action
+        mission.completed_at = mission.completed_at or utcnow()
+    mission.updated_at = utcnow()
+    session.add(mission)
+    await session.commit()
+    await session.refresh(mission)
+    return mission
 
 
 # ------------------------------------------------------------------

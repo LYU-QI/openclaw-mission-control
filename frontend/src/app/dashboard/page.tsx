@@ -22,6 +22,8 @@ import { DashboardSidebar } from "@/components/organisms/DashboardSidebar";
 import { DashboardShell } from "@/components/templates/DashboardShell";
 import { Markdown } from "@/components/atoms/Markdown";
 import { SignedOutPanel } from "@/components/auth/SignedOutPanel";
+import { MissionOverviewWidget } from "@/components/dashboard/MissionOverviewWidget";
+import { SyncStatusWidget } from "@/components/dashboard/SyncStatusWidget";
 import { ApiError } from "@/api/mutator";
 import {
   type dashboardMetricsApiV1MetricsDashboardGetResponse,
@@ -49,6 +51,7 @@ import {
   formatTimestamp,
   parseTimestamp,
 } from "@/lib/formatters";
+import { apiGet } from "@/lib/mission-control-api";
 
 type SessionSummary = {
   key: string;
@@ -525,6 +528,18 @@ export default function DashboardPage() {
       },
     },
   );
+  const missionOverviewQuery = useQuery({
+    queryKey: ["dashboard", "mission-overview"],
+    enabled: Boolean(isSignedIn),
+    queryFn: () =>
+      apiGet<Array<{ status: string }>>("/api/v1/missions"),
+  });
+  const feishuSyncOverviewQuery = useQuery({
+    queryKey: ["dashboard", "feishu-sync-overview"],
+    enabled: Boolean(isSignedIn),
+    queryFn: () =>
+      apiGet<Array<{ sync_status: string }>>("/api/v1/feishu-sync/configs"),
+  });
 
   const boards = useMemo(
     () =>
@@ -816,6 +831,13 @@ export default function DashboardPage() {
   const pendingApprovalItems = metrics?.pending_approvals.items ?? [];
   const pendingApprovalsTotal = metrics?.pending_approvals.total ?? 0;
   const hasPendingApprovals = pendingApprovalItems.length > 0;
+  const missions = missionOverviewQuery.data ?? [];
+  const runningMissions = missions.filter((item) => item.status === "running").length;
+  const pendingApprovalMissions = missions.filter(
+    (item) => item.status === "pending_approval",
+  ).length;
+  const syncConfigs = feishuSyncOverviewQuery.data ?? [];
+  const syncErrors = syncConfigs.filter((item) => item.sync_status === "error").length;
   const activityFeedHref = "/activity";
 
   const shouldIgnoreRowNavigation = (target: EventTarget | null): boolean => {
@@ -954,6 +976,15 @@ export default function DashboardPage() {
                 }}
                 rows={gatewayRows}
               />
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <MissionOverviewWidget
+                total={missions.length}
+                running={runningMissions}
+                pendingApproval={pendingApprovalMissions}
+              />
+              <SyncStatusWidget configs={syncConfigs.length} errors={syncErrors} />
             </div>
 
             <section className="mt-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">

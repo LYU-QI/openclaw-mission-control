@@ -12,6 +12,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.time import utcnow
+from app.core.secrets import decrypt_secret
 from app.models.feishu_sync import FeishuSyncConfig, FeishuTaskMapping
 from app.models.tasks import Task
 from app.services.activity_log import record_activity
@@ -32,7 +33,7 @@ class SyncService:
     def __init__(self, session: AsyncSession, config: FeishuSyncConfig) -> None:
         self.session = session
         self.config = config
-        self.client = FeishuClient(config.app_id, config.app_secret_encrypted)
+        self.client = FeishuClient(config.app_id, decrypt_secret(config.app_secret_encrypted))
         self.mapper = FieldMapper(config.field_mapping)
 
     async def pull_from_feishu(self) -> dict[str, int]:

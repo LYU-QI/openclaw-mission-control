@@ -107,6 +107,7 @@ jobs:
         run: |
           make backend-lint
           make backend-coverage
+          make backend-e2e
 
       - name: Run frontend checks
         env:

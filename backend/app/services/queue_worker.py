@@ -4,11 +4,19 @@ from __future__ import annotations
 
 import asyncio
 import random
+import time
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.db.session import async_session_maker
+from app.services.feishu.scheduler import schedule_feishu_sync
+from app.services.feishu.queue_tasks import TASK_TYPE as FEISHU_SYNC_TASK_TYPE
+from app.services.feishu.queue_tasks import (
+    process_feishu_queue_task,
+    requeue_feishu_queue_task,
+)
 from app.services.openclaw.lifecycle_queue import TASK_TYPE as LIFECYCLE_RECONCILE_TASK_TYPE
 from app.services.openclaw.lifecycle_queue import (
     requeue_lifecycle_queue_task,
@@ -49,11 +57,39 @@ _TASK_HANDLERS: dict[str, _TaskHandler] = {
         ),
         requeue=lambda task, delay: requeue_webhook_queue_task(task, delay_seconds=delay),
     ),
+    FEISHU_SYNC_TASK_TYPE: _TaskHandler(
+        handler=process_feishu_queue_task,
+        attempts_to_delay=lambda attempts: min(
+            settings.rq_dispatch_retry_base_seconds * (2 ** max(0, attempts)),
+            settings.rq_dispatch_retry_max_seconds,
+        ),
+        requeue=lambda task, delay: requeue_feishu_queue_task(task, delay_seconds=delay),
+    ),
 }
 
 
 def _compute_jitter(base_delay: float) -> float:
     return random.uniform(0, min(settings.rq_dispatch_retry_max_seconds / 10, base_delay * 0.1))
+
+
+async def _run_feishu_scheduler_if_due(last_run_at: float) -> float:
+    if not settings.feishu_sync_enabled:
+        return last_run_at
+    interval_seconds = max(float(settings.feishu_sync_scheduler_interval_seconds), 1.0)
+    now = time.monotonic()
+    if now - last_run_at < interval_seconds:
+        return last_run_at
+    try:
+        async with async_session_maker() as session:
+            queued_count = await schedule_feishu_sync(session)
+        if queued_count > 0:
+            logger.info(
+                "queue.worker.feishu_scheduler_enqueued",
+                extra={"queued_count": queued_count},
+            )
+    except Exception:
+        logger.exception("queue.worker.feishu_scheduler_failed")
+    return now
 
 
 async def flush_queue(*, block: bool = False, block_timeout: float = 0) -> int:
@@ -125,8 +161,10 @@ async def flush_queue(*, block: bool = False, block_timeout: float = 0) -> int:
 
 
 async def _run_worker_loop() -> None:
+    scheduler_last_run_at = 0.0
     while True:
         try:
+            scheduler_last_run_at = await _run_feishu_scheduler_if_due(scheduler_last_run_at)
             await flush_queue(
                 block=True,
                 # Keep a finite timeout so scheduled tasks are periodically drained.

@@ -83,6 +83,10 @@ test: backend-test frontend-test ## Run tests
 backend-test: ## Backend tests (pytest)
 	cd $(BACKEND_DIR) && uv run pytest
 
+.PHONY: backend-e2e
+backend-e2e: ## Backend end-to-end flow tests
+	cd $(BACKEND_DIR) && uv run pytest tests/test_e2e_mission_feishu_notification.py
+
 .PHONY: backend-coverage
 backend-coverage: ## Backend tests with coverage gate (scoped 100% stmt+branch on selected modules)
 	# Policy: enforce 100% coverage only for the explicitly scoped, unit-testable backend modules.

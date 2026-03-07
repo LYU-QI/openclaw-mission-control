@@ -115,7 +115,7 @@ async def require_org_admin(
 
 
 async def get_board_or_404(
-    board_id: str,
+    board_id: UUID,
     session: AsyncSession = SESSION_DEP,
 ) -> Board:
     """Load a board by id or raise HTTP 404."""
@@ -126,7 +126,7 @@ async def get_board_or_404(
 
 
 async def get_board_for_actor_read(
-    board_id: str,
+    board_id: UUID,
     session: AsyncSession = SESSION_DEP,
     actor: ActorContext = ACTOR_DEP,
 ) -> Board:
@@ -145,7 +145,7 @@ async def get_board_for_actor_read(
 
 
 async def get_board_for_actor_write(
-    board_id: str,
+    board_id: UUID,
     session: AsyncSession = SESSION_DEP,
     actor: ActorContext = ACTOR_DEP,
 ) -> Board:
@@ -164,7 +164,7 @@ async def get_board_for_actor_write(
 
 
 async def get_board_for_user_read(
-    board_id: str,
+    board_id: UUID,
     session: AsyncSession = SESSION_DEP,
     auth: AuthContext = AUTH_DEP,
 ) -> Board:
@@ -179,7 +179,7 @@ async def get_board_for_user_read(
 
 
 async def get_board_for_user_write(
-    board_id: str,
+    board_id: UUID,
     session: AsyncSession = SESSION_DEP,
     auth: AuthContext = AUTH_DEP,
 ) -> Board:

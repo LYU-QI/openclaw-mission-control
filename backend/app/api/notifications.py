@@ -5,13 +5,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from sqlmodel import select
 
 from app.api.deps import AUTH_DEP, SESSION_DEP
 from app.core.time import utcnow
 from app.models.notifications import NotificationConfig, NotificationLog
 from app.schemas.notifications import (
+    NotificationConfirmRequest,
+    NotificationConfirmResponse,
     NotificationConfigCreate,
     NotificationConfigRead,
     NotificationConfigUpdate,
@@ -148,3 +150,33 @@ async def list_notification_logs(
         stmt = stmt.where(NotificationLog.event_type == event_type)
     result = await session.exec(stmt)
     return list(result.all())
+
+
+@router.post("/confirm/{log_id}", response_model=NotificationConfirmResponse)
+async def confirm_notification(
+    log_id: UUID,
+    payload: NotificationConfirmRequest,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> NotificationConfirmResponse:
+    """Handle manual confirmation callbacks for pending notifications."""
+    log = await NotificationLog.objects.by_id(log_id).first(session)
+    if log is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    status_map = {
+        "confirmed": "sent",
+        "approved": "sent",
+        "rejected": "failed",
+        "dismissed": "failed",
+    }
+    log.status = status_map.get(payload.action.lower(), log.status)
+    log.error_message = payload.comment if log.status == "failed" else None
+    session.add(log)
+    await session.commit()
+    await session.refresh(log)
+    return NotificationConfirmResponse(
+        ok=True,
+        status=log.status,
+        message="Confirmation recorded",
+    )
