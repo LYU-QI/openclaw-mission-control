@@ -21,9 +21,12 @@ from app.api.board_memory import router as board_memory_router
 from app.api.board_onboarding import router as board_onboarding_router
 from app.api.board_webhooks import router as board_webhooks_router
 from app.api.boards import router as boards_router
+from app.api.feishu_sync import router as feishu_sync_router
 from app.api.gateway import router as gateway_router
 from app.api.gateways import router as gateways_router
 from app.api.metrics import router as metrics_router
+from app.api.missions import router as missions_router
+from app.api.notifications import router as notifications_router
 from app.api.organizations import router as organizations_router
 from app.api.skills_marketplace import router as skills_marketplace_router
 from app.api.souls_directory import router as souls_directory_router
@@ -127,6 +130,18 @@ OPENAPI_TAGS = [
     {
         "name": "users",
         "description": "User profile read/update operations and user-centric settings endpoints.",
+    },
+    {
+        "name": "missions",
+        "description": "Mission orchestration, dispatch, subtask management, and lifecycle endpoints.",
+    },
+    {
+        "name": "feishu-sync",
+        "description": "Feishu Bitable sync configuration, trigger, and mapping endpoints.",
+    },
+    {
+        "name": "notifications",
+        "description": "Notification channel configuration, delivery, and log endpoints.",
     },
     {
         "name": "agent",
@@ -550,6 +565,9 @@ api_v1.include_router(approvals_router)
 api_v1.include_router(tasks_router)
 api_v1.include_router(task_custom_fields_router)
 api_v1.include_router(tags_router)
+api_v1.include_router(missions_router)
+api_v1.include_router(feishu_sync_router)
+api_v1.include_router(notifications_router)
 api_v1.include_router(users_router)
 app.include_router(api_v1)
 

@@ -42,5 +42,19 @@ class Task(TenantScoped, table=True):
     auto_created: bool = Field(default=False)
     auto_reason: str | None = None
 
+    # External system integration (Feishu sync)
+    external_source: str | None = None  # "feishu" / "jira" / etc.
+    external_id: str | None = Field(default=None, index=True)
+
+    # AI execution result fields
+    result_summary: str | None = None
+    result_risk: str | None = None
+    result_next_action: str | None = None
+
+    # Human owner info (synced from Feishu)
+    owner_name: str | None = None
+    owner_feishu_id: str | None = None
+    milestone: str | None = None
+
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
