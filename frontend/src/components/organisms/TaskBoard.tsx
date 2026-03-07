@@ -48,39 +48,39 @@ const columns: Array<{
   text: string;
   badge: string;
 }> = [
-  {
-    title: "Inbox",
-    status: "inbox",
-    dot: "bg-slate-400",
-    accent: "hover:border-slate-400 hover:bg-slate-50",
-    text: "group-hover:text-slate-700 text-slate-500",
-    badge: "bg-slate-100 text-slate-600",
-  },
-  {
-    title: "In Progress",
-    status: "in_progress",
-    dot: "bg-purple-500",
-    accent: "hover:border-purple-400 hover:bg-purple-50",
-    text: "group-hover:text-purple-600 text-slate-500",
-    badge: "bg-purple-100 text-purple-700",
-  },
-  {
-    title: "Review",
-    status: "review",
-    dot: "bg-indigo-500",
-    accent: "hover:border-indigo-400 hover:bg-indigo-50",
-    text: "group-hover:text-indigo-600 text-slate-500",
-    badge: "bg-indigo-100 text-indigo-700",
-  },
-  {
-    title: "Done",
-    status: "done",
-    dot: "bg-green-500",
-    accent: "hover:border-green-400 hover:bg-green-50",
-    text: "group-hover:text-green-600 text-slate-500",
-    badge: "bg-emerald-100 text-emerald-700",
-  },
-];
+    {
+      title: "Inbox",
+      status: "inbox",
+      dot: "bg-slate-400",
+      accent: "hover:border-slate-400 hover:bg-slate-50",
+      text: "group-hover:text-slate-700 text-slate-500",
+      badge: "bg-slate-100 text-slate-600",
+    },
+    {
+      title: "In Progress",
+      status: "in_progress",
+      dot: "bg-purple-500",
+      accent: "hover:border-purple-400 hover:bg-purple-50",
+      text: "group-hover:text-purple-600 text-slate-500",
+      badge: "bg-purple-100 text-purple-700",
+    },
+    {
+      title: "Review",
+      status: "review",
+      dot: "bg-indigo-500",
+      accent: "hover:border-indigo-400 hover:bg-indigo-50",
+      text: "group-hover:text-indigo-600 text-slate-500",
+      badge: "bg-indigo-100 text-indigo-700",
+    },
+    {
+      title: "Done",
+      status: "done",
+      dot: "bg-green-500",
+      accent: "hover:border-green-400 hover:bg-green-50",
+      text: "group-hover:text-green-600 text-slate-500",
+      badge: "bg-emerald-100 text-emerald-700",
+    },
+  ];
 
 /**
  * Build compact due-date UI state for a task card.
@@ -96,7 +96,7 @@ const resolveDueState = (
   const date = parseApiDatetime(task.due_at);
   if (!date) return { due: undefined, isOverdue: false };
 
-  const dueLabel = date.toLocaleDateString(undefined, {
+  const dueLabel = date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
@@ -376,42 +376,42 @@ export const TaskBoard = memo(function TaskBoard({
         const reviewCounts =
           column.status === "review"
             ? columnTasks.reduce(
-                (acc, task) => {
-                  if (task.is_blocked) {
-                    acc.blocked += 1;
-                    return acc;
-                  }
-                  if ((task.approvals_pending_count ?? 0) > 0) {
-                    acc.approval_needed += 1;
-                    return acc;
-                  }
-                  acc.waiting_lead += 1;
+              (acc, task) => {
+                if (task.is_blocked) {
+                  acc.blocked += 1;
                   return acc;
-                },
-                {
-                  all: columnTasks.length,
-                  approval_needed: 0,
-                  waiting_lead: 0,
-                  blocked: 0,
-                },
-              )
+                }
+                if ((task.approvals_pending_count ?? 0) > 0) {
+                  acc.approval_needed += 1;
+                  return acc;
+                }
+                acc.waiting_lead += 1;
+                return acc;
+              },
+              {
+                all: columnTasks.length,
+                approval_needed: 0,
+                waiting_lead: 0,
+                blocked: 0,
+              },
+            )
             : null;
 
         const filteredTasks =
           column.status === "review" && reviewBucket !== "all"
             ? columnTasks.filter((task) => {
-                if (reviewBucket === "blocked") return Boolean(task.is_blocked);
-                if (reviewBucket === "approval_needed")
-                  return (
-                    (task.approvals_pending_count ?? 0) > 0 && !task.is_blocked
-                  );
-                if (reviewBucket === "waiting_lead")
-                  return (
-                    !task.is_blocked &&
-                    (task.approvals_pending_count ?? 0) === 0
-                  );
-                return true;
-              })
+              if (reviewBucket === "blocked") return Boolean(task.is_blocked);
+              if (reviewBucket === "approval_needed")
+                return (
+                  (task.approvals_pending_count ?? 0) > 0 && !task.is_blocked
+                );
+              if (reviewBucket === "waiting_lead")
+                return (
+                  !task.is_blocked &&
+                  (task.approvals_pending_count ?? 0) === 0
+                );
+              return true;
+            })
             : columnTasks;
 
         return (
@@ -423,8 +423,8 @@ export const TaskBoard = memo(function TaskBoard({
               // On larger screens, keep columns tall to reduce empty space during drag.
               "sm:min-h-[calc(100vh-260px)]",
               activeColumn === column.status &&
-                !readOnly &&
-                "ring-2 ring-slate-200",
+              !readOnly &&
+              "ring-2 ring-slate-200",
             )}
             onDrop={readOnly ? undefined : handleDrop(column.status)}
             onDragOver={readOnly ? undefined : handleDragOver(column.status)}

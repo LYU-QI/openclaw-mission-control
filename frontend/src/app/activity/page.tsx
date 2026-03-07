@@ -118,7 +118,7 @@ const isTaskEventType = (value: string): value is TaskEventType =>
 const formatShortTimestamp = (value: string) => {
   const date = parseApiDatetime(value);
   if (!date) return "—";
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -173,10 +173,10 @@ const buildRouteHref = (
     Object.keys(routeParams).length > 0
       ? routeParams
       : {
-          eventId: fallback.eventId,
-          eventType: fallback.eventType,
-          createdAt: fallback.createdAt,
-        },
+        eventId: fallback.eventId,
+        eventType: fallback.eventType,
+        createdAt: fallback.createdAt,
+      },
   );
   if (fallback.taskId && !params.has("taskId")) {
     params.set("taskId", fallback.taskId);
@@ -709,7 +709,7 @@ export default function ActivityPage() {
         (previous?.name !== agent.name ||
           previous?.is_board_lead !== agent.is_board_lead ||
           JSON.stringify(previous?.identity_profile ?? {}) !==
-            JSON.stringify(agent.identity_profile ?? {}));
+          JSON.stringify(agent.identity_profile ?? {}));
 
       let kind: FeedEventType;
       if (isSnapshot) {
@@ -764,11 +764,11 @@ export default function ActivityPage() {
           boardId === null
             ? null
             : buildRouteHref("board", routeParams, {
-                eventId: agent.id,
-                eventType: kind,
-                createdAt: stamp,
-                taskId: null,
-              }),
+              eventId: agent.id,
+              eventType: kind,
+              createdAt: stamp,
+              taskId: null,
+            }),
       };
     },
     [boardNameForId],

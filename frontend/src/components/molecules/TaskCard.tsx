@@ -164,6 +164,7 @@ export function TaskCard({
               "flex items-center gap-2",
               isOverdue && "font-semibold text-rose-600",
             )}
+            suppressHydrationWarning={true}
           >
             <CalendarClock
               className={cn(
@@ -171,7 +172,7 @@ export function TaskCard({
                 isOverdue ? "text-rose-500" : "text-slate-400",
               )}
             />
-            <span>{due}</span>
+            <span suppressHydrationWarning={true}>{due}</span>
           </div>
         ) : null}
       </div>

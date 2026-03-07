@@ -253,7 +253,10 @@ export function DashboardSidebar() {
         </nav>
       </div>
       <div className="border-t border-slate-200 p-4">
-        <div className="flex items-center gap-2 text-xs text-slate-500">
+        <div
+          className="flex items-center gap-2 text-xs text-slate-500"
+          suppressHydrationWarning={true}
+        >
           <span
             className={cn(
               "h-2 w-2 rounded-full",

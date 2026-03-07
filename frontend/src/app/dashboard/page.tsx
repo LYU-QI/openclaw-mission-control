@@ -439,13 +439,12 @@ function InfoBlock({
         </div>
         {badge ? (
           <span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
-              badge.tone === "online"
+            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${badge.tone === "online"
                 ? "bg-emerald-100 text-emerald-700"
                 : badge.tone === "offline"
                   ? "bg-rose-100 text-rose-700"
                   : "bg-slate-200 text-slate-700"
-            }`}
+              }`}
           >
             {badge.text}
           </span>
@@ -456,15 +455,14 @@ function InfoBlock({
           <div key={`${row.label}-${row.value}`} className="flex items-start justify-between gap-3 px-3 py-2">
             <span className="min-w-0 text-sm text-slate-500">{row.label}</span>
             <span
-              className={`max-w-[65%] break-words text-right text-sm font-medium leading-5 ${
-                row.tone === "success"
+              className={`max-w-[65%] break-words text-right text-sm font-medium leading-5 ${row.tone === "success"
                   ? "text-emerald-700"
                   : row.tone === "warning"
                     ? "text-amber-700"
                     : row.tone === "danger"
                       ? "text-rose-700"
                       : "text-slate-800"
-              }`}
+                }`}
             >
               {row.value}
             </span>
@@ -723,8 +721,8 @@ export default function DashboardPage() {
     gatewayStatusLabel === "All connected"
       ? "online"
       : gatewayStatusLabel === "Partially connected" ||
-          gatewayStatusLabel === "Disconnected" ||
-          gatewayStatusLabel === "Unavailable"
+        gatewayStatusLabel === "Disconnected" ||
+        gatewayStatusLabel === "Unavailable"
         ? "offline"
         : "neutral";
   const gatewayStatusTone: SummaryRow["tone"] =
@@ -854,10 +852,10 @@ export default function DashboardPage() {
       Object.keys(routeParams).length > 0
         ? routeParams
         : {
-            eventId: event.id,
-            eventType: event.event_type,
-            createdAt: event.created_at,
-          },
+          eventId: event.id,
+          eventType: event.event_type,
+          createdAt: event.created_at,
+        },
     );
     if (event.task_id && !params.has("taskId")) {
       params.set("taskId", event.task_id);
@@ -995,7 +993,7 @@ export default function DashboardPage() {
                             {item.board_name} · {item.confidence}% score
                           </span>
                         </span>
-                        <span className="shrink-0 text-xs text-slate-500">
+                        <span className="shrink-0 text-xs text-slate-500" suppressHydrationWarning={true}>
                           {formatRelativeTimestamp(item.created_at)}
                         </span>
                       </Link>
@@ -1048,9 +1046,8 @@ export default function DashboardPage() {
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-sm font-medium text-slate-900">
                                 <span
-                                  className={`mr-2 inline-block h-2 w-2 rounded-full ${
-                                    session.isMain ? "bg-emerald-500" : "bg-slate-400"
-                                  }`}
+                                  className={`mr-2 inline-block h-2 w-2 rounded-full ${session.isMain ? "bg-emerald-500" : "bg-slate-400"
+                                    }`}
                                 />
                                 {session.title}
                               </p>
@@ -1060,7 +1057,7 @@ export default function DashboardPage() {
                               <p className="truncate text-xs font-medium text-slate-700">
                                 {session.usage === DASH ? "Usage unavailable" : session.usage}
                               </p>
-                              <p className="text-[11px] text-slate-500">
+                              <p className="text-[11px] text-slate-500" suppressHydrationWarning={true}>
                                 {session.lastSeenAt
                                   ? formatRelativeTimestamp(session.lastSeenAt)
                                   : "Activity unavailable"}
@@ -1102,7 +1099,7 @@ export default function DashboardPage() {
                           key={event.id}
                           role="link"
                           tabIndex={0}
-                        aria-label={`Open related context for ${event.event_type} activity`}
+                          aria-label={`Open related context for ${event.event_type} activity`}
                           onClick={(interactionEvent) =>
                             handleLogRowClick(interactionEvent, eventHref)
                           }
@@ -1123,7 +1120,7 @@ export default function DashboardPage() {
                                 {event.event_type}
                               </p>
                             </div>
-                            <div className="shrink-0 text-right text-[11px] text-slate-500">
+                            <div className="shrink-0 text-right text-[11px] text-slate-500" suppressHydrationWarning={true}>
                               <p>{formatRelativeTimestamp(event.created_at)}</p>
                               <p>{formatTimestamp(event.created_at)}</p>
                             </div>

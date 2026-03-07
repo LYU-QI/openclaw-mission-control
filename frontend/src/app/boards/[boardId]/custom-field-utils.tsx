@@ -59,7 +59,7 @@ const formatDateOnlyValue = (value: string): string => {
       parsed.getMonth() === month - 1 &&
       parsed.getDate() === day
     ) {
-      return parsed.toLocaleDateString(undefined, {
+      return parsed.toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -68,7 +68,7 @@ const formatDateOnlyValue = (value: string): string => {
   }
   const parsed = new Date(trimmed);
   if (Number.isNaN(parsed.getTime())) return trimmed;
-  return parsed.toLocaleDateString(undefined, {
+  return parsed.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -78,7 +78,7 @@ const formatDateOnlyValue = (value: string): string => {
 const formatDateTimeValue = (value: string): string => {
   const parsed = parseApiDatetime(value) ?? new Date(value);
   if (Number.isNaN(parsed.getTime())) return value;
-  return parsed.toLocaleString(undefined, {
+  return parsed.toLocaleString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -107,13 +107,13 @@ export const formatCustomFieldDetailValue = (
 
   if (fieldType === "integer" || fieldType === "decimal") {
     if (typeof value === "number" && Number.isFinite(value)) {
-      return value.toLocaleString();
+      return value.toLocaleString("en-US");
     }
     if (typeof value === "string") {
       const trimmed = value.trim();
       if (!trimmed) return "—";
       const parsed = Number(trimmed);
-      if (Number.isFinite(parsed)) return parsed.toLocaleString();
+      if (Number.isFinite(parsed)) return parsed.toLocaleString("en-US");
       return trimmed;
     }
     return customFieldInputText(value) || "—";
@@ -270,7 +270,7 @@ export const customFieldPayload = (
     const key = definition.field_key;
     acc[key] =
       Object.prototype.hasOwnProperty.call(values, key) &&
-      values[key] !== undefined
+        values[key] !== undefined
         ? values[key]
         : null;
     return acc;

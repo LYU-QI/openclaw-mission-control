@@ -149,7 +149,7 @@ export function LandingShell({ children }: { children: ReactNode }) {
         </div>
 
         <div className="footer-bottom">
-          <div className="footer-copyright">
+          <div className="footer-copyright" suppressHydrationWarning={true}>
             © {new Date().getFullYear()} OpenClaw. All rights reserved.
           </div>
           <div className="footer-bottom-links">

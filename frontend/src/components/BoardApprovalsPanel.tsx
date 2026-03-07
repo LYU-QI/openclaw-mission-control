@@ -55,7 +55,7 @@ const formatTimestamp = (value?: string | null) => {
   if (!value) return "—";
   const date = parseApiDatetime(value);
   if (!date) return value;
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",

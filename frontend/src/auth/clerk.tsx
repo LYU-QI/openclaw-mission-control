@@ -3,7 +3,7 @@
 // NOTE: We intentionally keep this file very small and dependency-free.
 // It provides CI/secretless-build safe fallbacks for Clerk hooks/components.
 
-import type { ReactNode, ComponentProps } from "react";
+import { ReactNode, ComponentProps, useEffect, useState } from "react";
 
 import {
   ClerkProvider,
@@ -18,10 +18,6 @@ import {
 import { isLikelyValidClerkPublishableKey } from "@/auth/clerkKey";
 import { getLocalAuthToken, isLocalAuthMode } from "@/auth/localAuth";
 
-function hasLocalAuthToken(): boolean {
-  return Boolean(getLocalAuthToken());
-}
-
 export function isClerkEnabled(): boolean {
   // IMPORTANT: keep this in sync with AuthProvider; otherwise components like
   // <SignedOut/> may render without a <ClerkProvider/> and crash during prerender.
@@ -32,16 +28,24 @@ export function isClerkEnabled(): boolean {
 }
 
 export function SignedIn(props: { children: ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   if (isLocalAuthMode()) {
-    return hasLocalAuthToken() ? <>{props.children}</> : null;
+    if (!mounted) return null;
+    return getLocalAuthToken() ? <>{props.children}</> : null;
   }
   if (!isClerkEnabled()) return null;
   return <ClerkSignedIn>{props.children}</ClerkSignedIn>;
 }
 
 export function SignedOut(props: { children: ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   if (isLocalAuthMode()) {
-    return hasLocalAuthToken() ? null : <>{props.children}</>;
+    if (!mounted) return null;
+    return getLocalAuthToken() ? null : <>{props.children}</>;
   }
   if (!isClerkEnabled()) return <>{props.children}</>;
   return <ClerkSignedOut>{props.children}</ClerkSignedOut>;
@@ -61,24 +65,32 @@ export function SignOutButton(
 }
 
 export function useUser() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   if (isLocalAuthMode()) {
+    const hasToken = mounted ? Boolean(getLocalAuthToken()) : false;
     return {
-      isLoaded: true,
-      isSignedIn: hasLocalAuthToken(),
+      isLoaded: mounted,
+      isSignedIn: hasToken,
       user: null,
     } as const;
   }
   if (!isClerkEnabled()) {
     return { isLoaded: true, isSignedIn: false, user: null } as const;
   }
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   return clerkUseUser();
 }
 
 export function useAuth() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   if (isLocalAuthMode()) {
-    const token = getLocalAuthToken();
+    const token = mounted ? getLocalAuthToken() : null;
     return {
-      isLoaded: true,
+      isLoaded: mounted,
       isSignedIn: Boolean(token),
       userId: token ? "local-user" : null,
       sessionId: token ? "local-session" : null,
@@ -94,6 +106,7 @@ export function useAuth() {
       getToken: async () => null,
     } as const;
   }
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   return clerkUseAuth();
 }
 

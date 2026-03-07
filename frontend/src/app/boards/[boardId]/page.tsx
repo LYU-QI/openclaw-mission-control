@@ -330,7 +330,7 @@ const toLiveFeedFromAgentUpdate = (
     (previous?.name !== agent.name ||
       previous?.is_board_lead !== agent.is_board_lead ||
       JSON.stringify(previous?.identity_profile ?? {}) !==
-        JSON.stringify(agent.identity_profile ?? {}));
+      JSON.stringify(agent.identity_profile ?? {}));
 
   let eventType: LiveFeedEventType;
   if (isNew) {
@@ -529,7 +529,7 @@ const SSE_RECONNECT_BACKOFF = {
 const formatShortTimestamp = (value: string) => {
   const date = parseApiDatetime(value);
   if (!date) return "—";
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -1551,16 +1551,16 @@ export default function BoardDetailPage() {
                 const payload = JSON.parse(data) as {
                   approval?: ApprovalRead;
                   task_counts?:
-                    | {
-                        task_id?: string;
-                        approvals_count?: number;
-                        approvals_pending_count?: number;
-                      }
-                    | Array<{
-                        task_id?: string;
-                        approvals_count?: number;
-                        approvals_pending_count?: number;
-                      }>;
+                  | {
+                    task_id?: string;
+                    approvals_count?: number;
+                    approvals_pending_count?: number;
+                  }
+                  | Array<{
+                    task_id?: string;
+                    approvals_count?: number;
+                    approvals_pending_count?: number;
+                  }>;
                   pending_approvals_count?: number;
                 };
                 if (payload.approval) {
@@ -1770,9 +1770,9 @@ export default function BoardDetailPage() {
                     if (index === -1) {
                       const assignee = incomingTask.assigned_agent_id
                         ? (agentsRef.current.find(
-                            (agent) =>
-                              agent.id === incomingTask.assigned_agent_id,
-                          )?.name ?? null)
+                          (agent) =>
+                            agent.id === incomingTask.assigned_agent_id,
+                        )?.name ?? null)
                         : null;
                       const created = normalizeTask({
                         ...incomingTask,
@@ -1786,9 +1786,9 @@ export default function BoardDetailPage() {
                     const existing = next[index];
                     const assignee = incomingTask.assigned_agent_id
                       ? (agentsRef.current.find(
-                          (agent) =>
-                            agent.id === incomingTask.assigned_agent_id,
-                        )?.name ?? null)
+                        (agent) =>
+                          agent.id === incomingTask.assigned_agent_id,
+                      )?.name ?? null)
                       : null;
                     const updated = normalizeTask({
                       ...existing,
@@ -2438,8 +2438,8 @@ export default function BoardDetailPage() {
         disabled: !dependencyTask,
         onClick: dependencyTask
           ? () => {
-              openComments({ id: dependencyId });
-            }
+            openComments({ id: dependencyId });
+          }
           : undefined,
       };
     });
@@ -2808,12 +2808,12 @@ export default function BoardDetailPage() {
         prev.map((task) =>
           task.id === taskId
             ? {
-                ...task,
-                status,
-                assigned_agent_id:
-                  status === "inbox" ? null : task.assigned_agent_id,
-                assignee: status === "inbox" ? null : task.assignee,
-              }
+              ...task,
+              status,
+              assigned_agent_id:
+                status === "inbox" ? null : task.assigned_agent_id,
+              assignee: status === "inbox" ? null : task.assignee,
+            }
             : task,
         ),
       );
@@ -2837,13 +2837,13 @@ export default function BoardDetailPage() {
         if (result.status === 422) {
           throw new Error(
             result.data.detail?.[0]?.msg ??
-              "Validation error while moving task.",
+            "Validation error while moving task.",
           );
         }
         const assignee = result.data.assigned_agent_id
           ? (agentsRef.current.find(
-              (agent) => agent.id === result.data.assigned_agent_id,
-            )?.name ?? null)
+            (agent) => agent.id === result.data.assigned_agent_id,
+          )?.name ?? null)
           : null;
         const updated = normalizeTask({
           ...currentTask,
@@ -2915,7 +2915,7 @@ export default function BoardDetailPage() {
     if (!value) return "—";
     const date = parseApiDatetime(value);
     if (!date) return "—";
-    return date.toLocaleString(undefined, {
+    return date.toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       hour: "2-digit",
@@ -2953,7 +2953,7 @@ export default function BoardDetailPage() {
     if (!value) return "—";
     const date = parseApiDatetime(value);
     if (!date) return value;
-    return date.toLocaleString(undefined, {
+    return date.toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       hour: "2-digit",
@@ -3369,7 +3369,7 @@ export default function BoardDetailPage() {
                           </div>
                           <div className="px-5 py-4">
                             {groupSnapshot.boards &&
-                            groupSnapshot.boards.length ? (
+                              groupSnapshot.boards.length ? (
                               <div className="grid gap-4 md:grid-cols-2">
                                 {groupSnapshot.boards.map((item) => (
                                   <div
@@ -3587,9 +3587,9 @@ export default function BoardDetailPage() {
                                   <p className="mt-1 text-xs text-slate-500">
                                     {task.description
                                       ? task.description
-                                          .toString()
-                                          .trim()
-                                          .slice(0, 120)
+                                        .toString()
+                                        .trim()
+                                        .slice(0, 120)
                                       : "No description"}
                                   </p>
                                 </div>

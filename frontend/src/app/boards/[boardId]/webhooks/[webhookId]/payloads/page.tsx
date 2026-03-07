@@ -192,7 +192,7 @@ export default function WebhookPayloadsPage() {
                   Payload {payload.id.slice(0, 8)}
                 </span>
                 <span className="text-xs text-slate-500">
-                  {new Date(payload.received_at).toLocaleString()}
+                  {new Date(payload.received_at).toLocaleString("en-US")}
                 </span>
               </div>
               <div className="grid gap-2 text-xs text-slate-600 md:grid-cols-2">

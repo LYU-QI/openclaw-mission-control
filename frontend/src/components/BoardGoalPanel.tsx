@@ -24,7 +24,7 @@ const formatTargetDate = (value?: string | null) => {
   if (!value) return "—";
   const date = parseApiDatetime(value);
   if (!date) return value;
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",

@@ -24,7 +24,7 @@ export const formatTimestamp = (
 ): string => {
   const date = parseTimestamp(value);
   if (!date) return fallback;
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
