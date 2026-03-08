@@ -14,6 +14,7 @@ from app.db import crud
 from app.db.pagination import paginate
 from app.db.session import get_session
 from app.models.agents import Agent
+from app.models.boards import Board
 from app.models.gateways import Gateway
 from app.models.skills import GatewayInstalledSkill
 from app.schemas.common import OkResponse
@@ -195,20 +196,20 @@ async def delete_gateway(
         gateway_id=gateway_id,
         organization_id=ctx.organization.id,
     )
-    main_agent = await service.find_main_agent(gateway)
-    if main_agent is not None:
-        await service.clear_agent_foreign_keys(agent_id=main_agent.id)
-        await session.delete(main_agent)
-
-    duplicate_main_agents = await Agent.objects.filter_by(
+    agents = await Agent.objects.filter_by(
         gateway_id=gateway.id,
-        board_id=None,
     ).all(session)
-    for agent in duplicate_main_agents:
-        if main_agent is not None and agent.id == main_agent.id:
-            continue
+    for agent in agents:
         await service.clear_agent_foreign_keys(agent_id=agent.id)
         await session.delete(agent)
+
+    await crud.update_where(
+        session,
+        Board,
+        col(Board.gateway_id) == gateway.id,
+        gateway_id=None,
+        commit=False,
+    )
 
     # NOTE: The migration declares `ondelete="CASCADE"` for gateway_installed_skills.gateway_id,
     # but some backends/test environments (e.g. SQLite without FK pragma) may not

@@ -499,8 +499,9 @@ async def test_non_lead_agent_move_to_review_reassigns_to_lead_and_sends_review_
                 config: Any,
                 agent_name: str,
                 message: str,
+                deliver: bool | None = None,
             ) -> None:
-                _ = dispatch, config
+                _ = dispatch, config, deliver
                 sent["session_key"] = session_key
                 sent["agent_name"] = agent_name
                 sent["message"] = message
@@ -616,8 +617,9 @@ async def test_lead_moves_review_task_to_inbox_and_reassigns_last_worker_with_re
                 config: Any,
                 agent_name: str,
                 message: str,
+                deliver: bool | None = None,
             ) -> None:
-                _ = dispatch, config
+                _ = dispatch, config, deliver
                 sent.append(
                     {
                         "session_key": session_key,
@@ -674,6 +676,70 @@ async def test_lead_moves_review_task_to_inbox_and_reassigns_last_worker_with_re
             final_message = worker_messages[-1]["message"]
             assert "CHANGES REQUESTED" in final_message
             assert "Please update error handling and add tests for edge cases." in final_message
+    finally:
+        await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_admin_can_assign_inbox_task_without_status_change() -> None:
+    engine = await _make_engine()
+    try:
+        async with await _make_session(engine) as session:
+            board_id = uuid4()
+            worker_id = uuid4()
+            task_id = uuid4()
+            gateway_id = uuid4()
+
+            session.add(
+                Board(
+                    id=board_id,
+                    organization_id=uuid4(),
+                    name="Board",
+                    slug="board",
+                ),
+            )
+            session.add(
+                Gateway(
+                    id=gateway_id,
+                    organization_id=uuid4(),
+                    name="Gateway",
+                    url="ws://gateway.example/ws",
+                    workspace_root="/tmp",
+                ),
+            )
+            session.add(
+                Agent(
+                    id=worker_id,
+                    board_id=board_id,
+                    gateway_id=gateway_id,
+                    name="Worker",
+                    status="online",
+                    openclaw_session_id="agent:worker:main",
+                ),
+            )
+            session.add(
+                Task(
+                    id=task_id,
+                    board_id=board_id,
+                    title="assign me",
+                    status="inbox",
+                    assigned_agent_id=None,
+                ),
+            )
+            await session.commit()
+
+            task = (await session.exec(select(Task).where(col(Task.id) == task_id))).first()
+            assert task is not None
+
+            updated = await tasks_api.update_task(
+                payload=TaskUpdate(assigned_agent_id=worker_id),
+                task=task,
+                session=session,
+                actor=ActorContext(actor_type="user", user=None),
+            )
+
+            assert updated.status == "inbox"
+            assert updated.assigned_agent_id == worker_id
     finally:
         await engine.dispose()
 

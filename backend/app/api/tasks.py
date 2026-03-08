@@ -571,7 +571,8 @@ async def _send_lead_task_message(
         config=config,
         agent_name="Lead Agent",
         message=message,
-        deliver=False,
+        # Task workflow notifications should wake the assignee/lead immediately.
+        deliver=True,
     )
 
 
@@ -588,7 +589,8 @@ async def _send_agent_task_message(
         config=config,
         agent_name=agent_name,
         message=message,
-        deliver=False,
+        # Task workflow notifications should wake the assignee/lead immediately.
+        deliver=True,
     )
 
 
@@ -2446,6 +2448,7 @@ async def _apply_admin_task_rules(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         if agent.board_id and update.task.board_id and agent.board_id != update.task.board_id:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT)
+        update.task.assigned_agent_id = agent.id
 
 
 async def _record_task_comment_from_update(

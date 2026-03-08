@@ -23,6 +23,8 @@ from app.api.skills_marketplace import (
 )
 from app.api.skills_marketplace import router as skills_marketplace_router
 from app.db.session import get_session
+from app.models.agents import Agent
+from app.models.boards import Board
 from app.models.gateways import Gateway
 from app.models.organization_members import OrganizationMember
 from app.models.organizations import Organization
@@ -220,6 +222,63 @@ async def test_delete_gateway_removes_installed_skill_rows() -> None:
                 )
             ).all()
             assert remaining_installs == []
+    finally:
+        await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_delete_gateway_clears_board_gateway_and_deletes_gateway_agents() -> None:
+    engine = await _make_engine()
+    session_maker = async_sessionmaker(
+        engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+    try:
+        async with session_maker() as session:
+            organization, gateway = await _seed_base(session)
+            board = Board(
+                organization_id=organization.id,
+                name="Board One",
+                slug="board-one",
+                gateway_id=gateway.id,
+            )
+            session.add(board)
+            await session.commit()
+            await session.refresh(board)
+
+            agent = Agent(
+                organization_id=organization.id,
+                board_id=board.id,
+                gateway_id=gateway.id,
+                name="Worker One",
+                status="offline",
+                openclaw_session_id=f"agent:mc-{uuid4()}:main",
+            )
+            session.add(agent)
+            await session.commit()
+            await session.refresh(agent)
+
+        app = _build_test_app(session_maker, organization=organization)
+        async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url="http://testserver",
+        ) as client:
+            response = await client.delete(f"/api/v1/gateways/{gateway.id}")
+
+        assert response.status_code == 200
+        assert response.json() == {"ok": True}
+
+        async with session_maker() as session:
+            deleted_gateway = await session.get(Gateway, gateway.id)
+            assert deleted_gateway is None
+
+            deleted_agent = await session.get(Agent, agent.id)
+            assert deleted_agent is None
+
+            updated_board = await session.get(Board, board.id)
+            assert updated_board is not None
+            assert updated_board.gateway_id is None
     finally:
         await engine.dispose()
 

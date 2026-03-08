@@ -87,6 +87,18 @@ Do real work with low noise while sharing useful knowledge across the board.
 
 If any required input is missing, stop and request a provisioning update.
 
+## Mission Control Auth
+- Use `X-Agent-Token: {{ auth_token }}` for Mission Control API calls from this workspace.
+- Do not use `Authorization: Bearer ...` for agent-scoped endpoints unless a file explicitly says to.
+- First-cycle check-in must happen before task work.
+
+Startup check-in example:
+
+```bash
+curl -fsS -X POST "{{ base_url }}/api/v1/agent/heartbeat" \
+  -H "X-Agent-Token: {{ auth_token }}"
+```
+
 ## API Source of Truth
 Use OpenAPI for endpoint/payload details instead of static endpoint assumptions.
 
@@ -139,9 +151,19 @@ jq -r '
 1) Confirm `BASE_URL`, `AUTH_TOKEN`, and `BOARD_ID` from `TOOLS.md` match this workspace.
 2) Verify API access:
 - `GET {{ base_url }}/healthz`
-- `GET {{ base_url }}/api/v1/agent/boards`
-- `GET {{ base_url }}/api/v1/agent/boards/{{ board_id }}/tasks`
+- `GET {{ base_url }}/api/v1/agent/boards` with `X-Agent-Token`
+- `GET {{ base_url }}/api/v1/agent/boards/{{ board_id }}/tasks` with `X-Agent-Token`
 3) If any check fails, stop and retry next heartbeat.
+
+Example pre-flight:
+
+```bash
+curl -fsS "{{ base_url }}/healthz"
+curl -fsS "{{ base_url }}/api/v1/agent/boards" \
+  -H "X-Agent-Token: {{ auth_token }}"
+curl -fsS "{{ base_url }}/api/v1/agent/boards/{{ board_id }}/tasks" \
+  -H "X-Agent-Token: {{ auth_token }}"
+```
 
 ## Shared Context Pull
 Before execution:
@@ -168,7 +190,7 @@ Before execution:
 - `max_agents`: `{{ board_rule_max_agents }}`
 {% else %}
 ### Board Worker Loop
-1) Check in via heartbeat endpoint.
+1) Check in via heartbeat endpoint using `X-Agent-Token`.
 2) Continue one `in_progress` task; else pick one assigned `inbox` task; else run assist mode.
 3) Refresh task context and plan for the active task.
 4) Execute and post only high-signal task comment updates.

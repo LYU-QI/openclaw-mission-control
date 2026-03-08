@@ -7,6 +7,7 @@ from types import SimpleNamespace
 from uuid import UUID, uuid4
 
 import pytest
+from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
 
 import app.services.openclaw.internal.agent_key as agent_key_mod
 import app.services.openclaw.provisioning as agent_provisioning
@@ -40,6 +41,17 @@ class _AgentStub:
     soul_template: str | None = None
 
 
+def _render_template(name: str, **context: object) -> str:
+    env = Environment(
+        loader=FileSystemLoader(str(agent_provisioning._templates_root())),
+        undefined=StrictUndefined,
+        autoescape=select_autoescape(disabled_extensions=("j2",), default_for_string=False),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    return env.get_template(name).render(**context)
+
+
 def test_agent_key_uses_session_key_when_present():
     agent = _AgentStub(name="Alice", openclaw_session_id="agent:alice:main")
     assert agent_provisioning._agent_key(agent) == "alice"
@@ -56,12 +68,91 @@ def test_workspace_path_preserves_tilde_in_workspace_root():
     assert agent_provisioning._workspace_path(agent, "~/.openclaw") == "~/.openclaw/workspace-alice"
 
 
-def test_wakeup_text_includes_bootstrap_before_agents():
+def test_wakeup_text_starts_from_agents_for_worker():
     agent = _AgentStub(name="Alice")
 
     text = agent_provisioning._wakeup_text(agent, verb="created")
 
-    assert "If BOOTSTRAP.md exists, read it first, then read AGENTS.md." in text
+    assert "Read AGENTS.md first." in text
+    assert "If AGENTS.md instructs a bootstrap step, follow it once." not in text
+
+
+def test_wakeup_text_mentions_optional_bootstrap_for_lead():
+    agent = _AgentStub(name="Lead", is_board_lead=True)
+
+    text = agent_provisioning._wakeup_text(agent, verb="updated")
+
+    assert "Read AGENTS.md first." in text
+    assert "If AGENTS.md instructs a bootstrap step, follow it once." in text
+
+
+def test_board_agents_worker_startup_prioritizes_heartbeat_before_memory_reads():
+    text = _render_template(
+        "BOARD_AGENTS.md.j2",
+        is_board_lead=False,
+        agent_name="codingAgent",
+        agent_id="agent-1",
+        user_timezone="UTC",
+    )
+
+    assert "Run the first heartbeat check-in immediately" in text
+    assert "### Phase 1: immediate startup" in text
+    assert "### Phase 2: continue after the first successful heartbeat" in text
+
+
+def test_board_worker_stale_file_candidates_remove_bootstrap_only():
+    gateway = _GatewayStub(
+        id=uuid4(),
+        name="G",
+        url="ws://x",
+        token=None,
+        workspace_root="/tmp",
+    )
+    manager = agent_provisioning.BoardAgentLifecycleManager(
+        gateway,
+        SimpleNamespace(),
+    )  # type: ignore[arg-type]
+    agent = _AgentStub(name="Worker")
+
+    assert manager._allow_stale_file_deletion(agent) is True
+    assert manager._stale_file_candidates(agent) == {"BOOTSTRAP.md"}
+
+
+def test_board_worker_file_names_include_bootstrap_compat_file():
+    gateway = _GatewayStub(
+        id=uuid4(),
+        name="G",
+        url="ws://x",
+        token=None,
+        workspace_root="/tmp",
+    )
+    manager = agent_provisioning.BoardAgentLifecycleManager(
+        gateway,
+        SimpleNamespace(),
+    )  # type: ignore[arg-type]
+    agent = _AgentStub(name="Worker")
+
+    assert "BOOTSTRAP.md" in manager._file_names(agent)
+
+
+def test_board_worker_template_overrides_use_worker_bootstrap_template():
+    gateway = _GatewayStub(
+        id=uuid4(),
+        name="G",
+        url="ws://x",
+        token=None,
+        workspace_root="/tmp",
+    )
+    manager = agent_provisioning.BoardAgentLifecycleManager(
+        gateway,
+        SimpleNamespace(),
+    )  # type: ignore[arg-type]
+    agent = _AgentStub(name="Worker")
+
+    overrides = manager._template_overrides(agent)
+
+    assert overrides is not None
+    assert overrides["BOOTSTRAP.md"] == "BOARD_BOOTSTRAP_WORKER.md.j2"
 
 
 def test_agent_lifecycle_workspace_path_preserves_tilde_in_workspace_root():

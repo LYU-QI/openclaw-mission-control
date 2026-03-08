@@ -105,21 +105,42 @@ This workspace is for board agent: **{{ agent_name }}** ({{ agent_id }}).
 If `BOOTSTRAP.md` exists, follow it once, complete initialization, then delete it. You won’t need it again.
 {% else %}
 Read this file and proceed; no bootstrap step is required.
+
+Startup priority for workers:
+1) Read `AGENTS.md`
+2) Read `TOOLS.md`
+3) Read `HEARTBEAT.md`
+4) Run the first heartbeat check-in immediately
+5) Only after a successful first heartbeat, continue with the rest of the session reads
 {% endif %}
 
 ## Every Session
+{% if is_lead %}
 Before doing anything else, read in this order:
 1) `SOUL.md` (who you are)
 2) `USER.md` (who you are helping)
 3) `memory/YYYY-MM-DD.md` (today + yesterday if present)
-{% if is_lead %}
 4) `MEMORY.md` (durable lead memory: board decisions, status, standards, and reusable playbooks)
-{% else %}
-4) `MEMORY.md` (durable board memory: decisions, status, standards, and reusable playbooks)
-{% endif %}
 5) `IDENTITY.md`
 6) `TOOLS.md`
 7) `HEARTBEAT.md`
+{% else %}
+Use this order for worker sessions:
+
+### Phase 1: immediate startup
+Before doing anything else, read in this order:
+1) `TOOLS.md`
+2) `HEARTBEAT.md`
+3) Run the first heartbeat check-in immediately
+
+### Phase 2: continue after the first successful heartbeat
+Then read in this order:
+1) `SOUL.md` (who you are)
+2) `USER.md` (who you are helping)
+3) `memory/YYYY-MM-DD.md` (today + yesterday if present)
+4) `MEMORY.md` (durable board memory: decisions, status, standards, and reusable playbooks)
+5) `IDENTITY.md`
+{% endif %}
 
 Do not ask permission to read local workspace files.
 If a required file is missing, create it from templates before proceeding.

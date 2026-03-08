@@ -5,6 +5,9 @@ This folder is the documentation home for **OpenClaw Mission Control**.
 ## Start here
 
 - [Getting started](./getting-started/README.md)
+- [10 分钟上手演练](./user-guide-10min.zh-CN.md)
+- [傻瓜式上手指南](./user-guide-simple.zh-CN.md)
+- [中文使用手册](./user-manual.zh-CN.md)
 - [Development](./development/README.md)
 - [Testing](./testing/README.md)
 - [Deployment](./deployment/README.md)

@@ -1,0 +1,17 @@
+# BOOTSTRAP.md
+
+_Compatibility note: some OpenClaw gateways create this file automatically for every agent workspace._
+
+For Mission Control board workers, this file is not the source of truth for startup.
+
+## What to do
+1. Stop here and return to `AGENTS.md`.
+2. Follow `AGENTS.md` as the canonical startup contract.
+3. Do not prompt the human to introduce themselves or define your identity.
+4. If `AGENTS.md` tells you to heartbeat immediately, do that.
+
+## Why this file exists
+- It prevents gateway-default bootstrap content from misleading the worker.
+- It keeps compatibility with gateways that expect a `BOOTSTRAP.md` file to exist.
+
+Leave this file in place unless Mission Control explicitly instructs you to change it.

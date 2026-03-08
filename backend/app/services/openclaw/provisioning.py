@@ -37,6 +37,7 @@ from app.services.openclaw.constants import (
     LEAD_TEMPLATE_MAP,
     MAIN_TEMPLATE_MAP,
     PRESERVE_AGENT_EDITABLE_FILES,
+    WORKER_BOOTSTRAP_TEMPLATE,
 )
 from app.services.openclaw.gateway_rpc import GatewayConfig as GatewayClientConfig
 from app.services.openclaw.gateway_rpc import (
@@ -998,19 +999,21 @@ class BoardAgentLifecycleManager(BaseAgentLifecycleManager):
         overrides = dict(BOARD_SHARED_TEMPLATE_MAP)
         if agent.is_board_lead:
             overrides.update(LEAD_TEMPLATE_MAP)
+        else:
+            overrides["BOOTSTRAP.md"] = WORKER_BOOTSTRAP_TEMPLATE
         return overrides
 
     def _file_names(self, agent: Agent) -> set[str]:
         if agent.is_board_lead:
             return set(LEAD_GATEWAY_FILES)
-        return super()._file_names(agent)
+        return super()._file_names(agent) | {"BOOTSTRAP.md"}
 
     def _allow_stale_file_deletion(self, agent: Agent) -> bool:
-        return bool(agent.is_board_lead)
+        return True
 
     def _stale_file_candidates(self, agent: Agent) -> set[str]:
         if not agent.is_board_lead:
-            return set()
+            return {"BOOTSTRAP.md"}
         return (
             set(DEFAULT_GATEWAY_FILES)
             | set(LEAD_GATEWAY_FILES)
@@ -1098,10 +1101,15 @@ def _should_include_bootstrap(
 
 
 def _wakeup_text(agent: Agent, *, verb: str) -> str:
+    startup_instruction = "Start the agent. Read AGENTS.md first."
+    if agent.is_board_lead or bool(getattr(agent, "is_gateway_main", False)):
+        startup_instruction = (
+            "Start the agent. Read AGENTS.md first. "
+            "If AGENTS.md instructs a bootstrap step, follow it once."
+        )
     return (
         f"Hello {agent.name}. Your workspace has been {verb}.\n\n"
-        "Start the agent. If BOOTSTRAP.md exists, read it first, then read AGENTS.md. "
-        "Begin heartbeats after startup."
+        f"{startup_instruction} Begin heartbeats after startup."
     )
 
 
