@@ -26,6 +26,14 @@ class GatewayCreate(GatewayBase):
 
     token: str | None = None
 
+    @field_validator("name", "url", "workspace_root", mode="before")
+    @classmethod
+    def trim_text_fields(cls, value: object) -> object:
+        """Trim surrounding whitespace from text fields."""
+        if isinstance(value, str):
+            return value.strip()
+        return value
+
     @field_validator("token", mode="before")
     @classmethod
     def normalize_token(cls, value: object) -> str | None | object:
@@ -47,6 +55,14 @@ class GatewayUpdate(SQLModel):
     workspace_root: str | None = None
     allow_insecure_tls: bool | None = None
     disable_device_pairing: bool | None = None
+
+    @field_validator("name", "url", "workspace_root", mode="before")
+    @classmethod
+    def trim_text_fields(cls, value: object) -> object:
+        """Trim surrounding whitespace from text fields."""
+        if isinstance(value, str):
+            return value.strip()
+        return value
 
     @field_validator("token", mode="before")
     @classmethod
