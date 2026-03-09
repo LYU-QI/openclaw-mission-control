@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
+from pydantic import field_validator
 from sqlmodel import Field, SQLModel
 
 RUNTIME_ANNOTATION_TYPES = (datetime, UUID)
@@ -105,6 +106,23 @@ class OrganizationInviteCreate(SQLModel):
     all_boards_read: bool = False
     all_boards_write: bool = False
     board_access: list[OrganizationBoardAccessSpec] = Field(default_factory=list)
+
+    @field_validator("invited_email", mode="before")
+    @classmethod
+    def normalize_invited_email(cls, value: object) -> object:
+        """Trim surrounding whitespace from invited email."""
+        if isinstance(value, str):
+            return value.strip()
+        return value
+
+    @field_validator("role", mode="before")
+    @classmethod
+    def normalize_role(cls, value: object) -> object:
+        """Trim/lower role text and default blank values to `member`."""
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            return normalized or "member"
+        return value
 
 
 class OrganizationInviteRead(SQLModel):
