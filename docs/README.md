@@ -4,6 +4,8 @@ This folder is the documentation home for **OpenClaw Mission Control**.
 
 ## Start here
 
+> Tip: Before local debugging of Agent tasks, run `openclaw gateway run` first.
+
 - [Getting started](./getting-started/README.md)
 - [10 分钟上手演练](./user-guide-10min.zh-CN.md)
 - [傻瓜式上手指南](./user-guide-simple.zh-CN.md)
