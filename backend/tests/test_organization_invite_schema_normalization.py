@@ -1,3 +1,6 @@
+import pytest
+from pydantic import ValidationError
+
 from app.schemas.organizations import OrganizationInviteCreate
 
 
@@ -18,3 +21,11 @@ def test_organization_invite_create_defaults_blank_role_to_member() -> None:
     )
 
     assert payload.role == "member"
+
+
+def test_organization_invite_create_rejects_blank_email() -> None:
+    with pytest.raises(ValidationError):
+        OrganizationInviteCreate(
+            invited_email="   ",
+            role="member",
+        )

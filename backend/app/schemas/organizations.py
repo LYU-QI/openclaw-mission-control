@@ -8,6 +8,8 @@ from uuid import UUID
 from pydantic import field_validator
 from sqlmodel import Field, SQLModel
 
+from app.schemas.common import NonEmptyStr
+
 RUNTIME_ANNOTATION_TYPES = (datetime, UUID)
 
 
@@ -101,7 +103,7 @@ class OrganizationMemberAccessUpdate(SQLModel):
 class OrganizationInviteCreate(SQLModel):
     """Payload for creating an organization invite."""
 
-    invited_email: str
+    invited_email: NonEmptyStr
     role: str = "member"
     all_boards_read: bool = False
     all_boards_write: bool = False
