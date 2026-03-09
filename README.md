@@ -49,6 +49,8 @@ Core operational areas:
 
 ## Get started in minutes
 
+> Tip: If you are debugging Agent tasks locally, keep `openclaw gateway run` running in another terminal.
+
 ### Option A: One-command production-style bootstrap
 
 If you haven't cloned the repo yet, you can run the installer in one line:
