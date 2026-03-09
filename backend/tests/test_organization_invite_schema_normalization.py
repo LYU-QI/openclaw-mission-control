@@ -7,7 +7,7 @@ def test_organization_invite_create_normalizes_email_and_role() -> None:
         role="  ADMIN  ",
     )
 
-    assert payload.invited_email == "Foo@Example.com"
+    assert payload.invited_email == "foo@example.com"
     assert payload.role == "admin"
 
 

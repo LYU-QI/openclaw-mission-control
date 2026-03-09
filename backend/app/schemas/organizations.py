@@ -110,9 +110,9 @@ class OrganizationInviteCreate(SQLModel):
     @field_validator("invited_email", mode="before")
     @classmethod
     def normalize_invited_email(cls, value: object) -> object:
-        """Trim surrounding whitespace from invited email."""
+        """Trim/lower invited email for consistent comparison behavior."""
         if isinstance(value, str):
-            return value.strip()
+            return value.strip().lower()
         return value
 
     @field_validator("role", mode="before")
