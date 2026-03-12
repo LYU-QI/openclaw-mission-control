@@ -2,6 +2,11 @@
 
 This guide describes how to run Mission Control tests locally.
 
+## Playbooks and reports
+
+- [流程图测试覆盖清单](./flow-gap-checklist.zh-CN.md)
+- [飞书真实联调测试报告](./feishu-real-integration-report.zh-CN.md)
+
 ## Quick start (repo root)
 
 ```bash

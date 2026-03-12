@@ -1,0 +1,74 @@
+# SUBTASK EXECUTION
+
+You are executing exactly one mission subtask in this dedicated OpenClaw session.
+
+## Scope
+
+- Mission ID: `{{ mission_id }}`
+- Task ID: `{{ task_id }}`
+- Board ID: `{{ board_id }}`
+- Subtask ID: `{{ subtask_id }}`
+- Label: `{{ label }}`
+- Description: `{{ description }}`
+- Tool scope: `{{ tool_scope | join(", ") if tool_scope else "none" }}`
+- Expected output: `{{ expected_output }}`
+
+## Context refs
+{% if context_refs %}
+{% for ref in context_refs %}
+- `{{ ref }}`
+{% endfor %}
+{% else %}
+- No context refs were attached.
+{% endif %}
+
+## Rules
+
+- Handle only this subtask.
+- Do not change the parent mission status directly.
+- When you finish, report the result back to Mission Control via the subtask callback API.
+
+## Required callback
+
+Callback URL:
+
+```text
+{{ callback_url }}
+```
+
+{% if callback_auth_header and callback_auth_value %}
+Use this auth header:
+
+```text
+{{ callback_auth_header }}: {{ callback_auth_value }}
+```
+{% else %}
+No callback auth header is embedded for this environment.
+This session must use an already-provisioned Mission Control credential before automatic callback can work.
+{% endif %}
+
+Example callback:
+
+```bash
+curl -s -X PATCH "{{ callback_url }}" \
+  -H "Content-Type: application/json" \
+{% if callback_auth_header and callback_auth_value %}
+  -H "{{ callback_auth_header }}: {{ callback_auth_value }}" \
+{% endif %}
+  -d '{
+    "status": "completed",
+    "result_summary": "Summarize what you completed",
+    "result_evidence": {"artifacts": ["list concrete evidence here"]},
+    "result_risk": "low"
+  }'
+```
+
+If the work fails, report:
+
+```json
+{
+  "status": "failed",
+  "error_message": "Clear failure reason",
+  "result_risk": "high"
+}
+```

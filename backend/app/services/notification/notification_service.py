@@ -9,7 +9,9 @@ from uuid import UUID
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.core.config import settings
 from app.models.notifications import NotificationConfig, NotificationLog
+from app.services.notification.feishu_bot import send_feishu_webhook
 
 logger = logging.getLogger(__name__)
 
@@ -131,22 +133,19 @@ class NotificationService:
             ],
         }
 
-        # Use FeishuClient for bot messaging (no app auth needed for webhook)
-        import json as _json
-        from urllib.request import Request, urlopen
-
-        data = _json.dumps({
+        response = send_feishu_webhook(
+            webhook_url=webhook_url,
+            payload={
             "msg_type": "interactive",
             "card": card_content,
-        }).encode()
-        req = Request(
-            webhook_url,
-            data=data,
-            headers={"Content-Type": "application/json"},
-            method="POST",
+            },
+            secret=str(
+                channel_config.get("webhook_secret")
+                or settings.feishu_bot_webhook_secret
+                or ""
+            ),
         )
-        with urlopen(req, timeout=10) as resp:  # noqa: S310
-            return _json.loads(resp.read())  # type: ignore[no-any-return]
+        return response
 
     def _send_webhook(
         self,

@@ -17,6 +17,7 @@ from app.services.feishu.queue_tasks import (
     process_feishu_queue_task,
     requeue_feishu_queue_task,
 )
+from app.services.missions.subtask_timeout import fail_timed_out_subtasks
 from app.services.openclaw.lifecycle_queue import TASK_TYPE as LIFECYCLE_RECONCILE_TASK_TYPE
 from app.services.openclaw.lifecycle_queue import (
     requeue_lifecycle_queue_task,
@@ -92,6 +93,24 @@ async def _run_feishu_scheduler_if_due(last_run_at: float) -> float:
     return now
 
 
+async def _run_subtask_timeout_scan_if_due(last_run_at: float) -> float:
+    interval_seconds = max(float(settings.mission_subtask_scheduler_interval_seconds), 1.0)
+    now = time.monotonic()
+    if now - last_run_at < interval_seconds:
+        return last_run_at
+    try:
+        async with async_session_maker() as session:
+            timed_out_count = await fail_timed_out_subtasks(session)
+        if timed_out_count > 0:
+            logger.info(
+                "queue.worker.subtask_timeout_failed",
+                extra={"timed_out_count": timed_out_count},
+            )
+    except Exception:
+        logger.exception("queue.worker.subtask_timeout_scan_failed")
+    return now
+
+
 async def flush_queue(*, block: bool = False, block_timeout: float = 0) -> int:
     """Consume one queue batch and dispatch by task type."""
     processed = 0
@@ -162,9 +181,13 @@ async def flush_queue(*, block: bool = False, block_timeout: float = 0) -> int:
 
 async def _run_worker_loop() -> None:
     scheduler_last_run_at = 0.0
+    timeout_scan_last_run_at = 0.0
     while True:
         try:
             scheduler_last_run_at = await _run_feishu_scheduler_if_due(scheduler_last_run_at)
+            timeout_scan_last_run_at = await _run_subtask_timeout_scan_if_due(
+                timeout_scan_last_run_at
+            )
             await flush_queue(
                 block=True,
                 # Keep a finite timeout so scheduled tasks are periodically drained.

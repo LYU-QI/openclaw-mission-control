@@ -587,6 +587,257 @@ async def _run_approval_rejection_flow(monkeypatch: pytest.MonkeyPatch) -> None:
         await ctx.engine.dispose()
 
 
+async def _run_subagent_dispatch_flow(monkeypatch: pytest.MonkeyPatch) -> None:
+    ctx = await _bootstrap(monkeypatch)
+    sent_messages: list[dict[str, object]] = []
+
+    async def _fake_optional_gateway_config_for_board(self: object, board: Board) -> object:
+        del self, board
+        return object()
+
+    async def _fake_send_agent_message(
+        self: object,
+        *,
+        session_key: str,
+        config: object,
+        agent_name: str,
+        message: str,
+        deliver: bool = False,
+    ) -> None:
+        del self, config
+        sent_messages.append(
+            {
+                "session_key": session_key,
+                "agent_name": agent_name,
+                "message": message,
+                "deliver": deliver,
+            }
+        )
+
+    monkeypatch.setattr(
+        "app.services.openclaw.gateway_dispatch.GatewayDispatchService.optional_gateway_config_for_board",
+        _fake_optional_gateway_config_for_board,
+    )
+    monkeypatch.setattr(
+        "app.services.openclaw.gateway_dispatch.GatewayDispatchService.send_agent_message",
+        _fake_send_agent_message,
+    )
+    monkeypatch.setattr("app.core.config.settings.auth_mode", "local")
+    monkeypatch.setattr(
+        "app.core.config.settings.local_auth_token",
+        "local-dev-token-openclaw-mission-control-2026-bootstrap-abcdef",
+    )
+
+    try:
+        async with AsyncClient(
+            transport=ASGITransport(app=ctx.app),
+            base_url="http://testserver",
+        ) as client:
+            await _create_and_trigger_feishu_sync(client, ctx)
+
+            async with ctx.session_maker() as session:
+                task = (
+                    await session.exec(
+                        select(Task).where(Task.external_id == "rec-e2e-1"),
+                    )
+                ).first()
+                assert task is not None
+                task_id = task.id
+
+            mission_resp = await client.post(
+                "/api/v1/missions",
+                json={
+                    "task_id": str(task_id),
+                    "board_id": str(ctx.board_id),
+                    "goal": "Dispatch decomposed subtasks into dedicated subagent sessions",
+                    "approval_policy": "auto",
+                },
+            )
+            assert mission_resp.status_code == 201
+            mission_id = mission_resp.json()["id"]
+
+            dispatch_resp = await client.post(
+                f"/api/v1/missions/{mission_id}/dispatch",
+                json={"force": False},
+            )
+            assert dispatch_resp.status_code == 200
+
+            subtasks_resp = await client.get(f"/api/v1/missions/{mission_id}/subtasks")
+            assert subtasks_resp.status_code == 200
+            subtasks = subtasks_resp.json()
+            assert len(subtasks) >= 2
+            assigned_ids = [item["assigned_subagent_id"] for item in subtasks]
+            assert all(assigned_ids)
+            assert len(set(assigned_ids)) == len(assigned_ids)
+            assert len(sent_messages) == len(subtasks)
+            assert all(item["deliver"] is True for item in sent_messages)
+            assert all("/api/v1/missions/subtasks/" in str(item["message"]) for item in sent_messages)
+            assert all("Authorization: Bearer " in str(item["message"]) for item in sent_messages)
+    finally:
+        await ctx.engine.dispose()
+
+
+async def _run_auto_aggregation_after_last_subtask_flow(monkeypatch: pytest.MonkeyPatch) -> None:
+    ctx = await _bootstrap(monkeypatch)
+    try:
+        async with AsyncClient(
+            transport=ASGITransport(app=ctx.app),
+            base_url="http://testserver",
+        ) as client:
+            await _create_and_trigger_feishu_sync(client, ctx)
+
+            async with ctx.session_maker() as session:
+                task = (
+                    await session.exec(
+                        select(Task).where(Task.external_id == "rec-e2e-1"),
+                    )
+                ).first()
+                assert task is not None
+                task_id = task.id
+
+            mission_resp = await client.post(
+                "/api/v1/missions",
+                json={
+                    "task_id": str(task_id),
+                    "board_id": str(ctx.board_id),
+                    "goal": "Auto aggregate after the final subtask reports back",
+                    "approval_policy": "auto",
+                },
+            )
+            assert mission_resp.status_code == 201
+            mission_id = mission_resp.json()["id"]
+
+            dispatch_resp = await client.post(
+                f"/api/v1/missions/{mission_id}/dispatch",
+                json={"force": False},
+            )
+            assert dispatch_resp.status_code == 200
+
+            start_resp = await client.post(f"/api/v1/missions/{mission_id}/start")
+            assert start_resp.status_code == 200
+
+            subtasks_resp = await client.get(f"/api/v1/missions/{mission_id}/subtasks")
+            assert subtasks_resp.status_code == 200
+            subtasks = subtasks_resp.json()
+            assert len(subtasks) >= 2
+
+            for index, subtask in enumerate(subtasks):
+                patch_resp = await client.patch(
+                    f"/api/v1/missions/subtasks/{subtask['id']}",
+                    json={
+                        "status": "completed",
+                        "result_summary": f"subtask-{index + 1}-done",
+                        "result_risk": "low",
+                    },
+                )
+                assert patch_resp.status_code == 200
+
+            mission_after = await client.get(f"/api/v1/missions/{mission_id}")
+            assert mission_after.status_code == 200
+            payload = mission_after.json()
+            assert payload["status"] == "completed"
+            assert payload["result_evidence"] is not None
+            assert payload["result_evidence"]["stats"]["completed"] == len(subtasks)
+
+            timeline_resp = await client.get(f"/api/v1/missions/{mission_id}/timeline")
+            assert timeline_resp.status_code == 200
+            event_types = {item["event_type"] for item in timeline_resp.json()}
+            assert "subtask_completed" in event_types
+            assert "mission_completed" in event_types
+    finally:
+        await ctx.engine.dispose()
+
+
+async def _run_subtask_redispatch_flow(monkeypatch: pytest.MonkeyPatch) -> None:
+    ctx = await _bootstrap(monkeypatch)
+    sent_messages: list[str] = []
+
+    async def _fake_optional_gateway_config_for_board(self: object, board: Board) -> object:
+        del self, board
+        return object()
+
+    async def _fake_send_agent_message(
+        self: object,
+        *,
+        session_key: str,
+        config: object,
+        agent_name: str,
+        message: str,
+        deliver: bool = False,
+    ) -> None:
+        del self, config, agent_name, deliver
+        sent_messages.append(session_key)
+
+    monkeypatch.setattr(
+        "app.services.openclaw.gateway_dispatch.GatewayDispatchService.optional_gateway_config_for_board",
+        _fake_optional_gateway_config_for_board,
+    )
+    monkeypatch.setattr(
+        "app.services.openclaw.gateway_dispatch.GatewayDispatchService.send_agent_message",
+        _fake_send_agent_message,
+    )
+
+    try:
+        async with AsyncClient(
+            transport=ASGITransport(app=ctx.app),
+            base_url="http://testserver",
+        ) as client:
+            await _create_and_trigger_feishu_sync(client, ctx)
+
+            async with ctx.session_maker() as session:
+                task = (
+                    await session.exec(
+                        select(Task).where(Task.external_id == "rec-e2e-1"),
+                    )
+                ).first()
+                assert task is not None
+                task_id = task.id
+
+            mission_resp = await client.post(
+                "/api/v1/missions",
+                json={
+                    "task_id": str(task_id),
+                    "board_id": str(ctx.board_id),
+                    "goal": "Redispatch a failed subtask",
+                    "approval_policy": "auto",
+                },
+            )
+            assert mission_resp.status_code == 201
+            mission_id = mission_resp.json()["id"]
+
+            dispatch_resp = await client.post(
+                f"/api/v1/missions/{mission_id}/dispatch",
+                json={"force": False},
+            )
+            assert dispatch_resp.status_code == 200
+
+            subtasks_resp = await client.get(f"/api/v1/missions/{mission_id}/subtasks")
+            assert subtasks_resp.status_code == 200
+            subtasks = subtasks_resp.json()
+            first_subtask = subtasks[0]
+
+            fail_resp = await client.patch(
+                f"/api/v1/missions/subtasks/{first_subtask['id']}",
+                json={"status": "failed", "error_message": "transient error", "result_risk": "high"},
+            )
+            assert fail_resp.status_code == 200
+
+            redispatch_resp = await client.post(f"/api/v1/missions/subtasks/{first_subtask['id']}/redispatch")
+            assert redispatch_resp.status_code == 200
+            redispatched = redispatch_resp.json()
+            assert redispatched["status"] == "pending"
+            assert redispatched["error_message"] is None
+            assert redispatched["assigned_subagent_id"] is not None
+
+            mission_after = await client.get(f"/api/v1/missions/{mission_id}")
+            assert mission_after.status_code == 200
+            assert mission_after.json()["status"] == "running"
+
+            assert sent_messages.count(redispatched["assigned_subagent_id"]) >= 2
+    finally:
+        await ctx.engine.dispose()
+
+
 def test_feishu_sync_creates_task_and_history(monkeypatch: pytest.MonkeyPatch) -> None:
     asyncio.run(_run_feishu_sync_flow(monkeypatch))
 
@@ -609,3 +860,15 @@ def test_approved_pending_mission_becomes_completed(monkeypatch: pytest.MonkeyPa
 
 def test_rejected_pending_mission_becomes_failed(monkeypatch: pytest.MonkeyPatch) -> None:
     asyncio.run(_run_approval_rejection_flow(monkeypatch))
+
+
+def test_subagent_dispatch_flow(monkeypatch: pytest.MonkeyPatch) -> None:
+    asyncio.run(_run_subagent_dispatch_flow(monkeypatch))
+
+
+def test_auto_aggregation_after_last_subtask(monkeypatch: pytest.MonkeyPatch) -> None:
+    asyncio.run(_run_auto_aggregation_after_last_subtask_flow(monkeypatch))
+
+
+def test_subtask_redispatch_flow(monkeypatch: pytest.MonkeyPatch) -> None:
+    asyncio.run(_run_subtask_redispatch_flow(monkeypatch))

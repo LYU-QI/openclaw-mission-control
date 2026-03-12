@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from typing import Any
+from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 logger = logging.getLogger(__name__)
@@ -115,6 +116,38 @@ class FeishuClient:
             f"/tables/{table_id}/records/{record_id}"
         )
         return self._request("PUT", url, body={"fields": fields})
+
+    # ------------------------------------------------------------------
+    # Docx (document) operations
+    # ------------------------------------------------------------------
+
+    def get_doc_raw_content(self, document_id: str) -> dict[str, Any]:
+        """Fetch the plain-text content of a Feishu docx document."""
+        url = f"{FEISHU_BASE_URL}/docx/v1/documents/{document_id}/raw_content"
+        return self._request("GET", url)
+
+    # ------------------------------------------------------------------
+    # IM (chat message) operations
+    # ------------------------------------------------------------------
+
+    def list_chat_messages(
+        self,
+        chat_id: str,
+        *,
+        page_size: int = 20,
+        sort_type: str = "ByCreateTimeAsc",
+    ) -> dict[str, Any]:
+        """Fetch messages from a Feishu chat."""
+        query = urlencode(
+            {
+                "container_id_type": "chat",
+                "container_id": chat_id,
+                "page_size": page_size,
+                "sort_type": sort_type,
+            }
+        )
+        url = f"{FEISHU_BASE_URL}/im/v1/messages?{query}"
+        return self._request("GET", url)
 
     # ------------------------------------------------------------------
     # Bot messaging

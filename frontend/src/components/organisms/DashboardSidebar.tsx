@@ -55,21 +55,21 @@ export function DashboardSidebar() {
           : "unknown";
   const statusLabel =
     systemStatus === "operational"
-      ? "All systems operational"
+      ? "系统运行正常"
       : systemStatus === "unknown"
-        ? "System status unavailable"
-        : "System degraded";
+        ? "系统状态暂不可用"
+        : "系统存在异常";
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-slate-200 bg-white">
       <div className="flex-1 px-3 py-4">
         <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-          Navigation
+          导航
         </p>
         <nav className="mt-3 space-y-4 text-sm">
           <div>
             <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              Overview
+              总览
             </p>
             <div className="mt-1 space-y-1">
               <Link
@@ -82,7 +82,7 @@ export function DashboardSidebar() {
                 )}
               >
                 <BarChart3 className="h-4 w-4" />
-                Dashboard
+                仪表盘
               </Link>
               <Link
                 href="/activity"
@@ -94,14 +94,14 @@ export function DashboardSidebar() {
                 )}
               >
                 <Activity className="h-4 w-4" />
-                Live feed
+                实时动态
               </Link>
             </div>
           </div>
 
           <div>
             <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              Boards
+              看板
             </p>
             <div className="mt-1 space-y-1">
               <Link
@@ -114,7 +114,7 @@ export function DashboardSidebar() {
                 )}
               >
                 <Folder className="h-4 w-4" />
-                Board groups
+                看板分组
               </Link>
               <Link
                 href="/boards"
@@ -126,7 +126,7 @@ export function DashboardSidebar() {
                 )}
               >
                 <LayoutGrid className="h-4 w-4" />
-                Boards
+                看板
               </Link>
               <Link
                 href="/tags"
@@ -138,7 +138,7 @@ export function DashboardSidebar() {
                 )}
               >
                 <Tags className="h-4 w-4" />
-                Tags
+                标签
               </Link>
               <Link
                 href="/approvals"
@@ -150,7 +150,7 @@ export function DashboardSidebar() {
                 )}
               >
                 <CheckCircle2 className="h-4 w-4" />
-                Approvals
+                审批
               </Link>
               {isAdmin ? (
                 <Link
@@ -163,7 +163,7 @@ export function DashboardSidebar() {
                   )}
                 >
                   <Settings className="h-4 w-4" />
-                  Custom fields
+                  自定义字段
                 </Link>
               ) : null}
             </div>
@@ -171,7 +171,7 @@ export function DashboardSidebar() {
 
           <div>
             <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              Orchestration
+              编排
             </p>
             <div className="mt-1 space-y-1">
               <Link
@@ -196,7 +196,7 @@ export function DashboardSidebar() {
                 )}
               >
                 <RefreshCw className="h-4 w-4" />
-                Feishu sync
+                飞书同步
               </Link>
               <Link
                 href="/notifications"
@@ -208,7 +208,7 @@ export function DashboardSidebar() {
                 )}
               >
                 <Bell className="h-4 w-4" />
-                Notifications
+                通知
               </Link>
             </div>
           </div>
@@ -217,7 +217,7 @@ export function DashboardSidebar() {
             {isAdmin ? (
               <>
                 <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Skills
+                  技能
                 </p>
                 <div className="mt-1 space-y-1">
                   <Link
@@ -231,7 +231,7 @@ export function DashboardSidebar() {
                     )}
                   >
                     <Store className="h-4 w-4" />
-                    Marketplace
+                    市场
                   </Link>
                   <Link
                     href="/skills/packs"
@@ -243,7 +243,7 @@ export function DashboardSidebar() {
                     )}
                   >
                     <Boxes className="h-4 w-4" />
-                    Packs
+                    技能包
                   </Link>
                 </div>
               </>
@@ -252,7 +252,7 @@ export function DashboardSidebar() {
 
           <div>
             <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              Administration
+              管理
             </p>
             <div className="mt-1 space-y-1">
               <Link

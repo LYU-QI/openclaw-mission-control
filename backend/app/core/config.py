@@ -68,9 +68,17 @@ class Settings(BaseSettings):
     rq_dispatch_retry_max_seconds: float = 120.0
 
     # Feishu sync scheduler
+    feishu_app_id: str = ""
+    feishu_app_secret: str = ""
+    feishu_bot_webhook_url: str = ""
+    feishu_bot_webhook_secret: str = ""
     feishu_sync_enabled: bool = True
     feishu_sync_default_interval_minutes: int = 15
     feishu_sync_scheduler_interval_seconds: float = 30.0
+
+    # Mission subtask timeout scanning
+    mission_subtask_timeout_minutes: int = 30
+    mission_subtask_scheduler_interval_seconds: float = 30.0
 
     # Context loading controls
     context_loader_max_tokens: int = 8000

@@ -24,6 +24,7 @@ from app.services.notification.notification_service import NotificationService
 from app.services.openclaw.aggregator.aggregator import ResultAggregator
 from app.services.openclaw.context.loader import ContextLoader
 from app.services.openclaw.decomposer.decomposer import TaskDecomposer
+from app.services.openclaw.subagent_dispatch import SubagentDispatchService
 from app.services.activity_log import record_activity
 
 logger = logging.getLogger(__name__)
@@ -123,6 +124,7 @@ class MissionOrchestrator:
         self.session.add(mission)
 
         await self._ensure_subtasks_for_mission(mission)
+        await SubagentDispatchService(self.session).dispatch_subtasks_for_mission(mission)
 
         # Update associated task status
         task = await Task.objects.by_id(mission.task_id).first(self.session)
@@ -426,6 +428,20 @@ class MissionOrchestrator:
         await self.session.refresh(subtask)
         return subtask
 
+    async def _all_subtasks_terminal(self, mission_id: UUID) -> bool:
+        rows = list(
+            (
+                await self.session.exec(
+                    select(MissionSubtask)
+                    .where(MissionSubtask.mission_id == mission_id)
+                    .order_by(MissionSubtask.order),
+                )
+            ).all()
+        )
+        if not rows:
+            return False
+        return all(row.status in {"completed", "failed"} for row in rows)
+
     async def update_subtask_status(
         self,
         subtask_id: UUID,
@@ -440,6 +456,7 @@ class MissionOrchestrator:
         subtask = await MissionSubtask.objects.by_id(subtask_id).first(self.session)
         if subtask is None:
             raise ValueError(f"Subtask {subtask_id} not found")
+        mission = await Mission.objects.by_id(subtask.mission_id).first(self.session)
 
         subtask.status = status
         if status == "running":
@@ -458,8 +475,49 @@ class MissionOrchestrator:
         subtask.updated_at = utcnow()
         self.session.add(subtask)
 
+        if mission is not None:
+            if status == "running":
+                record_activity(
+                    self.session,
+                    event_type="subtask_started",
+                    message=f"Subtask started: {subtask.label}",
+                    task_id=mission.task_id,
+                    board_id=mission.board_id,
+                    agent_id=mission.agent_id,
+                )
+            elif status == "completed":
+                record_activity(
+                    self.session,
+                    event_type="subtask_completed",
+                    message=f"Subtask completed: {subtask.label}",
+                    task_id=mission.task_id,
+                    board_id=mission.board_id,
+                    agent_id=mission.agent_id,
+                )
+            elif status == "failed":
+                record_activity(
+                    self.session,
+                    event_type="subtask_failed",
+                    message=f"Subtask failed: {subtask.label}",
+                    task_id=mission.task_id,
+                    board_id=mission.board_id,
+                    agent_id=mission.agent_id,
+                )
+
         await self.session.commit()
         await self.session.refresh(subtask)
+
+        if (
+            mission is not None
+            and mission.status in {"dispatched", "running"}
+            and status in {"completed", "failed"}
+            and await self._all_subtasks_terminal(mission.id)
+        ):
+            mission.status = "aggregating"
+            mission.updated_at = utcnow()
+            self.session.add(mission)
+            await self.session.commit()
+            await self.complete_mission(mission.id)
         return subtask
 
     async def get_mission_subtasks(self, mission_id: UUID) -> list[MissionSubtask]:
@@ -471,3 +529,42 @@ class MissionOrchestrator:
         )
         result = await self.session.exec(stmt)
         return list(result.all())
+
+    async def redispatch_subtask(self, subtask_id: UUID) -> MissionSubtask:
+        """Reset and redispatch a subtask into its dedicated session."""
+        subtask = await MissionSubtask.objects.by_id(subtask_id).first(self.session)
+        if subtask is None:
+            raise ValueError(f"Subtask {subtask_id} not found")
+        mission = await Mission.objects.by_id(subtask.mission_id).first(self.session)
+        if mission is None:
+            raise ValueError(f"Mission {subtask.mission_id} not found")
+
+        subtask.status = "pending"
+        subtask.result_summary = None
+        subtask.result_evidence = None
+        subtask.result_risk = None
+        subtask.error_message = None
+        subtask.started_at = None
+        subtask.completed_at = None
+        subtask.updated_at = utcnow()
+        self.session.add(subtask)
+
+        mission.status = "running"
+        mission.completed_at = None
+        mission.error_message = None
+        mission.updated_at = utcnow()
+        self.session.add(mission)
+
+        record_activity(
+            self.session,
+            event_type="subtask_redispatched",
+            message=f"Subtask redispatched: {subtask.label}",
+            task_id=mission.task_id,
+            board_id=mission.board_id,
+            agent_id=mission.agent_id,
+        )
+
+        await SubagentDispatchService(self.session).dispatch_subtask(mission, subtask)
+        await self.session.commit()
+        await self.session.refresh(subtask)
+        return subtask

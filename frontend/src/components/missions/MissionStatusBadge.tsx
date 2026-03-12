@@ -2,6 +2,21 @@
 
 import { cn } from "@/lib/utils";
 
+const statusLabelMap: Record<string, string> = {
+  pending: "待处理",
+  dispatched: "已派发",
+  running: "执行中",
+  aggregating: "聚合中",
+  completed: "已完成",
+  failed: "失败",
+  pending_approval: "待审批",
+  cancelled: "已取消",
+  inbox: "收件箱",
+  in_progress: "进行中",
+  review: "评审中",
+  done: "已完成",
+};
+
 export function MissionStatusBadge({ status }: { status: string }) {
   return (
     <span
@@ -16,8 +31,7 @@ export function MissionStatusBadge({ status }: { status: string }) {
           "bg-slate-100 text-slate-700",
       )}
     >
-      {status}
+      {statusLabelMap[status] ?? status}
     </span>
   );
 }
-

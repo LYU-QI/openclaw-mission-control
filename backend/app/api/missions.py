@@ -353,3 +353,17 @@ async def update_subtask(
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.post("/subtasks/{subtask_id}/redispatch", response_model=SubtaskRead)
+async def redispatch_subtask(
+    subtask_id: UUID,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> MissionSubtask:
+    """Reset and redispatch a subtask into its dedicated OpenClaw session."""
+    orchestrator = MissionOrchestrator(session)
+    try:
+        return await orchestrator.redispatch_subtask(subtask_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
