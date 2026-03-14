@@ -25,6 +25,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SearchableSelect from "@/components/ui/searchable-select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const slugify = (value: string) =>
   value
@@ -41,6 +48,7 @@ export default function NewBoardPage() {
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [boardType, setBoardType] = useState("goal");
   const [gatewayId, setGatewayId] = useState<string>("");
   const [boardGroupId, setBoardGroupId] = useState<string>("none");
 
@@ -72,7 +80,9 @@ export default function NewBoardPage() {
     mutation: {
       onSuccess: (result) => {
         if (result.status === 200) {
-          router.push(`/boards/${result.data.id}/edit?onboarding=1`);
+          // Only show onboarding for Goal boards, not Task boards
+          const onboardingParam = boardType === "goal" ? "?onboarding=1" : "";
+          router.push(`/boards/${result.data.id}/edit${onboardingParam}`);
         }
       },
       onError: (err) => {
@@ -115,6 +125,11 @@ export default function NewBoardPage() {
     [groups],
   );
 
+  const boardTypeOptions = [
+    { value: "goal", label: "Goal (目标看板)" },
+    { value: "task", label: "Task (任务看板)" },
+  ];
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isSignedIn) return;
@@ -141,6 +156,7 @@ export default function NewBoardPage() {
         name: trimmedName,
         slug: slugify(trimmedName),
         description: trimmedDescription,
+        board_type: boardType,
         gateway_id: resolvedGatewayId,
         board_group_id: boardGroupId === "none" ? null : boardGroupId,
       },
@@ -178,6 +194,30 @@ export default function NewBoardPage() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-900">
+                Board type <span className="text-red-500">*</span>
+              </label>
+              <Select value={boardType} onValueChange={setBoardType} disabled={isLoading}>
+                <SelectTrigger className="w-full h-11 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                  <SelectValue placeholder="Select board type" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border border-slate-200 shadow-lg">
+                  {boardTypeOptions.map((option) => (
+                    <SelectItem
+                      key={option.value}
+                      value={option.value}
+                      className="px-4 py-3 text-sm text-slate-700 data-[selected=true]:bg-slate-50 data-[selected=true]:text-slate-900"
+                    >
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-900">
                 Gateway <span className="text-red-500">*</span>
               </label>
               <SearchableSelect
@@ -193,9 +233,6 @@ export default function NewBoardPage() {
                 itemClassName="px-4 py-3 text-sm text-slate-700 data-[selected=true]:bg-slate-50 data-[selected=true]:text-slate-900"
               />
             </div>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-900">
                 Board group

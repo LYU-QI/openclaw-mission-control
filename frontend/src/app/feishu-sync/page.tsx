@@ -60,7 +60,7 @@ type TriggerResult = {
   conflicts_count: number;
 };
 
-const DEMO_ORG_ID = "00000000-0000-0000-0000-000000000001";
+const DEMO_ORG_ID = "3a9ff3b7-7f21-4e68-8c01-0919db770bcd"; // Personal organization
 
 export default function FeishuSyncPage() {
   const queryClient = useQueryClient();

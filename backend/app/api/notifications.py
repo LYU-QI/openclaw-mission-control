@@ -47,6 +47,7 @@ async def create_notification_config(
     config = NotificationConfig(
         organization_id=payload.organization_id,
         board_id=payload.board_id,
+        name=payload.name,
         channel_type=payload.channel_type,
         channel_config=payload.channel_config,
         notify_on_events=payload.notify_on_events,
@@ -117,9 +118,21 @@ async def delete_notification_config(
     auth: AuthContext = AUTH_DEP,
 ) -> None:
     """Delete a notification configuration."""
+    from sqlmodel import select
+    from app.models.notifications import NotificationLog
+
     config = await NotificationConfig.objects.by_id(config_id).first(session)
     if config is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    # Delete associated notification logs first (foreign key constraint)
+    logs_stmt = select(NotificationLog).where(
+        NotificationLog.notification_config_id == config_id
+    )
+    logs = await session.exec(logs_stmt)
+    for log in logs.all():
+        await session.delete(log)
+
     await session.delete(config)
     await session.commit()
 

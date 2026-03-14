@@ -23,6 +23,7 @@ class NotificationConfig(QueryModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     organization_id: UUID = Field(foreign_key="organizations.id", index=True)
     board_id: UUID | None = Field(default=None, foreign_key="boards.id", index=True)
+    name: str = Field(default="", index=True)  # Channel name for display
 
     channel_type: str = Field(default="feishu_bot")  # feishu_bot / webhook
     channel_config: dict[str, Any] = Field(

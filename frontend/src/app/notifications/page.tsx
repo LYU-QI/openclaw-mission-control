@@ -10,11 +10,13 @@ import { NotificationConfigForm } from "@/components/notifications/NotificationC
 import { NotificationLogViewer } from "@/components/notifications/NotificationLogViewer";
 import { NotificationTemplatePreview } from "@/components/notifications/NotificationTemplatePreview";
 import { Button } from "@/components/ui/button";
-import { apiGet, apiPost } from "@/lib/mission-control-api";
+import { apiGet, apiPost, apiDelete } from "@/lib/mission-control-api";
 
 type NotificationConfig = {
   id: string;
   organization_id: string;
+  board_id: string | null;
+  name: string;
   channel_type: string;
   enabled: boolean;
 };
@@ -27,7 +29,12 @@ type NotificationLog = {
   created_at: string;
 };
 
-const DEMO_ORG_ID = "00000000-0000-0000-0000-000000000001";
+type Board = {
+  id: string;
+  name: string;
+};
+
+const DEMO_ORG_ID = "3a9ff3b7-7f21-4e68-8c01-0919db770bcd"; // Personal organization
 
 export default function NotificationsPage() {
   const queryClient = useQueryClient();
@@ -40,11 +47,20 @@ export default function NotificationsPage() {
     queryFn: () => apiGet<NotificationLog[]>("/api/v1/notifications/logs"),
     refetchInterval: 15_000,
   });
+  const boardsQuery = useQuery({
+    queryKey: ["boards"],
+    queryFn: async () => {
+      const res = await apiGet<{ items: Board[] }>("/api/v1/boards");
+      return res.items;
+    },
+  });
 
   const createMutation = useMutation({
     mutationFn: (payload: {
+      name: string;
+      board_id: string | null;
       channel_type: string;
-      channel_config: { webhook_url: string };
+      channel_config: { webhook_url: string; webhook_secret?: string };
     }) =>
       apiPost<NotificationConfig>("/api/v1/notifications/configs", {
         organization_id: DEMO_ORG_ID,
@@ -64,6 +80,13 @@ export default function NotificationsPage() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiDelete(`/api/v1/notifications/configs/${id}`),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["notification-configs"] });
+    },
+  });
+
   return (
     <DashboardShell>
       <DashboardSidebar />
@@ -79,6 +102,7 @@ export default function NotificationsPage() {
             <NotificationTemplatePreview />
           </div>
           <NotificationConfigForm
+            boards={boardsQuery.data ?? []}
             onSubmit={async (payload) => {
               await createMutation.mutateAsync(payload);
             }}
@@ -93,12 +117,34 @@ export default function NotificationsPage() {
                   key={config.id}
                   className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm"
                 >
-                  <span>
-                    {config.channel_type} / {config.enabled ? "已启用" : "已禁用"}
-                  </span>
-                  <Button size="sm" onClick={() => testMutation.mutate(config.id)}>
-                    测试
-                  </Button>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{config.name || "未命名"}</span>
+                    <span className="text-xs text-slate-500">
+                      {config.board_id
+                        ? `看板: ${boardsQuery.data?.find((b) => b.id === config.board_id)?.name || config.board_id}`
+                        : "全局渠道"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500">
+                      {config.enabled ? "已启用" : "已禁用"}
+                    </span>
+                    <Button size="sm" variant="outline" onClick={() => testMutation.mutate(config.id)}>
+                      测试
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => {
+                        if (confirm(`确定要删除渠道 "${config.name || '未命名'}" 吗？`)) {
+                          deleteMutation.mutate(config.id);
+                        }
+                      }}
+                    >
+                      删除
+                    </Button>
+                  </div>
                 </div>
               ))}
               {(configsQuery.data ?? []).length === 0 ? (

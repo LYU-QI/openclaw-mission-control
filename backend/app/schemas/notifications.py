@@ -16,6 +16,7 @@ class NotificationConfigCreate(SQLModel):
 
     organization_id: UUID
     board_id: UUID | None = None
+    name: str = ""  # Channel name for display
     channel_type: str = "feishu_bot"
     channel_config: dict[str, Any] = Field(default_factory=dict)
     notify_on_events: list[str] = Field(default_factory=list)
@@ -27,6 +28,7 @@ class NotificationConfigUpdate(SQLModel):
     """Payload for updating a notification configuration."""
 
     board_id: UUID | None = None
+    name: str | None = None
     channel_type: str | None = None
     channel_config: dict[str, Any] | None = None
     notify_on_events: list[str] | None = None
@@ -40,6 +42,7 @@ class NotificationConfigRead(SQLModel):
     id: UUID
     organization_id: UUID
     board_id: UUID | None
+    name: str
     channel_type: str
     channel_config: dict[str, Any]
     notify_on_events: list[str]

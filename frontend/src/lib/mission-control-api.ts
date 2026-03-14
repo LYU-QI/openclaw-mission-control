@@ -24,3 +24,10 @@ export async function apiPatch<T>(path: string, body: unknown): Promise<T> {
   });
   return res.data;
 }
+
+export async function apiDelete(path: string): Promise<void> {
+  await customFetch<{ data: void }>(path, {
+    method: "DELETE",
+    cache: "no-store",
+  });
+}
