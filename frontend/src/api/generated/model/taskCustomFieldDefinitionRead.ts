@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TaskCustomFieldDefinitionReadFieldType } from "./taskCustomFieldDefinitionReadFieldType";
-import type { TaskCustomFieldDefinitionReadUiVisibility } from "./taskCustomFieldDefinitionReadUiVisibility";
+import type { TaskCustomFieldDefinitionReadFieldType } from './taskCustomFieldDefinitionReadFieldType';
+import type { TaskCustomFieldDefinitionReadUiVisibility } from './taskCustomFieldDefinitionReadUiVisibility';
 
 /**
  * Payload returned for custom field definitions.

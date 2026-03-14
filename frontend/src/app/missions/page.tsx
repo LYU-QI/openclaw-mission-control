@@ -2,8 +2,9 @@
 
 export const dynamic = "force-dynamic";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 import { DashboardSidebar } from "@/components/organisms/DashboardSidebar";
 import { DashboardShell } from "@/components/templates/DashboardShell";
@@ -24,7 +25,30 @@ type SubtaskSummary = {
 };
 
 export default function MissionsPage() {
-  const [showNeedsAttentionOnly, setShowNeedsAttentionOnly] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const activeFilters = useMemo(() => {
+    const filterParam = searchParams.get("filter");
+    return filterParam ? filterParam.split(",") : [];
+  }, [searchParams]);
+
+  const toggleFilter = (filterKey: string) => {
+    const newFilters = new Set(activeFilters);
+    if (newFilters.has(filterKey)) {
+      newFilters.delete(filterKey);
+    } else {
+      newFilters.add(filterKey);
+    }
+    const params = new URLSearchParams(searchParams.toString());
+    if (newFilters.size > 0) {
+      params.set("filter", Array.from(newFilters).join(","));
+    } else {
+      params.delete("filter");
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  };
   const missionsQuery = useQuery({
     queryKey: ["missions"],
     queryFn: () => apiGet<MissionRow[]>("/api/v1/missions"),
@@ -52,20 +76,36 @@ export default function MissionsPage() {
     return missions.map((mission) => {
       const subtasks = subtaskMap[mission.id] ?? [];
       const failedSubtasks = subtasks.filter((item) => item.status === "failed").length;
+      
       const needsAttention =
         failedSubtasks > 0 ||
         subtasks.some((item) => item.status === "failed" && item.error_message);
+        
+      const minutesSinceUpdate = (Date.now() - new Date(mission.updated_at).getTime()) / 60000;
+      const isStale = ["pending", "in_progress"].includes(mission.status) && minutesSinceUpdate > 60;
+      
+      const isTimedOut = (mission.status === "failed" || mission.status === "timeout") && 
+          subtasks.some((item) => item.error_message?.toLowerCase().includes("timeout") || item.status === "timeout");
+
       return {
         ...mission,
         failedSubtasks,
         needsAttention,
+        isStale,
+        isTimedOut,
       };
     });
   }, [missions, subtaskOverviewQuery.data]);
 
-  const visibleMissions = showNeedsAttentionOnly
-    ? missionCards.filter((mission) => mission.needsAttention)
-    : missionCards;
+  const visibleMissions = useMemo(() => {
+    if (activeFilters.length === 0) return missionCards;
+    return missionCards.filter((mission) => {
+      if (activeFilters.includes("attention") && mission.needsAttention) return true;
+      if (activeFilters.includes("stale") && mission.isStale) return true;
+      if (activeFilters.includes("timed_out") && mission.isTimedOut) return true;
+      return false;
+    });
+  }, [missionCards, activeFilters]);
 
   return (
     <DashboardShell>
@@ -79,18 +119,37 @@ export default function MissionsPage() {
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={() => setShowNeedsAttentionOnly((value) => !value)}
+              onClick={() => toggleFilter("attention")}
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                showNeedsAttentionOnly
+                activeFilters.includes("attention")
                   ? "bg-amber-600 text-white"
                   : "bg-white text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300"
               }`}
             >
-              {showNeedsAttentionOnly ? "仅显示需处理" : "需处理"}
+              需处理 ({missionCards.filter((m) => m.needsAttention).length})
             </button>
-            <span className="text-xs text-slate-500">
-              {missionCards.filter((mission) => mission.needsAttention).length} 条 mission 需要处理
-            </span>
+            <button
+              type="button"
+              onClick={() => toggleFilter("stale")}
+              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                activeFilters.includes("stale")
+                  ? "bg-slate-600 text-white"
+                  : "bg-white text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300"
+              }`}
+            >
+              已陈旧 ({missionCards.filter((m) => m.isStale).length})
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleFilter("timed_out")}
+              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                activeFilters.includes("timed_out")
+                  ? "bg-rose-600 text-white"
+                  : "bg-white text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300"
+              }`}
+            >
+              已超时 ({missionCards.filter((m) => m.isTimedOut).length})
+            </button>
           </div>
           <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {visibleMissions.map((mission) => (

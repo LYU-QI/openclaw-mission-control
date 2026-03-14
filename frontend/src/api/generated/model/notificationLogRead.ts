@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { NotificationLogReadPayload } from "./notificationLogReadPayload";
-import type { NotificationLogReadResponse } from "./notificationLogReadResponse";
+import type { NotificationLogReadPayload } from './notificationLogReadPayload';
+import type { NotificationLogReadResponse } from './notificationLogReadResponse';
 
 /**
  * Notification delivery log returned from read endpoints.

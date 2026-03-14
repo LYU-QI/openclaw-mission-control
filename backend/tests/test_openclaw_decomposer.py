@@ -95,7 +95,9 @@ def test_build_provider_request_openai(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_build_provider_request_azure(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("app.core.config.settings.llm_provider", "azure")
     monkeypatch.setattr("app.core.config.settings.llm_api_key", "azure-key")
-    monkeypatch.setattr("app.core.config.settings.llm_base_url", "https://my-azure.openai.azure.com")
+    monkeypatch.setattr(
+        "app.core.config.settings.llm_base_url", "https://my-azure.openai.azure.com"
+    )
     monkeypatch.setattr("app.core.config.settings.llm_model", "my-deployment")
     monkeypatch.setattr("app.core.config.settings.llm_api_version", "2024-10-21")
     url, headers, payload = TaskDecomposer()._build_provider_request("hello")

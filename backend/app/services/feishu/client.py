@@ -36,8 +36,8 @@ class FeishuClient:
             data = json.loads(resp.read())
         if data.get("code") != 0:
             raise RuntimeError(f"Failed to get tenant_access_token: {data}")
-        self._token = data["tenant_access_token"]
-        return self._token  # type: ignore[return-value]
+        self._token = str(data["tenant_access_token"])
+        return self._token
 
     def _headers(self) -> dict[str, str]:
         return {
@@ -63,6 +63,22 @@ class FeishuClient:
     # ------------------------------------------------------------------
     # Bitable (Multi-dimensional table) operations
     # ------------------------------------------------------------------
+
+    def list_bitable_fields(
+        self,
+        app_token: str,
+        table_id: str,
+        *,
+        page_size: int = 100,
+        page_token: str | None = None,
+    ) -> dict[str, Any]:
+        """List fields of a Feishu Bitable table."""
+        url = f"{FEISHU_BASE_URL}/bitable/v1/apps/{app_token}/tables/{table_id}/fields"
+        params = [f"page_size={page_size}"]
+        if page_token:
+            params.append(f"page_token={page_token}")
+        url = f"{url}?{'&'.join(params)}"
+        return self._request("GET", url)
 
     def list_bitable_records(
         self,

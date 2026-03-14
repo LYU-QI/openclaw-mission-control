@@ -15,4 +15,3 @@ class GoalBuilder:
         if board and board.objective:
             return f"{task.title}. Objective: {board.objective}"
         return task.title
-

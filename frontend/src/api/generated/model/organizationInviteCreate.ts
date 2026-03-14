@@ -4,12 +4,13 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { OrganizationBoardAccessSpec } from "./organizationBoardAccessSpec";
+import type { OrganizationBoardAccessSpec } from './organizationBoardAccessSpec';
 
 /**
  * Payload for creating an organization invite.
  */
 export interface OrganizationInviteCreate {
+  /** @minLength 1 */
   invited_email: string;
   role?: string;
   all_boards_read?: boolean;

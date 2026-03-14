@@ -16,9 +16,22 @@ type MissionDetail = {
   id: string;
   goal: string;
   status: string;
+  approval_policy?: string | null;
+  approval_id?: string | null;
   result_summary?: string | null;
+  result_evidence?: {
+    stats?: {
+      total?: number;
+      completed?: number;
+      pending?: number;
+      failed?: number;
+      high_risk?: number;
+    };
+    anomalies?: unknown[];
+  } | null;
   result_risk?: string | null;
   result_next_action?: string | null;
+  error_message?: string | null;
   updated_at?: string | null;
 };
 
@@ -37,6 +50,10 @@ type SubtaskItem = {
 type TimelineEntry = {
   timestamp: string;
   event_type: string;
+  stage: string;
+  stage_label: string;
+  tone: "info" | "success" | "warning" | "danger" | "muted";
+  status_hint?: string | null;
   message?: string | null;
 };
 
@@ -82,9 +99,14 @@ export default function MissionDetailPage() {
           <MissionDetailPanel
             goal={mission?.goal ?? "Mission detail"}
             status={mission?.status ?? "unknown"}
+            approvalPolicy={mission?.approval_policy}
+            approvalId={mission?.approval_id}
             summary={mission?.result_summary}
+            evidenceStats={mission?.result_evidence?.stats}
+            anomaliesCount={mission?.result_evidence?.anomalies?.length ?? 0}
             risk={mission?.result_risk}
             nextAction={mission?.result_next_action}
+            errorMessage={mission?.error_message}
             updatedAt={mission?.updated_at}
           />
           <div className="grid gap-4 lg:grid-cols-2">

@@ -105,3 +105,14 @@ class GatewayTemplatesSyncResult(SQLModel):
     agents_skipped: int
     main_updated: bool
     errors: list[GatewayTemplatesSyncError] = Field(default_factory=list)
+
+
+class GatewayHealthCheckStatus(SQLModel):
+    """Detailed health probe diagnostic status for a gateway."""
+
+    http_reachable: bool = False
+    ws_connected: bool = False
+    rpc_callable: bool = False
+    session_active: bool = False
+    agent_checked_in: bool = False
+    last_error: str | None = None

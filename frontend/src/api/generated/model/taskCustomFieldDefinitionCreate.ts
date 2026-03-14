@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TaskCustomFieldDefinitionCreateFieldType } from "./taskCustomFieldDefinitionCreateFieldType";
-import type { TaskCustomFieldDefinitionCreateUiVisibility } from "./taskCustomFieldDefinitionCreateUiVisibility";
+import type { TaskCustomFieldDefinitionCreateFieldType } from './taskCustomFieldDefinitionCreateFieldType';
+import type { TaskCustomFieldDefinitionCreateUiVisibility } from './taskCustomFieldDefinitionCreateUiVisibility';
 
 /**
  * Payload for creating a task custom field definition.

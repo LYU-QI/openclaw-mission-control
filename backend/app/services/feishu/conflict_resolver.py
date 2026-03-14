@@ -19,13 +19,18 @@ class ConflictResolver:
 
     def resolve(self, *, feishu: SyncSideState, mission_control: SyncSideState) -> str:
         """Return winner side: `feishu`, `mission_control`, or `none`."""
-        if feishu.checksum and mission_control.checksum and feishu.checksum == mission_control.checksum:
+        if (
+            feishu.checksum
+            and mission_control.checksum
+            and feishu.checksum == mission_control.checksum
+        ):
             return "none"
         if feishu.updated_at and mission_control.updated_at:
-            return "feishu" if feishu.updated_at >= mission_control.updated_at else "mission_control"
+            return (
+                "feishu" if feishu.updated_at >= mission_control.updated_at else "mission_control"
+            )
         if feishu.updated_at:
             return "feishu"
         if mission_control.updated_at:
             return "mission_control"
         return "none"
-

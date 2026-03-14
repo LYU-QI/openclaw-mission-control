@@ -14,4 +14,6 @@ export interface FeishuSyncTriggerResponse {
   records_processed?: number;
   records_created?: number;
   records_updated?: number;
+  records_skipped?: number;
+  conflicts_count?: number;
 }

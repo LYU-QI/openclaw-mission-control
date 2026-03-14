@@ -13,6 +13,8 @@ from app.core.logging import TRACE_LEVEL
 from app.models.boards import Board
 from app.models.gateways import Gateway
 from app.schemas.gateway_api import (
+    GatewayHealthLayer,
+    GatewayHealthLayers,
     GatewayResolveQuery,
     GatewaySessionHistoryResponse,
     GatewaySessionMessageRequest,
@@ -21,7 +23,10 @@ from app.schemas.gateway_api import (
     GatewaysStatusResponse,
 )
 from app.services.openclaw.db_service import OpenClawDBService
-from app.services.openclaw.error_messages import normalize_gateway_error_message
+from app.services.openclaw.error_messages import (
+    classify_gateway_error_message,
+    normalize_gateway_error_message,
+)
 from app.services.openclaw.gateway_compat import check_gateway_version_compatibility
 from app.services.openclaw.gateway_resolver import gateway_client_config, require_gateway_for_board
 from app.services.openclaw.gateway_rpc import GatewayConfig as GatewayClientConfig
@@ -60,6 +65,28 @@ class GatewaySessionService(OpenClawDBService):
 
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session)
+
+    @staticmethod
+    def _layer(ok: bool, label: str, detail: str | None = None) -> GatewayHealthLayer:
+        return GatewayHealthLayer(ok=ok, label=label, detail=detail)
+
+    @classmethod
+    def _layers(
+        cls,
+        *,
+        http_reachable: GatewayHealthLayer,
+        ws_handshake: GatewayHealthLayer,
+        rpc_ready: GatewayHealthLayer,
+        session_visible: GatewayHealthLayer,
+        main_agent_checkin: GatewayHealthLayer,
+    ) -> GatewayHealthLayers:
+        return GatewayHealthLayers(
+            http_reachable=http_reachable,
+            ws_handshake=ws_handshake,
+            rpc_ready=rpc_ready,
+            session_visible=session_visible,
+            main_agent_checkin=main_agent_checkin,
+        )
 
     @staticmethod
     def to_resolve_query(
@@ -226,16 +253,42 @@ class GatewaySessionService(OpenClawDBService):
         try:
             compatibility = await check_gateway_version_compatibility(config)
         except OpenClawGatewayError as exc:
+            normalized = normalize_gateway_error_message(str(exc))
+            info = classify_gateway_error_message(str(exc))
             return GatewaysStatusResponse(
                 connected=False,
                 gateway_url=config.url,
-                error=normalize_gateway_error_message(str(exc)),
+                error=normalized,
+                layers=self._layers(
+                    http_reachable=self._layer(
+                        info.code != "TRANSPORT_ERROR",
+                        "HTTP 可达",
+                        None if info.code != "TRANSPORT_ERROR" else normalized,
+                    ),
+                    ws_handshake=self._layer(False, "WS 握手", normalized),
+                    rpc_ready=self._layer(False, "RPC 可调用", normalized),
+                    session_visible=self._layer(False, "Session 可见", "尚未进入 session 查询阶段"),
+                    main_agent_checkin=self._layer(
+                        False, "主 Agent check-in", "尚未进入 check-in 阶段"
+                    ),
+                ),
             )
         if not compatibility.compatible:
             return GatewaysStatusResponse(
                 connected=False,
                 gateway_url=config.url,
                 error=compatibility.message,
+                layers=self._layers(
+                    http_reachable=self._layer(True, "HTTP 可达", "已获取运行时元数据"),
+                    ws_handshake=self._layer(True, "WS 握手", "已完成连接握手"),
+                    rpc_ready=self._layer(False, "RPC 可调用", compatibility.message),
+                    session_visible=self._layer(
+                        False, "Session 可见", "版本不兼容，未继续查询 session"
+                    ),
+                    main_agent_checkin=self._layer(
+                        False, "主 Agent check-in", "版本不兼容，未继续检查"
+                    ),
+                ),
             )
         try:
             sessions = await openclaw_call("sessions.list", config=config)
@@ -256,19 +309,54 @@ class GatewaySessionService(OpenClawDBService):
                         main_session_entry = ensured.get("entry") or ensured
                 except OpenClawGatewayError as exc:
                     main_session_error = str(exc)
+            sessions_count = len(sessions_list)
+            main_agent_ok = main_session_error is None
             return GatewaysStatusResponse(
                 connected=True,
                 gateway_url=config.url,
-                sessions_count=len(sessions_list),
+                sessions_count=sessions_count,
                 sessions=sessions_list,
                 main_session=main_session_entry,
                 main_session_error=main_session_error,
+                layers=self._layers(
+                    http_reachable=self._layer(True, "HTTP 可达", "已建立到 Gateway 的基础连接"),
+                    ws_handshake=self._layer(True, "WS 握手", "已完成 WebSocket 握手"),
+                    rpc_ready=self._layer(True, "RPC 可调用", "sessions.list 调用成功"),
+                    session_visible=self._layer(
+                        sessions_count > 0,
+                        "Session 可见",
+                        f"当前发现 {sessions_count} 个 session。",
+                    ),
+                    main_agent_checkin=self._layer(
+                        main_agent_ok,
+                        "主 Agent check-in",
+                        (
+                            "主 Agent session 已建立。"
+                            if main_agent_ok and main_session_entry is not None
+                            else (
+                                normalize_gateway_error_message(main_session_error)
+                                if main_session_error
+                                else "主 Agent 尚未完成 check-in。"
+                            )
+                        ),
+                    ),
+                ),
             )
         except OpenClawGatewayError as exc:
+            normalized = normalize_gateway_error_message(str(exc))
             return GatewaysStatusResponse(
                 connected=False,
                 gateway_url=config.url,
-                error=normalize_gateway_error_message(str(exc)),
+                error=normalized,
+                layers=self._layers(
+                    http_reachable=self._layer(True, "HTTP 可达", "已建立到 Gateway 的基础连接"),
+                    ws_handshake=self._layer(True, "WS 握手", "已完成连接握手"),
+                    rpc_ready=self._layer(False, "RPC 可调用", normalized),
+                    session_visible=self._layer(False, "Session 可见", "RPC 查询失败，无法判断"),
+                    main_agent_checkin=self._layer(
+                        False, "主 Agent check-in", "RPC 查询失败，无法判断"
+                    ),
+                ),
             )
 
     async def get_sessions(

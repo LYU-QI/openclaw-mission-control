@@ -14,7 +14,6 @@ from app.services.openclaw.aggregator.output_generator import generate_output
 class AggregatedResult:
     """Final aggregated mission result."""
 
-    status: str
     summary: str
     risk: str
     next_action: str
@@ -33,9 +32,7 @@ class ResultAggregator:
     ) -> AggregatedResult:
         anomalies = detect_anomalies(subtask_results)
         output = generate_output(goal=mission.goal, results=subtask_results, anomalies=anomalies)
-        status = "pending_approval" if anomalies and mission.approval_policy != "auto" else "completed"
         return AggregatedResult(
-            status=status,
             summary=str(output["summary"]),
             risk=str(output["risk"]),
             next_action=str(output["next_action"]),

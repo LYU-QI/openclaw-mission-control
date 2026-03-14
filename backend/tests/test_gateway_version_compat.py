@@ -284,6 +284,7 @@ async def test_admin_service_maps_gateway_scope_errors_with_guidance(
         await service.assert_gateway_runtime_compatible(url="ws://gateway.example/ws", token=None)
 
     assert exc_info.value.status_code == 502
+    assert "MISSING_SCOPE:" in str(exc_info.value.detail)
     assert "missing required scope `operator.read`" in str(exc_info.value.detail)
 
 
@@ -332,6 +333,7 @@ async def test_gateway_status_surfaces_scope_error_guidance(
 
     assert response.connected is False
     assert response.error is not None
+    assert response.error.startswith("MISSING_SCOPE:")
     assert "missing required scope `operator.read`" in response.error
 
 

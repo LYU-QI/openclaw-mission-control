@@ -5,6 +5,7 @@ from __future__ import annotations
 from app.models.missions import Mission
 from app.services.openclaw.context.loader import ContextChunk
 
+
 def build_decompose_prompt(*, mission: Mission, context: list[ContextChunk]) -> str:
     """Return a deterministic prompt for LLM-based mission decomposition."""
     context_preview = "\n".join(

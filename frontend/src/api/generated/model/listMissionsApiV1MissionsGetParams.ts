@@ -6,7 +6,7 @@
  */
 
 export type ListMissionsApiV1MissionsGetParams = {
-  board_id?: string | null;
-  task_id?: string | null;
-  mission_status?: string | null;
+board_id?: string | null;
+task_id?: string | null;
+mission_status?: string | null;
 };

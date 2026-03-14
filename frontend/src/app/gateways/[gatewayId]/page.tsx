@@ -29,8 +29,10 @@ import {
   useDeleteAgentApiV1AgentsAgentIdDelete,
   useListAgentsApiV1AgentsGet,
 } from "@/api/generated/agents/agents";
+import { useSyncGatewayTemplatesApiV1GatewaysGatewayIdTemplatesSyncPost } from "@/api/generated/gateways/gateways";
 import { type AgentRead } from "@/api/generated/model";
 import { formatTimestamp } from "@/lib/formatters";
+import { parseGatewayDiagnostic } from "@/lib/gateway-form";
 import { createOptimisticListDeleteMutation } from "@/lib/list-delete";
 import { useOrganizationMembership } from "@/lib/use-organization-membership";
 
@@ -38,6 +40,20 @@ const maskToken = (value?: string | null) => {
   if (!value) return "—";
   if (value.length <= 8) return "••••";
   return `••••${value.slice(-4)}`;
+};
+
+type GatewayHealthLayer = {
+  ok: boolean;
+  label: string;
+  detail?: string | null;
+};
+
+type GatewayHealthLayers = {
+  http_reachable: GatewayHealthLayer;
+  ws_handshake: GatewayHealthLayer;
+  rpc_ready: GatewayHealthLayer;
+  session_visible: GatewayHealthLayer;
+  main_agent_checkin: GatewayHealthLayer;
 };
 
 export default function GatewayDetailPage() {
@@ -113,11 +129,11 @@ export default function GatewayDetailPage() {
 
   const statusParams = gateway
     ? {
-        gateway_url: gateway.url,
-        gateway_token: gateway.token ?? undefined,
-        gateway_disable_device_pairing: gateway.disable_device_pairing,
-        gateway_allow_insecure_tls: gateway.allow_insecure_tls,
-      }
+      gateway_url: gateway.url,
+      gateway_token: gateway.token ?? undefined,
+      gateway_disable_device_pairing: gateway.disable_device_pairing,
+      gateway_allow_insecure_tls: gateway.allow_insecure_tls,
+    }
     : {};
 
   const statusQuery = useGatewaysStatusApiV1GatewaysStatusGet<
@@ -127,6 +143,13 @@ export default function GatewayDetailPage() {
     query: {
       enabled: Boolean(isSignedIn && isAdmin && gateway),
       refetchInterval: 15_000,
+    },
+  });
+  const syncMutation = useSyncGatewayTemplatesApiV1GatewaysGatewayIdTemplatesSyncPost({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: agentsKey });
+      },
     },
   });
 
@@ -146,8 +169,15 @@ export default function GatewayDetailPage() {
   );
 
   const status =
-    statusQuery.data?.status === 200 ? statusQuery.data.data : null;
+    statusQuery.data?.status === 200 && statusQuery.data.data
+      ? (statusQuery.data.data as typeof statusQuery.data.data & {
+        layers?: GatewayHealthLayers | null;
+      })
+      : null;
   const isConnected = status?.connected ?? false;
+  const gatewayDiagnostic = parseGatewayDiagnostic(
+    status?.main_session_error ?? status?.error ?? null,
+  );
 
   const title = useMemo(
     () => (gateway?.name ? gateway.name : "Gateway"),
@@ -156,6 +186,10 @@ export default function GatewayDetailPage() {
   const handleDelete = () => {
     if (!deleteTarget) return;
     deleteMutation.mutate({ agentId: deleteTarget.id });
+  };
+  const handleSync = () => {
+    if (!gatewayId) return;
+    syncMutation.mutate({ gatewayId });
   };
 
   return (
@@ -173,11 +207,20 @@ export default function GatewayDetailPage() {
               Back to gateways
             </Button>
             {isAdmin && gatewayId ? (
-              <Button
-                onClick={() => router.push(`/gateways/${gatewayId}/edit`)}
-              >
-                Edit gateway
-              </Button>
+              <>
+                <Button
+                  variant="secondary"
+                  onClick={handleSync}
+                  disabled={syncMutation.isPending}
+                >
+                  {syncMutation.isPending ? "Syncing..." : "Sync templates"}
+                </Button>
+                <Button
+                  onClick={() => router.push(`/gateways/${gatewayId}/edit`)}
+                >
+                  Edit gateway
+                </Button>
+              </>
             ) : null}
           </div>
         }
@@ -202,13 +245,12 @@ export default function GatewayDetailPage() {
                   </p>
                   <div className="flex items-center gap-2 text-xs text-slate-500">
                     <span
-                      className={`h-2 w-2 rounded-full ${
-                        statusQuery.isLoading
+                      className={`h-2 w-2 rounded-full ${statusQuery.isLoading
                           ? "bg-slate-300"
                           : isConnected
                             ? "bg-emerald-500"
                             : "bg-rose-500"
-                      }`}
+                        }`}
                     />
                     <span>
                       {statusQuery.isLoading
@@ -242,6 +284,26 @@ export default function GatewayDetailPage() {
                       {gateway.disable_device_pairing ? "Disabled" : "Required"}
                     </p>
                   </div>
+                  {gatewayDiagnostic ? (
+                    <div
+                      className={`rounded-lg border p-3 text-sm ${gatewayDiagnostic.tone === "warning"
+                          ? "border-amber-200 bg-amber-50 text-amber-900"
+                          : "border-rose-200 bg-rose-50 text-rose-700"
+                        }`}
+                    >
+                      <p className="font-semibold">{gatewayDiagnostic.summary}</p>
+                      {gatewayDiagnostic.detail ? (
+                        <p className="mt-1 text-xs opacity-90">
+                          {gatewayDiagnostic.detail}
+                        </p>
+                      ) : null}
+                      {gatewayDiagnostic.code ? (
+                        <p className="mt-2 font-mono text-[11px] opacity-70">
+                          {gatewayDiagnostic.code}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
               </div>
 
@@ -279,6 +341,42 @@ export default function GatewayDetailPage() {
                 </div>
               </div>
             </div>
+
+            {status?.layers ? (
+              <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Health layers
+                </p>
+                <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                  {[
+                    status.layers.http_reachable,
+                    status.layers.ws_handshake,
+                    status.layers.rpc_ready,
+                    status.layers.session_visible,
+                    status.layers.main_agent_checkin,
+                  ].map((layer) => (
+                    <div
+                      key={layer.label}
+                      className={`rounded-lg border p-3 ${layer.ok
+                          ? "border-emerald-200 bg-emerald-50"
+                          : "border-amber-200 bg-amber-50"
+                        }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`h-2 w-2 rounded-full ${layer.ok ? "bg-emerald-500" : "bg-amber-500"
+                            }`}
+                        />
+                        <p className="text-sm font-semibold text-slate-900">{layer.label}</p>
+                      </div>
+                      {layer.detail ? (
+                        <p className="mt-2 text-xs text-slate-600">{layer.detail}</p>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
 
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">

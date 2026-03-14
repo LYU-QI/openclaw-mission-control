@@ -4,7 +4,10 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -17,1413 +20,1062 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
+  FeishuConflictResolutionRequest,
   FeishuSyncConfigCreate,
   FeishuSyncConfigRead,
   FeishuSyncConfigUpdate,
+  FeishuSyncHistoryEntry,
   FeishuSyncTriggerResponse,
   FeishuTaskMappingRead,
   HTTPValidationError,
   ListSyncConfigsApiV1FeishuSyncConfigsGetParams,
-  TestConnectionApiV1FeishuSyncConfigsConfigIdTestPost200,
-} from ".././model";
+  SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetParams,
+  TestConnectionApiV1FeishuSyncConfigsConfigIdTestPost200
+} from '.././model';
 
-import { customFetch } from "../../mutator";
+import { customFetch } from '../../mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * Create a new Feishu sync configuration.
  * @summary Create Sync Config
  */
 export type createSyncConfigApiV1FeishuSyncConfigsPostResponse201 = {
-  data: FeishuSyncConfigRead;
-  status: 201;
-};
+  data: FeishuSyncConfigRead
+  status: 201
+}
 
 export type createSyncConfigApiV1FeishuSyncConfigsPostResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type createSyncConfigApiV1FeishuSyncConfigsPostResponseSuccess = (createSyncConfigApiV1FeishuSyncConfigsPostResponse201) & {
+  headers: Headers;
+};
+export type createSyncConfigApiV1FeishuSyncConfigsPostResponseError = (createSyncConfigApiV1FeishuSyncConfigsPostResponse422) & {
+  headers: Headers;
 };
 
-export type createSyncConfigApiV1FeishuSyncConfigsPostResponseSuccess =
-  createSyncConfigApiV1FeishuSyncConfigsPostResponse201 & {
-    headers: Headers;
-  };
-export type createSyncConfigApiV1FeishuSyncConfigsPostResponseError =
-  createSyncConfigApiV1FeishuSyncConfigsPostResponse422 & {
-    headers: Headers;
-  };
-
-export type createSyncConfigApiV1FeishuSyncConfigsPostResponse =
-  | createSyncConfigApiV1FeishuSyncConfigsPostResponseSuccess
-  | createSyncConfigApiV1FeishuSyncConfigsPostResponseError;
+export type createSyncConfigApiV1FeishuSyncConfigsPostResponse = (createSyncConfigApiV1FeishuSyncConfigsPostResponseSuccess | createSyncConfigApiV1FeishuSyncConfigsPostResponseError)
 
 export const getCreateSyncConfigApiV1FeishuSyncConfigsPostUrl = () => {
-  return `/api/v1/feishu-sync/configs`;
-};
 
-export const createSyncConfigApiV1FeishuSyncConfigsPost = async (
-  feishuSyncConfigCreate: FeishuSyncConfigCreate,
-  options?: RequestInit,
-): Promise<createSyncConfigApiV1FeishuSyncConfigsPostResponse> => {
-  return customFetch<createSyncConfigApiV1FeishuSyncConfigsPostResponse>(
-    getCreateSyncConfigApiV1FeishuSyncConfigsPostUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(feishuSyncConfigCreate),
-    },
-  );
-};
 
-export const getCreateSyncConfigApiV1FeishuSyncConfigsPostMutationOptions = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>,
-    TError,
-    { data: FeishuSyncConfigCreate },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>,
-  TError,
-  { data: FeishuSyncConfigCreate },
-  TContext
-> => {
-  const mutationKey = ["createSyncConfigApiV1FeishuSyncConfigsPost"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>,
-    { data: FeishuSyncConfigCreate }
-  > = (props) => {
-    const { data } = props ?? {};
+  return `/api/v1/feishu-sync/configs`
+}
 
-    return createSyncConfigApiV1FeishuSyncConfigsPost(data, requestOptions);
-  };
+export const createSyncConfigApiV1FeishuSyncConfigsPost = async (feishuSyncConfigCreate: FeishuSyncConfigCreate, options?: RequestInit): Promise<createSyncConfigApiV1FeishuSyncConfigsPostResponse> => {
+  
+  return customFetch<createSyncConfigApiV1FeishuSyncConfigsPostResponse>(getCreateSyncConfigApiV1FeishuSyncConfigsPostUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      feishuSyncConfigCreate,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type CreateSyncConfigApiV1FeishuSyncConfigsPostMutationResult =
-  NonNullable<
-    Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>
-  >;
-export type CreateSyncConfigApiV1FeishuSyncConfigsPostMutationBody =
-  FeishuSyncConfigCreate;
-export type CreateSyncConfigApiV1FeishuSyncConfigsPostMutationError =
-  HTTPValidationError;
 
-/**
+
+export const getCreateSyncConfigApiV1FeishuSyncConfigsPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>, TError,{data: FeishuSyncConfigCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>, TError,{data: FeishuSyncConfigCreate}, TContext> => {
+
+const mutationKey = ['createSyncConfigApiV1FeishuSyncConfigsPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>, {data: FeishuSyncConfigCreate}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createSyncConfigApiV1FeishuSyncConfigsPost(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSyncConfigApiV1FeishuSyncConfigsPostMutationResult = NonNullable<Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>>
+    export type CreateSyncConfigApiV1FeishuSyncConfigsPostMutationBody = FeishuSyncConfigCreate
+    export type CreateSyncConfigApiV1FeishuSyncConfigsPostMutationError = HTTPValidationError
+
+    /**
  * @summary Create Sync Config
  */
-export const useCreateSyncConfigApiV1FeishuSyncConfigsPost = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>,
-      TError,
-      { data: FeishuSyncConfigCreate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>,
-  TError,
-  { data: FeishuSyncConfigCreate },
-  TContext
-> => {
-  return useMutation(
-    getCreateSyncConfigApiV1FeishuSyncConfigsPostMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useCreateSyncConfigApiV1FeishuSyncConfigsPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>, TError,{data: FeishuSyncConfigCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createSyncConfigApiV1FeishuSyncConfigsPost>>,
+        TError,
+        {data: FeishuSyncConfigCreate},
+        TContext
+      > => {
+      return useMutation(getCreateSyncConfigApiV1FeishuSyncConfigsPostMutationOptions(options), queryClient);
+    }
+    /**
  * List Feishu sync configurations.
  * @summary List Sync Configs
  */
 export type listSyncConfigsApiV1FeishuSyncConfigsGetResponse200 = {
-  data: FeishuSyncConfigRead[];
-  status: 200;
-};
+  data: FeishuSyncConfigRead[]
+  status: 200
+}
 
 export type listSyncConfigsApiV1FeishuSyncConfigsGetResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type listSyncConfigsApiV1FeishuSyncConfigsGetResponseSuccess = (listSyncConfigsApiV1FeishuSyncConfigsGetResponse200) & {
+  headers: Headers;
+};
+export type listSyncConfigsApiV1FeishuSyncConfigsGetResponseError = (listSyncConfigsApiV1FeishuSyncConfigsGetResponse422) & {
+  headers: Headers;
 };
 
-export type listSyncConfigsApiV1FeishuSyncConfigsGetResponseSuccess =
-  listSyncConfigsApiV1FeishuSyncConfigsGetResponse200 & {
-    headers: Headers;
-  };
-export type listSyncConfigsApiV1FeishuSyncConfigsGetResponseError =
-  listSyncConfigsApiV1FeishuSyncConfigsGetResponse422 & {
-    headers: Headers;
-  };
+export type listSyncConfigsApiV1FeishuSyncConfigsGetResponse = (listSyncConfigsApiV1FeishuSyncConfigsGetResponseSuccess | listSyncConfigsApiV1FeishuSyncConfigsGetResponseError)
 
-export type listSyncConfigsApiV1FeishuSyncConfigsGetResponse =
-  | listSyncConfigsApiV1FeishuSyncConfigsGetResponseSuccess
-  | listSyncConfigsApiV1FeishuSyncConfigsGetResponseError;
-
-export const getListSyncConfigsApiV1FeishuSyncConfigsGetUrl = (
-  params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams,
-) => {
+export const getListSyncConfigsApiV1FeishuSyncConfigsGetUrl = (params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/api/v1/feishu-sync/configs?${stringifiedParams}`
-    : `/api/v1/feishu-sync/configs`;
-};
+  return stringifiedParams.length > 0 ? `/api/v1/feishu-sync/configs?${stringifiedParams}` : `/api/v1/feishu-sync/configs`
+}
 
-export const listSyncConfigsApiV1FeishuSyncConfigsGet = async (
-  params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams,
-  options?: RequestInit,
-): Promise<listSyncConfigsApiV1FeishuSyncConfigsGetResponse> => {
-  return customFetch<listSyncConfigsApiV1FeishuSyncConfigsGetResponse>(
-    getListSyncConfigsApiV1FeishuSyncConfigsGetUrl(params),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+export const listSyncConfigsApiV1FeishuSyncConfigsGet = async (params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams, options?: RequestInit): Promise<listSyncConfigsApiV1FeishuSyncConfigsGetResponse> => {
+  
+  return customFetch<listSyncConfigsApiV1FeishuSyncConfigsGetResponse>(getListSyncConfigsApiV1FeishuSyncConfigsGetUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getListSyncConfigsApiV1FeishuSyncConfigsGetQueryKey = (
-  params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams,
+
+
+
+
+export const getListSyncConfigsApiV1FeishuSyncConfigsGetQueryKey = (params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams,) => {
+    return [
+    `/api/v1/feishu-sync/configs`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getListSyncConfigsApiV1FeishuSyncConfigsGetQueryOptions = <TData = Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError = HTTPValidationError>(params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return [`/api/v1/feishu-sync/configs`, ...(params ? [params] : [])] as const;
-};
 
-export const getListSyncConfigsApiV1FeishuSyncConfigsGetQueryOptions = <
-  TData = Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-  TError = HTTPValidationError,
->(
-  params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getListSyncConfigsApiV1FeishuSyncConfigsGetQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getListSyncConfigsApiV1FeishuSyncConfigsGetQueryKey(params);
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>
-  > = ({ signal }) =>
-    listSyncConfigsApiV1FeishuSyncConfigsGet(params, {
-      signal,
-      ...requestOptions,
-    });
+  
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>> = ({ signal }) => listSyncConfigsApiV1FeishuSyncConfigsGet(params, { signal, ...requestOptions });
 
-export type ListSyncConfigsApiV1FeishuSyncConfigsGetQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>
->;
-export type ListSyncConfigsApiV1FeishuSyncConfigsGetQueryError =
-  HTTPValidationError;
+      
 
-export function useListSyncConfigsApiV1FeishuSyncConfigsGet<
-  TData = Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-  TError = HTTPValidationError,
->(
-  params: undefined | ListSyncConfigsApiV1FeishuSyncConfigsGetParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListSyncConfigsApiV1FeishuSyncConfigsGetQueryResult = NonNullable<Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>>
+export type ListSyncConfigsApiV1FeishuSyncConfigsGetQueryError = HTTPValidationError
+
+
+export function useListSyncConfigsApiV1FeishuSyncConfigsGet<TData = Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError = HTTPValidationError>(
+ params: undefined |  ListSyncConfigsApiV1FeishuSyncConfigsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
           TError,
           Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListSyncConfigsApiV1FeishuSyncConfigsGet<
-  TData = Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-  TError = HTTPValidationError,
->(
-  params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSyncConfigsApiV1FeishuSyncConfigsGet<TData = Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError = HTTPValidationError>(
+ params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
           TError,
           Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListSyncConfigsApiV1FeishuSyncConfigsGet<
-  TData = Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-  TError = HTTPValidationError,
->(
-  params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSyncConfigsApiV1FeishuSyncConfigsGet<TData = Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError = HTTPValidationError>(
+ params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Sync Configs
  */
 
-export function useListSyncConfigsApiV1FeishuSyncConfigsGet<
-  TData = Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-  TError = HTTPValidationError,
->(
-  params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getListSyncConfigsApiV1FeishuSyncConfigsGetQueryOptions(
-    params,
-    options,
-  );
+export function useListSyncConfigsApiV1FeishuSyncConfigsGet<TData = Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError = HTTPValidationError>(
+ params?: ListSyncConfigsApiV1FeishuSyncConfigsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSyncConfigsApiV1FeishuSyncConfigsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getListSyncConfigsApiV1FeishuSyncConfigsGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Retrieve a sync configuration by ID.
  * @summary Get Sync Config
  */
 export type getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse200 = {
-  data: FeishuSyncConfigRead;
-  status: 200;
-};
+  data: FeishuSyncConfigRead
+  status: 200
+}
 
 export type getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponseSuccess = (getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse200) & {
+  headers: Headers;
+};
+export type getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponseError = (getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse422) & {
+  headers: Headers;
 };
 
-export type getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponseSuccess =
-  getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse200 & {
-    headers: Headers;
-  };
-export type getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponseError =
-  getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse422 & {
-    headers: Headers;
-  };
+export type getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse = (getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponseSuccess | getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponseError)
 
-export type getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse =
-  | getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponseSuccess
-  | getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponseError;
+export const getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetUrl = (configId: string,) => {
 
-export const getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetUrl = (
-  configId: string,
+
+  
+
+  return `/api/v1/feishu-sync/configs/${configId}`
+}
+
+export const getSyncConfigApiV1FeishuSyncConfigsConfigIdGet = async (configId: string, options?: RequestInit): Promise<getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse> => {
+  
+  return customFetch<getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse>(getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetUrl(configId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryKey = (configId: string,) => {
+    return [
+    `/api/v1/feishu-sync/configs/${configId}`
+    ] as const;
+    }
+
+    
+export const getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError = HTTPValidationError>(configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return `/api/v1/feishu-sync/configs/${configId}`;
-};
 
-export const getSyncConfigApiV1FeishuSyncConfigsConfigIdGet = async (
-  configId: string,
-  options?: RequestInit,
-): Promise<getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse> => {
-  return customFetch<getSyncConfigApiV1FeishuSyncConfigsConfigIdGetResponse>(
-    getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetUrl(configId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-export const getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryKey = (
-  configId: string,
-) => {
-  return [`/api/v1/feishu-sync/configs/${configId}`] as const;
-};
+  const queryKey =  queryOptions?.queryKey ?? getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryKey(configId);
 
-export const getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryOptions = <
-  TData = Awaited<
-    ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-  >,
-  TError = HTTPValidationError,
->(
-  configId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-        >,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryKey(configId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>> = ({ signal }) => getSyncConfigApiV1FeishuSyncConfigsConfigIdGet(configId, { signal, ...requestOptions });
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>
-  > = ({ signal }) =>
-    getSyncConfigApiV1FeishuSyncConfigsConfigIdGet(configId, {
-      signal,
-      ...requestOptions,
-    });
+      
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!configId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+      
 
-export type GetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryResult =
-  NonNullable<
-    Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>
-  >;
-export type GetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryError =
-  HTTPValidationError;
+   return  { queryKey, queryFn, enabled: !!(configId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-export function useGetSyncConfigApiV1FeishuSyncConfigsConfigIdGet<
-  TData = Awaited<
-    ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-  >,
-  TError = HTTPValidationError,
->(
-  configId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-        >,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+export type GetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryResult = NonNullable<Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>>
+export type GetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryError = HTTPValidationError
+
+
+export function useGetSyncConfigApiV1FeishuSyncConfigsConfigIdGet<TData = Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError = HTTPValidationError>(
+ configId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<
-            ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-          >,
+          Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>,
           TError,
-          Awaited<
-            ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-          >
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetSyncConfigApiV1FeishuSyncConfigsConfigIdGet<
-  TData = Awaited<
-    ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-  >,
-  TError = HTTPValidationError,
->(
-  configId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-        >,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+          Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSyncConfigApiV1FeishuSyncConfigsConfigIdGet<TData = Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError = HTTPValidationError>(
+ configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<
-            ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-          >,
+          Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>,
           TError,
-          Awaited<
-            ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-          >
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetSyncConfigApiV1FeishuSyncConfigsConfigIdGet<
-  TData = Awaited<
-    ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-  >,
-  TError = HTTPValidationError,
->(
-  configId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-        >,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+          Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSyncConfigApiV1FeishuSyncConfigsConfigIdGet<TData = Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError = HTTPValidationError>(
+ configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Sync Config
  */
 
-export function useGetSyncConfigApiV1FeishuSyncConfigsConfigIdGet<
-  TData = Awaited<
-    ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-  >,
-  TError = HTTPValidationError,
->(
-  configId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>
-        >,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions =
-    getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryOptions(
-      configId,
-      options,
-    );
+export function useGetSyncConfigApiV1FeishuSyncConfigsConfigIdGet<TData = Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError = HTTPValidationError>(
+ configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSyncConfigApiV1FeishuSyncConfigsConfigIdGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetSyncConfigApiV1FeishuSyncConfigsConfigIdGetQueryOptions(configId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Update a sync configuration.
  * @summary Update Sync Config
  */
 export type updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse200 = {
-  data: FeishuSyncConfigRead;
-  status: 200;
-};
+  data: FeishuSyncConfigRead
+  status: 200
+}
 
 export type updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponseSuccess = (updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse200) & {
+  headers: Headers;
+};
+export type updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponseError = (updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse422) & {
+  headers: Headers;
 };
 
-export type updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponseSuccess =
-  updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse200 & {
-    headers: Headers;
-  };
-export type updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponseError =
-  updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse422 & {
-    headers: Headers;
-  };
+export type updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse = (updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponseSuccess | updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponseError)
 
-export type updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse =
-  | updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponseSuccess
-  | updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponseError;
+export const getUpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchUrl = (configId: string,) => {
 
-export const getUpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchUrl = (
-  configId: string,
-) => {
-  return `/api/v1/feishu-sync/configs/${configId}`;
-};
 
-export const updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch = async (
-  configId: string,
-  feishuSyncConfigUpdate: FeishuSyncConfigUpdate,
-  options?: RequestInit,
-): Promise<updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse> => {
-  return customFetch<updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse>(
-    getUpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchUrl(configId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(feishuSyncConfigUpdate),
-    },
-  );
-};
+  
 
-export const getUpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchMutationOptions =
-  <TError = HTTPValidationError, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>
-      >,
-      TError,
-      { configId: string; data: FeishuSyncConfigUpdate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  }): UseMutationOptions<
-    Awaited<
-      ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>
-    >,
-    TError,
-    { configId: string; data: FeishuSyncConfigUpdate },
-    TContext
-  > => {
-    const mutationKey = ["updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-      ? options.mutation &&
-        "mutationKey" in options.mutation &&
-        options.mutation.mutationKey
-        ? options
-        : { ...options, mutation: { ...options.mutation, mutationKey } }
-      : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/feishu-sync/configs/${configId}`
+}
 
-    const mutationFn: MutationFunction<
-      Awaited<
-        ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>
-      >,
-      { configId: string; data: FeishuSyncConfigUpdate }
-    > = (props) => {
-      const { configId, data } = props ?? {};
+export const updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch = async (configId: string,
+    feishuSyncConfigUpdate: FeishuSyncConfigUpdate, options?: RequestInit): Promise<updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse> => {
+  
+  return customFetch<updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchResponse>(getUpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchUrl(configId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      feishuSyncConfigUpdate,)
+  }
+);}
 
-      return updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch(
-        configId,
-        data,
-        requestOptions,
-      );
-    };
 
-    return { mutationFn, ...mutationOptions };
-  };
 
-export type UpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchMutationResult =
-  NonNullable<
-    Awaited<
-      ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>
-    >
-  >;
-export type UpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchMutationBody =
-  FeishuSyncConfigUpdate;
-export type UpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchMutationError =
-  HTTPValidationError;
 
-/**
+export const getUpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>>, TError,{configId: string;data: FeishuSyncConfigUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>>, TError,{configId: string;data: FeishuSyncConfigUpdate}, TContext> => {
+
+const mutationKey = ['updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>>, {configId: string;data: FeishuSyncConfigUpdate}> = (props) => {
+          const {configId,data} = props ?? {};
+
+          return  updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch(configId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchMutationResult = NonNullable<Awaited<ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>>>
+    export type UpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchMutationBody = FeishuSyncConfigUpdate
+    export type UpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchMutationError = HTTPValidationError
+
+    /**
  * @summary Update Sync Config
  */
-export const useUpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>
-      >,
-      TError,
-      { configId: string; data: FeishuSyncConfigUpdate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<
-    ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>
-  >,
-  TError,
-  { configId: string; data: FeishuSyncConfigUpdate },
-  TContext
-> => {
-  return useMutation(
-    getUpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchMutationOptions(
-      options,
-    ),
-    queryClient,
-  );
-};
-/**
+export const useUpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>>, TError,{configId: string;data: FeishuSyncConfigUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateSyncConfigApiV1FeishuSyncConfigsConfigIdPatch>>,
+        TError,
+        {configId: string;data: FeishuSyncConfigUpdate},
+        TContext
+      > => {
+      return useMutation(getUpdateSyncConfigApiV1FeishuSyncConfigsConfigIdPatchMutationOptions(options), queryClient);
+    }
+    /**
  * Delete a sync configuration.
  * @summary Delete Sync Config
  */
 export type deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse204 = {
-  data: void;
-  status: 204;
-};
+  data: void
+  status: 204
+}
 
 export type deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponseSuccess = (deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse204) & {
+  headers: Headers;
+};
+export type deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponseError = (deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse422) & {
+  headers: Headers;
 };
 
-export type deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponseSuccess =
-  deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse204 & {
-    headers: Headers;
-  };
-export type deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponseError =
-  deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse422 & {
-    headers: Headers;
-  };
+export type deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse = (deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponseSuccess | deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponseError)
 
-export type deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse =
-  | deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponseSuccess
-  | deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponseError;
+export const getDeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteUrl = (configId: string,) => {
 
-export const getDeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteUrl = (
-  configId: string,
-) => {
-  return `/api/v1/feishu-sync/configs/${configId}`;
-};
 
-export const deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete = async (
-  configId: string,
-  options?: RequestInit,
-): Promise<deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse> => {
-  return customFetch<deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse>(
-    getDeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteUrl(configId),
-    {
-      ...options,
-      method: "DELETE",
-    },
-  );
-};
+  
 
-export const getDeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteMutationOptions =
-  <TError = HTTPValidationError, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>
-      >,
-      TError,
-      { configId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  }): UseMutationOptions<
-    Awaited<
-      ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>
-    >,
-    TError,
-    { configId: string },
-    TContext
-  > => {
-    const mutationKey = [
-      "deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete",
-    ];
-    const { mutation: mutationOptions, request: requestOptions } = options
-      ? options.mutation &&
-        "mutationKey" in options.mutation &&
-        options.mutation.mutationKey
-        ? options
-        : { ...options, mutation: { ...options.mutation, mutationKey } }
-      : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/feishu-sync/configs/${configId}`
+}
 
-    const mutationFn: MutationFunction<
-      Awaited<
-        ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>
-      >,
-      { configId: string }
-    > = (props) => {
-      const { configId } = props ?? {};
+export const deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete = async (configId: string, options?: RequestInit): Promise<deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse> => {
+  
+  return customFetch<deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteResponse>(getDeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteUrl(configId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
 
-      return deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete(
-        configId,
-        requestOptions,
-      );
-    };
 
-    return { mutationFn, ...mutationOptions };
-  };
 
-export type DeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteMutationResult =
-  NonNullable<
-    Awaited<
-      ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>
-    >
-  >;
 
-export type DeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteMutationError =
-  HTTPValidationError;
+export const getDeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>>, TError,{configId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>>, TError,{configId: string}, TContext> => {
 
-/**
+const mutationKey = ['deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>>, {configId: string}> = (props) => {
+          const {configId} = props ?? {};
+
+          return  deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete(configId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>>>
+    
+    export type DeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteMutationError = HTTPValidationError
+
+    /**
  * @summary Delete Sync Config
  */
-export const useDeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>
-      >,
-      TError,
-      { configId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<
-    ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>
-  >,
-  TError,
-  { configId: string },
-  TContext
-> => {
-  return useMutation(
-    getDeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteMutationOptions(
-      options,
-    ),
-    queryClient,
-  );
-};
-/**
+export const useDeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>>, TError,{configId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteSyncConfigApiV1FeishuSyncConfigsConfigIdDelete>>,
+        TError,
+        {configId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteSyncConfigApiV1FeishuSyncConfigsConfigIdDeleteMutationOptions(options), queryClient);
+    }
+    /**
  * Manually trigger a Feishu sync.
  * @summary Trigger Sync
  */
 export type triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse200 = {
-  data: FeishuSyncTriggerResponse;
-  status: 200;
-};
+  data: FeishuSyncTriggerResponse
+  status: 200
+}
 
 export type triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponseSuccess = (triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse200) & {
+  headers: Headers;
+};
+export type triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponseError = (triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse422) & {
+  headers: Headers;
 };
 
-export type triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponseSuccess =
-  triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse200 & {
-    headers: Headers;
-  };
-export type triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponseError =
-  triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse422 & {
-    headers: Headers;
-  };
+export type triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse = (triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponseSuccess | triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponseError)
 
-export type triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse =
-  | triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponseSuccess
-  | triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponseError;
+export const getTriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostUrl = (configId: string,) => {
 
-export const getTriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostUrl = (
-  configId: string,
-) => {
-  return `/api/v1/feishu-sync/configs/${configId}/trigger`;
-};
 
-export const triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost = async (
-  configId: string,
-  options?: RequestInit,
-): Promise<triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse> => {
-  return customFetch<triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse>(
-    getTriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostUrl(configId),
-    {
-      ...options,
-      method: "POST",
-    },
-  );
-};
+  
 
-export const getTriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostMutationOptions =
-  <TError = HTTPValidationError, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>
-      >,
-      TError,
-      { configId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  }): UseMutationOptions<
-    Awaited<
-      ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>
-    >,
-    TError,
-    { configId: string },
-    TContext
-  > => {
-    const mutationKey = [
-      "triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost",
-    ];
-    const { mutation: mutationOptions, request: requestOptions } = options
-      ? options.mutation &&
-        "mutationKey" in options.mutation &&
-        options.mutation.mutationKey
-        ? options
-        : { ...options, mutation: { ...options.mutation, mutationKey } }
-      : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/feishu-sync/configs/${configId}/trigger`
+}
 
-    const mutationFn: MutationFunction<
-      Awaited<
-        ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>
-      >,
-      { configId: string }
-    > = (props) => {
-      const { configId } = props ?? {};
+export const triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost = async (configId: string, options?: RequestInit): Promise<triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse> => {
+  
+  return customFetch<triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostResponse>(getTriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostUrl(configId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
 
-      return triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost(
-        configId,
-        requestOptions,
-      );
-    };
 
-    return { mutationFn, ...mutationOptions };
-  };
 
-export type TriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostMutationResult =
-  NonNullable<
-    Awaited<
-      ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>
-    >
-  >;
 
-export type TriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostMutationError =
-  HTTPValidationError;
+export const getTriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>>, TError,{configId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>>, TError,{configId: string}, TContext> => {
 
-/**
+const mutationKey = ['triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>>, {configId: string}> = (props) => {
+          const {configId} = props ?? {};
+
+          return  triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost(configId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostMutationResult = NonNullable<Awaited<ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>>>
+    
+    export type TriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostMutationError = HTTPValidationError
+
+    /**
  * @summary Trigger Sync
  */
-export const useTriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>
-      >,
-      TError,
-      { configId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<
-    ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>
-  >,
-  TError,
-  { configId: string },
-  TContext
-> => {
-  return useMutation(
-    getTriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostMutationOptions(
-      options,
-    ),
-    queryClient,
-  );
-};
-/**
+export const useTriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>>, TError,{configId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof triggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPost>>,
+        TError,
+        {configId: string},
+        TContext
+      > => {
+      return useMutation(getTriggerSyncApiV1FeishuSyncConfigsConfigIdTriggerPostMutationOptions(options), queryClient);
+    }
+    /**
  * List task mappings for a sync configuration.
  * @summary List Mappings
  */
 export type listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse200 = {
-  data: FeishuTaskMappingRead[];
-  status: 200;
-};
+  data: FeishuTaskMappingRead[]
+  status: 200
+}
 
 export type listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponseSuccess = (listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse200) & {
+  headers: Headers;
+};
+export type listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponseError = (listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse422) & {
+  headers: Headers;
 };
 
-export type listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponseSuccess =
-  listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse200 & {
-    headers: Headers;
-  };
-export type listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponseError =
-  listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse422 & {
-    headers: Headers;
-  };
+export type listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse = (listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponseSuccess | listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponseError)
 
-export type listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse =
-  | listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponseSuccess
-  | listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponseError;
+export const getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetUrl = (configId: string,) => {
 
-export const getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetUrl = (
-  configId: string,
+
+  
+
+  return `/api/v1/feishu-sync/configs/${configId}/mappings`
+}
+
+export const listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet = async (configId: string, options?: RequestInit): Promise<listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse> => {
+  
+  return customFetch<listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse>(getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetUrl(configId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryKey = (configId: string,) => {
+    return [
+    `/api/v1/feishu-sync/configs/${configId}/mappings`
+    ] as const;
+    }
+
+    
+export const getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryOptions = <TData = Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError = HTTPValidationError>(configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return `/api/v1/feishu-sync/configs/${configId}/mappings`;
-};
 
-export const listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet = async (
-  configId: string,
-  options?: RequestInit,
-): Promise<listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse> => {
-  return customFetch<listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetResponse>(
-    getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetUrl(configId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-export const getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryKey =
-  (configId: string) => {
-    return [`/api/v1/feishu-sync/configs/${configId}/mappings`] as const;
-  };
+  const queryKey =  queryOptions?.queryKey ?? getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryKey(configId);
 
-export const getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryOptions =
-  <
-    TData = Awaited<
-      ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>
-    >,
-    TError = HTTPValidationError,
-  >(
-    configId: string,
-    options?: {
-      query?: Partial<
-        UseQueryOptions<
-          Awaited<
-            ReturnType<
-              typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet
-            >
-          >,
-          TError,
-          TData
-        >
-      >;
-      request?: SecondParameter<typeof customFetch>;
-    },
-  ) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+  
 
-    const queryKey =
-      queryOptions?.queryKey ??
-      getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryKey(
-        configId,
-      );
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>> = ({ signal }) => listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet(configId, { signal, ...requestOptions });
 
-    const queryFn: QueryFunction<
-      Awaited<
-        ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>
-      >
-    > = ({ signal }) =>
-      listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet(configId, {
-        signal,
-        ...requestOptions,
-      });
+      
 
-    return {
-      queryKey,
-      queryFn,
-      enabled: !!configId,
-      ...queryOptions,
-    } as UseQueryOptions<
-      Awaited<
-        ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>
-      >,
-      TError,
-      TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-  };
+      
 
-export type ListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryResult =
-  NonNullable<
-    Awaited<
-      ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>
-    >
-  >;
-export type ListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryError =
-  HTTPValidationError;
+   return  { queryKey, queryFn, enabled: !!(configId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-export function useListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet<
-  TData = Awaited<
-    ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>
-  >,
-  TError = HTTPValidationError,
->(
-  configId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<
-            typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet
-          >
-        >,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+export type ListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryResult = NonNullable<Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>>
+export type ListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryError = HTTPValidationError
+
+
+export function useListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet<TData = Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError = HTTPValidationError>(
+ configId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<
-            ReturnType<
-              typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet
-            >
-          >,
+          Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>,
           TError,
-          Awaited<
-            ReturnType<
-              typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet
-            >
-          >
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet<
-  TData = Awaited<
-    ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>
-  >,
-  TError = HTTPValidationError,
->(
-  configId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<
-            typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet
-          >
-        >,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+          Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet<TData = Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError = HTTPValidationError>(
+ configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<
-            ReturnType<
-              typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet
-            >
-          >,
+          Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>,
           TError,
-          Awaited<
-            ReturnType<
-              typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet
-            >
-          >
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet<
-  TData = Awaited<
-    ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>
-  >,
-  TError = HTTPValidationError,
->(
-  configId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<
-            typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet
-          >
-        >,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+          Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet<TData = Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError = HTTPValidationError>(
+ configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Mappings
  */
 
-export function useListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet<
-  TData = Awaited<
-    ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>
-  >,
-  TError = HTTPValidationError,
->(
-  configId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<
-            typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet
-          >
-        >,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions =
-    getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryOptions(
-      configId,
-      options,
-    );
+export function useListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet<TData = Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError = HTTPValidationError>(
+ configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMappingsApiV1FeishuSyncConfigsConfigIdMappingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getListMappingsApiV1FeishuSyncConfigsConfigIdMappingsGetQueryOptions(configId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
+
+
+
 /**
+ * Resolve one Feishu sync conflict from the UI.
+ * @summary Resolve Mapping Conflict
+ */
+export type resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponse200 = {
+  data: FeishuTaskMappingRead
+  status: 200
+}
+
+export type resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponseSuccess = (resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponse200) & {
+  headers: Headers;
+};
+export type resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponseError = (resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponse422) & {
+  headers: Headers;
+};
+
+export type resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponse = (resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponseSuccess | resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponseError)
+
+export const getResolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostUrl = (configId: string,
+    mappingId: string,) => {
+
+
+  
+
+  return `/api/v1/feishu-sync/configs/${configId}/mappings/${mappingId}/resolve`
+}
+
+export const resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePost = async (configId: string,
+    mappingId: string,
+    feishuConflictResolutionRequest: FeishuConflictResolutionRequest, options?: RequestInit): Promise<resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponse> => {
+  
+  return customFetch<resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostResponse>(getResolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostUrl(configId,mappingId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      feishuConflictResolutionRequest,)
+  }
+);}
+
+
+
+
+export const getResolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePost>>, TError,{configId: string;mappingId: string;data: FeishuConflictResolutionRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePost>>, TError,{configId: string;mappingId: string;data: FeishuConflictResolutionRequest}, TContext> => {
+
+const mutationKey = ['resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePost>>, {configId: string;mappingId: string;data: FeishuConflictResolutionRequest}> = (props) => {
+          const {configId,mappingId,data} = props ?? {};
+
+          return  resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePost(configId,mappingId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostMutationResult = NonNullable<Awaited<ReturnType<typeof resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePost>>>
+    export type ResolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostMutationBody = FeishuConflictResolutionRequest
+    export type ResolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostMutationError = HTTPValidationError
+
+    /**
+ * @summary Resolve Mapping Conflict
+ */
+export const useResolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePost>>, TError,{configId: string;mappingId: string;data: FeishuConflictResolutionRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePost>>,
+        TError,
+        {configId: string;mappingId: string;data: FeishuConflictResolutionRequest},
+        TContext
+      > => {
+      return useMutation(getResolveMappingConflictApiV1FeishuSyncConfigsConfigIdMappingsMappingIdResolvePostMutationOptions(options), queryClient);
+    }
+    /**
  * Test the Feishu API connection for a sync config.
  * @summary Test Connection
  */
 export type testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse200 = {
-  data: TestConnectionApiV1FeishuSyncConfigsConfigIdTestPost200;
-  status: 200;
-};
+  data: TestConnectionApiV1FeishuSyncConfigsConfigIdTestPost200
+  status: 200
+}
 
 export type testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponseSuccess = (testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse200) & {
+  headers: Headers;
+};
+export type testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponseError = (testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse422) & {
+  headers: Headers;
 };
 
-export type testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponseSuccess =
-  testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse200 & {
-    headers: Headers;
-  };
-export type testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponseError =
-  testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse422 & {
-    headers: Headers;
-  };
+export type testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse = (testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponseSuccess | testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponseError)
 
-export type testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse =
-  | testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponseSuccess
-  | testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponseError;
+export const getTestConnectionApiV1FeishuSyncConfigsConfigIdTestPostUrl = (configId: string,) => {
 
-export const getTestConnectionApiV1FeishuSyncConfigsConfigIdTestPostUrl = (
-  configId: string,
-) => {
-  return `/api/v1/feishu-sync/configs/${configId}/test`;
-};
 
-export const testConnectionApiV1FeishuSyncConfigsConfigIdTestPost = async (
-  configId: string,
-  options?: RequestInit,
-): Promise<testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse> => {
-  return customFetch<testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse>(
-    getTestConnectionApiV1FeishuSyncConfigsConfigIdTestPostUrl(configId),
-    {
-      ...options,
-      method: "POST",
-    },
-  );
-};
+  
 
-export const getTestConnectionApiV1FeishuSyncConfigsConfigIdTestPostMutationOptions =
-  <TError = HTTPValidationError, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>
-      >,
-      TError,
-      { configId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  }): UseMutationOptions<
-    Awaited<
-      ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>
-    >,
-    TError,
-    { configId: string },
-    TContext
-  > => {
-    const mutationKey = [
-      "testConnectionApiV1FeishuSyncConfigsConfigIdTestPost",
-    ];
-    const { mutation: mutationOptions, request: requestOptions } = options
-      ? options.mutation &&
-        "mutationKey" in options.mutation &&
-        options.mutation.mutationKey
-        ? options
-        : { ...options, mutation: { ...options.mutation, mutationKey } }
-      : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/feishu-sync/configs/${configId}/test`
+}
 
-    const mutationFn: MutationFunction<
-      Awaited<
-        ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>
-      >,
-      { configId: string }
-    > = (props) => {
-      const { configId } = props ?? {};
+export const testConnectionApiV1FeishuSyncConfigsConfigIdTestPost = async (configId: string, options?: RequestInit): Promise<testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse> => {
+  
+  return customFetch<testConnectionApiV1FeishuSyncConfigsConfigIdTestPostResponse>(getTestConnectionApiV1FeishuSyncConfigsConfigIdTestPostUrl(configId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
 
-      return testConnectionApiV1FeishuSyncConfigsConfigIdTestPost(
-        configId,
-        requestOptions,
-      );
-    };
 
-    return { mutationFn, ...mutationOptions };
-  };
 
-export type TestConnectionApiV1FeishuSyncConfigsConfigIdTestPostMutationResult =
-  NonNullable<
-    Awaited<
-      ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>
-    >
-  >;
 
-export type TestConnectionApiV1FeishuSyncConfigsConfigIdTestPostMutationError =
-  HTTPValidationError;
+export const getTestConnectionApiV1FeishuSyncConfigsConfigIdTestPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>>, TError,{configId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>>, TError,{configId: string}, TContext> => {
 
-/**
+const mutationKey = ['testConnectionApiV1FeishuSyncConfigsConfigIdTestPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>>, {configId: string}> = (props) => {
+          const {configId} = props ?? {};
+
+          return  testConnectionApiV1FeishuSyncConfigsConfigIdTestPost(configId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TestConnectionApiV1FeishuSyncConfigsConfigIdTestPostMutationResult = NonNullable<Awaited<ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>>>
+    
+    export type TestConnectionApiV1FeishuSyncConfigsConfigIdTestPostMutationError = HTTPValidationError
+
+    /**
  * @summary Test Connection
  */
-export const useTestConnectionApiV1FeishuSyncConfigsConfigIdTestPost = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>
-      >,
-      TError,
-      { configId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<
-    ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>
-  >,
-  TError,
-  { configId: string },
-  TContext
-> => {
-  return useMutation(
-    getTestConnectionApiV1FeishuSyncConfigsConfigIdTestPostMutationOptions(
-      options,
-    ),
-    queryClient,
-  );
+export const useTestConnectionApiV1FeishuSyncConfigsConfigIdTestPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>>, TError,{configId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof testConnectionApiV1FeishuSyncConfigsConfigIdTestPost>>,
+        TError,
+        {configId: string},
+        TContext
+      > => {
+      return useMutation(getTestConnectionApiV1FeishuSyncConfigsConfigIdTestPostMutationOptions(options), queryClient);
+    }
+    /**
+ * Return recent sync history entries from activity log.
+ * @summary Sync History
+ */
+export type syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponse200 = {
+  data: FeishuSyncHistoryEntry[]
+  status: 200
+}
+
+export type syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponseSuccess = (syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponse200) & {
+  headers: Headers;
 };
+export type syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponseError = (syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponse422) & {
+  headers: Headers;
+};
+
+export type syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponse = (syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponseSuccess | syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponseError)
+
+export const getSyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetUrl = (configId: string,
+    params?: SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/feishu-sync/configs/${configId}/history?${stringifiedParams}` : `/api/v1/feishu-sync/configs/${configId}/history`
+}
+
+export const syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet = async (configId: string,
+    params?: SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetParams, options?: RequestInit): Promise<syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponse> => {
+  
+  return customFetch<syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetResponse>(getSyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetUrl(configId,params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getSyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetQueryKey = (configId: string,
+    params?: SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetParams,) => {
+    return [
+    `/api/v1/feishu-sync/configs/${configId}/history`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getSyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetQueryOptions = <TData = Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError = HTTPValidationError>(configId: string,
+    params?: SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetQueryKey(configId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>> = ({ signal }) => syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet(configId,params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(configId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetQueryResult = NonNullable<Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>>
+export type SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetQueryError = HTTPValidationError
+
+
+export function useSyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet<TData = Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError = HTTPValidationError>(
+ configId: string,
+    params: undefined |  SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>,
+          TError,
+          Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet<TData = Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError = HTTPValidationError>(
+ configId: string,
+    params?: SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>,
+          TError,
+          Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet<TData = Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError = HTTPValidationError>(
+ configId: string,
+    params?: SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Sync History
+ */
+
+export function useSyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet<TData = Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError = HTTPValidationError>(
+ configId: string,
+    params?: SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof syncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getSyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetQueryOptions(configId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+

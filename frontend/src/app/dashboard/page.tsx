@@ -10,12 +10,15 @@ import { useQuery } from "@tanstack/react-query";
 import { SignedIn, SignedOut, useAuth } from "@/auth/clerk";
 import {
   Activity,
+  AlertTriangle,
   ArrowUpRight,
   Bot,
+  Clock,
   Info,
   LayoutGrid,
   Shield,
   Timer,
+  XCircle,
 } from "lucide-react";
 
 import { DashboardSidebar } from "@/components/organisms/DashboardSidebar";
@@ -60,6 +63,28 @@ type SessionSummary = {
   usage: string;
   lastSeenAt: string | null;
   isMain: boolean;
+};
+
+type AttentionItem = {
+  category: "failed_subtask" | "timed_out_subtask" | "stale_mission" | "pending_approval";
+  severity: "critical" | "warning" | "info";
+  entity_id: string;
+  entity_type: string;
+  title: string;
+  message: string;
+  board_id: string | null;
+  board_name: string | null;
+  created_at: string;
+};
+
+type AttentionSnapshot = {
+  total: number;
+  failed_subtasks: number;
+  timed_out_subtasks: number;
+  stale_missions: number;
+  pending_approvals: number;
+  items: AttentionItem[];
+  generated_at: string;
 };
 
 type SummaryRow = {
@@ -539,6 +564,12 @@ export default function DashboardPage() {
     enabled: Boolean(isSignedIn),
     queryFn: () =>
       apiGet<Array<{ sync_status: string }>>("/api/v1/feishu-sync/configs"),
+  });
+  const attentionQuery = useQuery({
+    queryKey: ["dashboard", "attention"],
+    enabled: Boolean(isSignedIn),
+    refetchInterval: 15_000,
+    queryFn: () => apiGet<AttentionSnapshot>("/api/v1/metrics/attention"),
   });
 
   const boards = useMemo(
@@ -1043,6 +1074,89 @@ export default function DashboardPage() {
                 </div>
               )}
             </section>
+
+            {/* 🔔 Attention 需关注视图 */}
+            {attentionQuery.data && attentionQuery.data.total > 0 ? (
+              <section className="mt-4 rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-6 shadow-sm">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-amber-600" />
+                    <h3 className="text-lg font-semibold text-slate-900">需要关注</h3>
+                    <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[11px] font-bold text-white">
+                      {attentionQuery.data.total}
+                    </span>
+                  </div>
+                  <Link
+                    href="/missions"
+                    className="inline-flex items-center gap-1 text-xs text-slate-500 transition hover:text-slate-700"
+                  >
+                    查看详情
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+
+                {/* 统计标签 */}
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {attentionQuery.data.failed_subtasks > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700">
+                      <XCircle className="h-3 w-3" />
+                      {attentionQuery.data.failed_subtasks} 个失败子任务
+                    </span>
+                  )}
+                  {attentionQuery.data.timed_out_subtasks > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2.5 py-1 text-xs font-medium text-orange-700">
+                      <Clock className="h-3 w-3" />
+                      {attentionQuery.data.timed_out_subtasks} 个超时子任务
+                    </span>
+                  )}
+                  {attentionQuery.data.stale_missions > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-medium text-yellow-700">
+                      <AlertTriangle className="h-3 w-3" />
+                      {attentionQuery.data.stale_missions} 个停滞 Mission
+                    </span>
+                  )}
+                  {attentionQuery.data.pending_approvals > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700">
+                      <Shield className="h-3 w-3" />
+                      {attentionQuery.data.pending_approvals} 项待审批
+                    </span>
+                  )}
+                </div>
+
+                {/* Attention 条目列表 */}
+                <div className="divide-y divide-amber-100 rounded-lg border border-amber-200 bg-white">
+                  {attentionQuery.data.items.slice(0, 8).map((item) => (
+                    <div
+                      key={`${item.category}-${item.entity_id}`}
+                      className="flex items-start justify-between gap-3 px-3 py-2"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-sm font-medium ${
+                          item.severity === "critical"
+                            ? "text-rose-700"
+                            : item.severity === "warning"
+                              ? "text-amber-700"
+                              : "text-slate-700"
+                        }`}>
+                          {item.title}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs text-slate-500">
+                          {item.board_name ? `${item.board_name} · ` : ""}{item.message}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-[11px] text-slate-500" suppressHydrationWarning>
+                        {formatRelativeTimestamp(item.created_at)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                {attentionQuery.data.total > 8 && (
+                  <p className="mt-2 text-xs text-slate-500">
+                    仅显示最近 8 条，共 {attentionQuery.data.total} 条需要关注。
+                  </p>
+                )}
+              </section>
+            ) : null}
 
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <section className="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm">

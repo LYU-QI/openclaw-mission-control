@@ -25,6 +25,24 @@ class GatewayResolveQuery(SQLModel):
     gateway_allow_insecure_tls: bool | None = None
 
 
+class GatewayHealthLayer(SQLModel):
+    """Single probe layer in gateway health diagnosis."""
+
+    ok: bool
+    label: str
+    detail: str | None = None
+
+
+class GatewayHealthLayers(SQLModel):
+    """Layered gateway runtime diagnosis from transport to check-in."""
+
+    http_reachable: GatewayHealthLayer
+    ws_handshake: GatewayHealthLayer
+    rpc_ready: GatewayHealthLayer
+    session_visible: GatewayHealthLayer
+    main_agent_checkin: GatewayHealthLayer
+
+
 class GatewaysStatusResponse(SQLModel):
     """Aggregated gateway status response including session metadata."""
 
@@ -35,6 +53,7 @@ class GatewaysStatusResponse(SQLModel):
     main_session: object | None = None
     main_session_error: str | None = None
     error: str | None = None
+    layers: GatewayHealthLayers | None = None
 
 
 class GatewaySessionsResponse(SQLModel):

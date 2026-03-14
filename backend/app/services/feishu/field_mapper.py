@@ -6,7 +6,6 @@ from typing import Any
 
 from app.models.tasks import Task
 
-
 # Default mapping when user hasn't configured a custom one
 DEFAULT_FIELD_MAPPING: dict[str, str] = {
     "任务名称": "title",

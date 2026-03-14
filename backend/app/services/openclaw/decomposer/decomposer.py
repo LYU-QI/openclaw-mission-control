@@ -30,7 +30,9 @@ class SubtaskSpec:
 class TaskDecomposer:
     """Creates subtasks from mission goal and loaded context."""
 
-    def _fallback_subtasks(self, *, mission: Mission, context: list[ContextChunk]) -> list[dict[str, Any]]:
+    def _fallback_subtasks(
+        self, *, mission: Mission, context: list[ContextChunk]
+    ) -> list[dict[str, Any]]:
         context_desc = f"Review {len(context)} context chunks and extract facts."
         if not context:
             context_desc = "No context provided; identify assumptions and missing inputs."
@@ -102,7 +104,9 @@ class TaskDecomposer:
                 headers=headers,
                 method="POST",
             )
-            with urlopen(req, timeout=max(settings.context_loader_timeout_seconds, 5)) as resp:  # noqa: S310
+            with urlopen(
+                req, timeout=max(settings.context_loader_timeout_seconds, 5)
+            ) as resp:  # noqa: S310
                 body = json.loads(resp.read())
             choices = body.get("choices", [])
             if not isinstance(choices, list) or not choices:
@@ -125,7 +129,9 @@ class TaskDecomposer:
                 return [item for item in subtasks if isinstance(item, dict)]
         raise ValueError("Unsupported LLM subtask payload format.")
 
-    async def decompose(self, *, mission: Mission, context: list[ContextChunk]) -> list[SubtaskSpec]:
+    async def decompose(
+        self, *, mission: Mission, context: list[ContextChunk]
+    ) -> list[SubtaskSpec]:
         candidate: list[dict[str, Any]] = self._fallback_subtasks(mission=mission, context=context)
         if self._llm_enabled():
             prompt = build_decompose_prompt(mission=mission, context=context)

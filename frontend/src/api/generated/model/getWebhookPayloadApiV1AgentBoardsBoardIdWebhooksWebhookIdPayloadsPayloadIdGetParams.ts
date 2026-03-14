@@ -5,7 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetWebhookPayloadApiV1AgentBoardsBoardIdWebhooksWebhookIdPayloadsPayloadIdGetParams =
-  {
-    max_chars?: number | null;
-  };
+export type GetWebhookPayloadApiV1AgentBoardsBoardIdWebhooksWebhookIdPayloadsPayloadIdGetParams = {
+max_chars?: number | null;
+};

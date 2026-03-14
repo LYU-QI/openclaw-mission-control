@@ -3,6 +3,14 @@ import { gatewaysStatusApiV1GatewaysStatusGet } from "@/api/generated/gateways/g
 export const DEFAULT_WORKSPACE_ROOT = "~/.openclaw";
 
 export type GatewayCheckStatus = "idle" | "checking" | "success" | "error";
+export type GatewayDiagnosticTone = "error" | "warning" | "info";
+
+export type GatewayDiagnostic = {
+  code: string | null;
+  summary: string;
+  detail: string | null;
+  tone: GatewayDiagnosticTone;
+};
 
 /**
  * Returns true only when the URL string contains an explicit ":port" segment.
@@ -70,6 +78,75 @@ export const validateGatewayUrl = (value: string) => {
     return "Enter a valid gateway URL including port.";
   }
 };
+
+export function parseGatewayDiagnostic(message: string | null | undefined): GatewayDiagnostic | null {
+  const raw = (message ?? "").trim();
+  if (!raw) return null;
+
+  const prefixed = raw.match(/^([A-Z_]+):\s*(.+)$/);
+  const code = prefixed?.[1] ?? null;
+  const body = prefixed?.[2] ?? raw;
+
+  switch (code) {
+    case "PAIRING_REQUIRED":
+      return {
+        code,
+        summary: "需要先完成设备配对",
+        detail: "去远端 Gateway Dashboard 批准 Mission Control 设备，然后再重试保存。",
+        tone: "warning",
+      };
+    case "MISSING_SCOPE":
+      return {
+        code,
+        summary: body,
+        detail: "当前 Gateway token 缺少所需 operator scope，需要更新 token 权限。",
+        tone: "error",
+      };
+    case "TOKEN_MISMATCH":
+      return {
+        code,
+        summary: "Gateway token 不匹配",
+        detail: "Mission Control 里保存的 token 和远端 Gateway 当前 token 不一致。",
+        tone: "error",
+      };
+    case "TRANSPORT_ERROR":
+      return {
+        code,
+        summary: "Gateway 网络或 WebSocket 连接异常",
+        detail: "检查远端地址、端口、安全组、反向代理和 WebSocket 握手是否正常。",
+        tone: "error",
+      };
+    case "CHECKIN_TIMEOUT":
+      return {
+        code,
+        summary: "Agent 已被唤醒，但没有及时回传心跳",
+        detail: "通常是远端 session 没真正跑起来，或启动后立即失败。",
+        tone: "warning",
+      };
+    case "AUTH_FAILED":
+      return {
+        code,
+        summary: "Gateway 认证失败",
+        detail: "检查 token 是否正确，以及远端 Gateway 是否仍启用当前鉴权方式。",
+        tone: "error",
+      };
+    default:
+      if (body.toLowerCase().includes("pairing required")) {
+        return {
+          code: "PAIRING_REQUIRED",
+          summary: "需要先完成设备配对",
+          detail: "去远端 Gateway Dashboard 批准 Mission Control 设备，然后再重试保存。",
+          tone: "warning",
+        };
+      }
+      return {
+        code,
+        summary: body,
+        detail: null,
+        tone: "error",
+      };
+  }
+}
 
 export async function checkGatewayConnection(params: {
   gatewayUrl: string;

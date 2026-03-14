@@ -11,6 +11,7 @@ from app.models.agents import Agent
 from app.models.boards import Board
 from app.models.gateways import Gateway
 from app.services.openclaw.constants import MAX_WAKE_ATTEMPTS_WITHOUT_CHECKIN
+from app.services.openclaw.error_messages import normalize_gateway_error_message
 from app.services.openclaw.lifecycle_orchestrator import AgentLifecycleOrchestrator
 from app.services.openclaw.lifecycle_queue import decode_lifecycle_task, defer_lifecycle_reconcile
 from app.services.queue import QueuedTask
@@ -82,8 +83,8 @@ async def process_lifecycle_queue_task(task: QueuedTask) -> None:
         if agent.wake_attempts >= MAX_WAKE_ATTEMPTS_WITHOUT_CHECKIN:
             agent.status = "offline"
             agent.checkin_deadline_at = None
-            agent.last_provision_error = (
-                "Agent did not check in after wake; max wake attempts reached"
+            agent.last_provision_error = normalize_gateway_error_message(
+                "Agent did not check in after wake; max wake attempts reached",
             )
             agent.updated_at = utcnow()
             session.add(agent)

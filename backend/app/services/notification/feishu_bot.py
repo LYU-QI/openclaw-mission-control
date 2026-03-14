@@ -41,4 +41,5 @@ def send_feishu_webhook(
         method="POST",
     )
     with urlopen(req, timeout=10) as resp:  # noqa: S310
-        return json.loads(resp.read())
+        result: dict[str, Any] = json.loads(resp.read())
+        return result

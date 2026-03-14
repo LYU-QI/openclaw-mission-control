@@ -15,3 +15,12 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   });
   return res.data;
 }
+
+export async function apiPatch<T>(path: string, body: unknown): Promise<T> {
+  const res = await customFetch<{ data: T }>(path, {
+    method: "PATCH",
+    body: body === undefined ? undefined : JSON.stringify(body),
+    cache: "no-store",
+  });
+  return res.data;
+}

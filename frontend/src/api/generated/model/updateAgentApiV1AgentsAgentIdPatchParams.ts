@@ -6,5 +6,5 @@
  */
 
 export type UpdateAgentApiV1AgentsAgentIdPatchParams = {
-  force?: boolean;
+force?: boolean;
 };

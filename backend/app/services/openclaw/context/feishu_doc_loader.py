@@ -47,7 +47,9 @@ class FeishuDocLoader:
         if path_hint:
             resolved = _resolve_path(path_hint)
             if resolved is None:
-                return [{"source": ref, "content": f"Rejected doc path outside repository: {path_hint}"}]
+                return [
+                    {"source": ref, "content": f"Rejected doc path outside repository: {path_hint}"}
+                ]
             if resolved.exists() and resolved.is_file():
                 content = resolved.read_text(encoding="utf-8", errors="replace")
                 return [{"source": str(resolved), "content": content}]
@@ -56,7 +58,12 @@ class FeishuDocLoader:
             return [{"source": ref, "content": "No doc id or path provided."}]
 
         if not settings.feishu_app_id.strip() or not settings.feishu_app_secret.strip():
-            return [{"source": ref, "content": "Feishu app credentials are not configured for remote doc loading."}]
+            return [
+                {
+                    "source": ref,
+                    "content": "Feishu app credentials are not configured for remote doc loading.",
+                }
+            ]
 
         client = FeishuClient(settings.feishu_app_id, settings.feishu_app_secret)
         response = client.get_doc_raw_content(doc_id)
@@ -64,4 +71,9 @@ class FeishuDocLoader:
         content = data.get("content")
         if isinstance(content, str) and content.strip():
             return [{"source": f"feishu-doc:{doc_id}", "content": content}]
-        return [{"source": ref, "content": f"Feishu document returned no readable content for {doc_id}."}]
+        return [
+            {
+                "source": ref,
+                "content": f"Feishu document returned no readable content for {doc_id}.",
+            }
+        ]

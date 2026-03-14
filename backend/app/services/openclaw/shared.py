@@ -30,3 +30,12 @@ class GatewayAgentIdentity:
     @classmethod
     def openclaw_agent_id(cls, gateway: Gateway) -> str:
         return cls.openclaw_agent_id_for_id(gateway.id)
+
+    @classmethod
+    def system_agent_id(cls, gateway: Gateway, role: str) -> str:
+        return f"{_GATEWAY_OPENCLAW_AGENT_PREFIX}{gateway.id}-{role.replace('_', '-')}"
+
+    @classmethod
+    def system_session_key(cls, gateway: Gateway, role: str) -> str:
+        """Return a stable session key for a system-role agent."""
+        return f"{_GATEWAY_AGENT_PREFIX}{gateway.id}-{role.replace('_', '-')}{_GATEWAY_AGENT_SUFFIX}"

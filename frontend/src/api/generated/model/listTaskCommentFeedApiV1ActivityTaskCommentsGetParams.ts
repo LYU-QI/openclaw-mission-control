@@ -6,14 +6,14 @@
  */
 
 export type ListTaskCommentFeedApiV1ActivityTaskCommentsGetParams = {
-  board_id?: string | null;
-  /**
-   * @minimum 1
-   * @maximum 200
-   */
-  limit?: number;
-  /**
-   * @minimum 0
-   */
-  offset?: number;
+board_id?: string | null;
+/**
+ * @minimum 1
+ * @maximum 200
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
 };

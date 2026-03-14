@@ -19,7 +19,9 @@ from app.services.openclaw.context.log_loader import LogLoader
 def test_git_loader_status(monkeypatch: pytest.MonkeyPatch) -> None:
     def _fake_run(*args: object, **kwargs: object) -> subprocess.CompletedProcess[str]:
         del args, kwargs
-        return subprocess.CompletedProcess(args=["git"], returncode=0, stdout="M backend/app/main.py", stderr="")
+        return subprocess.CompletedProcess(
+            args=["git"], returncode=0, stdout="M backend/app/main.py", stderr=""
+        )
 
     monkeypatch.setattr("app.services.openclaw.context.git_loader.subprocess.run", _fake_run)
     chunks = asyncio.run(GitLoader().load("git://status"))
@@ -28,7 +30,9 @@ def test_git_loader_status(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_doc_loader_reads_local_file(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    monkeypatch.setattr("app.services.openclaw.context.feishu_doc_loader._repo_root", lambda: tmp_path)
+    monkeypatch.setattr(
+        "app.services.openclaw.context.feishu_doc_loader._repo_root", lambda: tmp_path
+    )
     doc_file = tmp_path / "doc.md"
     doc_file.write_text("line-1\nline-2", encoding="utf-8")
     loader = FeishuDocLoader()

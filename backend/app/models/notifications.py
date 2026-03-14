@@ -59,3 +59,21 @@ class NotificationLog(QueryModel, table=True):
     response: dict[str, Any] | None = Field(default=None, sa_column=Column(JSON))
     error_message: str | None = Field(default=None, sa_column=Column(Text))
     created_at: datetime = Field(default_factory=utcnow)
+
+
+class NotificationTemplate(QueryModel, table=True):
+    """Customizable templates for notification events."""
+
+    __tablename__ = "notification_templates"  # pyright: ignore[reportAssignmentType]
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    organization_id: UUID = Field(foreign_key="organizations.id", index=True)
+
+    event_type: str = Field(index=True)
+    title: str
+    template_type: str = Field(default="blue")  # blue, green, red, orange, etc.
+    content_format: str | None = Field(default=None, sa_column=Column(Text))
+
+    is_active: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=utcnow)
+    updated_at: datetime = Field(default_factory=utcnow)

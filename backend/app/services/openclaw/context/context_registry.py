@@ -24,4 +24,3 @@ class ContextRegistry:
 
     def get(self, scheme: str) -> BaseContextLoader | None:
         return self._loaders.get(scheme)
-

@@ -1,7 +1,10 @@
 import asyncio
+
 from sqlmodel import SQLModel
-from app.db.session import async_engine
+
 import app.models  # Ensures all models are registered
+from app.db.session import async_engine
+
 
 async def setup():
     async with async_engine.connect() as conn:
@@ -9,6 +12,7 @@ async def setup():
         await conn.run_sync(SQLModel.metadata.create_all)
         await conn.commit()
     print("Done!")
+
 
 if __name__ == "__main__":
     asyncio.run(setup())

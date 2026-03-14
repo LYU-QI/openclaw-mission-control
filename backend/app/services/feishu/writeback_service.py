@@ -19,4 +19,3 @@ class WritebackService:
     async def push_task_result(self, task_id: UUID) -> bool:
         """Write a task result to Feishu when a mapping exists."""
         return await self._sync_service.push_to_feishu(task_id)
-

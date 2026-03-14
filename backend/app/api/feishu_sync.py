@@ -14,23 +14,93 @@ from app.core.secrets import decrypt_secret, encrypt_secret
 from app.core.time import utcnow
 from app.models.activity_events import ActivityEvent
 from app.models.feishu_sync import FeishuSyncConfig, FeishuTaskMapping
+from app.models.tasks import Task
 from app.schemas.feishu_sync import (
+    FeishuConflictResolutionRequest,
     FeishuSyncConfigCreate,
     FeishuSyncConfigRead,
-    FeishuSyncHistoryEntry,
     FeishuSyncConfigUpdate,
+    FeishuSyncHistoryEntry,
     FeishuSyncTriggerResponse,
     FeishuTaskMappingRead,
 )
 from app.services.feishu.sync_service import SyncService
 
 if TYPE_CHECKING:
-    from app.core.auth import AuthContext
     from sqlmodel.ext.asyncio.session import AsyncSession
+
+    from app.core.auth import AuthContext
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/feishu-sync", tags=["feishu-sync"])
+
+
+async def _latest_conflict_events(
+    *,
+    session: AsyncSession,
+    board_id: UUID | None,
+    task_ids: set[UUID],
+) -> dict[UUID, ActivityEvent]:
+    if board_id is None or not task_ids:
+        return {}
+    stmt = (
+        select(ActivityEvent)
+        .where(ActivityEvent.board_id == board_id)
+        .where(ActivityEvent.task_id.in_(task_ids))
+        .where(ActivityEvent.event_type == "feishu_sync_conflict")
+        .order_by(ActivityEvent.created_at.desc())  # type: ignore[attr-defined]
+    )
+    events = list((await session.exec(stmt)).all())
+    latest: dict[UUID, ActivityEvent] = {}
+    for event in events:
+        if event.task_id is None or event.task_id in latest:
+            continue
+        latest[event.task_id] = event
+    return latest
+
+
+async def _build_mapping_reads(
+    *,
+    session: AsyncSession,
+    config: FeishuSyncConfig,
+    mappings: list[FeishuTaskMapping],
+) -> list[FeishuTaskMappingRead]:
+    task_ids = {mapping.task_id for mapping in mappings}
+    tasks = {}
+    if task_ids:
+        task_rows = list((await session.exec(select(Task).where(Task.id.in_(task_ids)))).all())
+        tasks = {task.id: task for task in task_rows}
+    conflict_events = await _latest_conflict_events(
+        session=session,
+        board_id=config.board_id,
+        task_ids=task_ids,
+    )
+    items: list[FeishuTaskMappingRead] = []
+    for mapping in mappings:
+        task = tasks.get(mapping.task_id)
+        conflict = conflict_events.get(mapping.task_id)
+        has_conflict = bool(conflict and conflict.created_at > mapping.updated_at)
+        items.append(
+            FeishuTaskMappingRead(
+                id=mapping.id,
+                sync_config_id=mapping.sync_config_id,
+                feishu_record_id=mapping.feishu_record_id,
+                task_id=mapping.task_id,
+                task_title=task.title if task is not None else None,
+                last_feishu_update=mapping.last_feishu_update,
+                last_mc_update=mapping.last_mc_update,
+                sync_hash=mapping.sync_hash,
+                has_conflict=has_conflict,
+                conflict_at=conflict.created_at if has_conflict and conflict is not None else None,
+                conflict_message=(
+                    conflict.message if has_conflict and conflict is not None else None
+                ),
+                created_at=mapping.created_at,
+                updated_at=mapping.updated_at,
+            ),
+        )
+    return items
 
 
 @router.post("/configs", response_model=FeishuSyncConfigRead, status_code=status.HTTP_201_CREATED)
@@ -148,6 +218,8 @@ async def trigger_sync(
             records_processed=stats["processed"],
             records_created=stats["created"],
             records_updated=stats["updated"],
+            records_skipped=stats["skipped"],
+            conflicts_count=stats["conflicts"],
         )
     except Exception as e:
         logger.exception("Feishu sync failed for config %s", config_id)
@@ -166,13 +238,50 @@ async def list_mappings(
     auth: AuthContext = AUTH_DEP,
 ) -> list[FeishuTaskMapping]:
     """List task mappings for a sync configuration."""
+    config = await FeishuSyncConfig.objects.by_id(config_id).first(session)
+    if config is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     stmt = (
         select(FeishuTaskMapping)
         .where(FeishuTaskMapping.sync_config_id == config_id)
         .order_by(FeishuTaskMapping.created_at.desc())  # type: ignore[attr-defined]
     )
     result = await session.exec(stmt)
-    return list(result.all())
+    mappings = list(result.all())
+    return await _build_mapping_reads(session=session, config=config, mappings=mappings)
+
+
+@router.post(
+    "/configs/{config_id}/mappings/{mapping_id}/resolve", response_model=FeishuTaskMappingRead
+)
+async def resolve_mapping_conflict(
+    config_id: UUID,
+    mapping_id: UUID,
+    payload: FeishuConflictResolutionRequest,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> FeishuTaskMappingRead:
+    """Resolve one Feishu sync conflict from the UI."""
+    config = await FeishuSyncConfig.objects.by_id(config_id).first(session)
+    if config is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    mapping = await FeishuTaskMapping.objects.by_id(mapping_id).first(session)
+    if mapping is None or mapping.sync_config_id != config_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    sync_svc = SyncService(session, config)
+    if payload.resolution == "keep_local":
+        mapping = await sync_svc.resolve_conflict_keep_local(mapping)
+    elif payload.resolution == "accept_feishu":
+        mapping = await sync_svc.resolve_conflict_accept_feishu(mapping)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Unsupported conflict resolution action.",
+        )
+
+    items = await _build_mapping_reads(session=session, config=config, mappings=[mapping])
+    return items[0]
 
 
 @router.post("/configs/{config_id}/test")
@@ -198,7 +307,9 @@ async def test_connection(
         code = resp.get("code", -1)
         return {
             "ok": code == 0,
-            "message": "Connection successful" if code == 0 else f"API error: {resp.get('msg', '')}",
+            "message": (
+                "Connection successful" if code == 0 else f"API error: {resp.get('msg', '')}"
+            ),
         }
     except Exception as e:
         return {"ok": False, "message": str(e)}

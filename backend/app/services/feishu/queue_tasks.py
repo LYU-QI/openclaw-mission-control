@@ -35,4 +35,3 @@ def requeue_feishu_queue_task(task: QueuedTask, *, delay_seconds: float) -> bool
         redis_url=settings.rq_redis_url,
         delay_seconds=delay_seconds,
     )
-

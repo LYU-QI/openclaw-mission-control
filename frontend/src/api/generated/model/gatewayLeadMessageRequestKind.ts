@@ -8,10 +8,10 @@
 /**
  * Routing mode for lead messages.
  */
-export type GatewayLeadMessageRequestKind =
-  (typeof GatewayLeadMessageRequestKind)[keyof typeof GatewayLeadMessageRequestKind];
+export type GatewayLeadMessageRequestKind = typeof GatewayLeadMessageRequestKind[keyof typeof GatewayLeadMessageRequestKind];
+
 
 export const GatewayLeadMessageRequestKind = {
-  question: "question",
-  handoff: "handoff",
+  question: 'question',
+  handoff: 'handoff',
 } as const;

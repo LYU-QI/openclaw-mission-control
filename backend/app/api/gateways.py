@@ -20,6 +20,7 @@ from app.models.skills import GatewayInstalledSkill
 from app.schemas.common import OkResponse
 from app.schemas.gateways import (
     GatewayCreate,
+    GatewayHealthCheckStatus,
     GatewayRead,
     GatewayTemplatesSyncResult,
     GatewayUpdate,
@@ -123,6 +124,21 @@ async def get_gateway(
         organization_id=ctx.organization.id,
     )
     return gateway
+
+
+@router.get("/{gateway_id}/health", response_model=GatewayHealthCheckStatus)
+async def check_gateway_health(
+    gateway_id: UUID,
+    session: AsyncSession = SESSION_DEP,
+    ctx: OrganizationContext = ORG_ADMIN_DEP,
+) -> GatewayHealthCheckStatus:
+    """Run real-time diagnostics on a gateway and return health check status."""
+    service = GatewayAdminLifecycleService(session)
+    gateway = await service.require_gateway(
+        gateway_id=gateway_id,
+        organization_id=ctx.organization.id,
+    )
+    return await service.check_gateway_health(gateway)
 
 
 @router.patch("/{gateway_id}", response_model=GatewayRead)

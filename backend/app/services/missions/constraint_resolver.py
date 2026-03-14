@@ -19,4 +19,3 @@ class ConstraintResolver:
             "only_lead_can_change_status": board.only_lead_can_change_status,
             "max_agents": board.max_agents,
         }
-

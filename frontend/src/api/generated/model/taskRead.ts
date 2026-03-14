@@ -4,9 +4,9 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TagRef } from "./tagRef";
-import type { TaskReadCustomFieldValues } from "./taskReadCustomFieldValues";
-import type { TaskReadStatus } from "./taskReadStatus";
+import type { TagRef } from './tagRef';
+import type { TaskReadCustomFieldValues } from './taskReadCustomFieldValues';
+import type { TaskReadStatus } from './taskReadStatus';
 
 /**
  * Task payload returned from read endpoints.
@@ -18,11 +18,20 @@ export interface TaskRead {
   priority?: string;
   due_at?: string | null;
   assigned_agent_id?: string | null;
+  owner_name?: string | null;
+  owner_feishu_id?: string | null;
+  milestone?: string | null;
   depends_on_task_ids?: string[];
   tag_ids?: string[];
   id: string;
   board_id: string | null;
   created_by_user_id: string | null;
+  external_source?: string | null;
+  external_id?: string | null;
+  result_summary?: string | null;
+  result_evidence_link?: string | null;
+  result_risk?: string | null;
+  result_next_action?: string | null;
   in_progress_at: string | null;
   created_at: string;
   updated_at: string;

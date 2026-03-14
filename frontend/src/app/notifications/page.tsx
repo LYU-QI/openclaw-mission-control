@@ -8,6 +8,7 @@ import { DashboardSidebar } from "@/components/organisms/DashboardSidebar";
 import { DashboardShell } from "@/components/templates/DashboardShell";
 import { NotificationConfigForm } from "@/components/notifications/NotificationConfigForm";
 import { NotificationLogViewer } from "@/components/notifications/NotificationLogViewer";
+import { NotificationTemplatePreview } from "@/components/notifications/NotificationTemplatePreview";
 import { Button } from "@/components/ui/button";
 import { apiGet, apiPost } from "@/lib/mission-control-api";
 
@@ -22,6 +23,7 @@ type NotificationLog = {
   id: string;
   event_type: string;
   status: string;
+  error_message?: string | null;
   created_at: string;
 };
 
@@ -36,6 +38,7 @@ export default function NotificationsPage() {
   const logsQuery = useQuery({
     queryKey: ["notification-logs"],
     queryFn: () => apiGet<NotificationLog[]>("/api/v1/notifications/logs"),
+    refetchInterval: 15_000,
   });
 
   const createMutation = useMutation({
@@ -66,7 +69,15 @@ export default function NotificationsPage() {
       <DashboardSidebar />
       <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="space-y-4 p-6">
-          <h1 className="text-xl font-semibold text-slate-900">Notifications</h1>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-xl font-semibold text-slate-900">通知管理 / Notifications</h1>
+              <p className="mt-1 text-sm text-slate-500">
+                管理通知渠道配置，查看事件分布和投递日志。
+              </p>
+            </div>
+            <NotificationTemplatePreview />
+          </div>
           <NotificationConfigForm
             onSubmit={async (payload) => {
               await createMutation.mutateAsync(payload);
@@ -74,7 +85,7 @@ export default function NotificationsPage() {
           />
           <div className="rounded-xl border border-slate-200 bg-white p-4">
             <h3 className="mb-3 text-sm font-semibold text-slate-900">
-              Notification channels
+              通知渠道
             </h3>
             <div className="space-y-2">
               {(configsQuery.data ?? []).map((config) => (
@@ -83,15 +94,15 @@ export default function NotificationsPage() {
                   className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm"
                 >
                   <span>
-                    {config.channel_type} / {config.enabled ? "enabled" : "disabled"}
+                    {config.channel_type} / {config.enabled ? "已启用" : "已禁用"}
                   </span>
                   <Button size="sm" onClick={() => testMutation.mutate(config.id)}>
-                    Test
+                    测试
                   </Button>
                 </div>
               ))}
               {(configsQuery.data ?? []).length === 0 ? (
-                <p className="text-sm text-slate-500">No notification config yet.</p>
+                <p className="text-sm text-slate-500">暂无通知渠道配置。</p>
               ) : null}
             </div>
           </div>

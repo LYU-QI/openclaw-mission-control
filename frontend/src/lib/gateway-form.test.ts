@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { gatewaysStatusApiV1GatewaysStatusGet } from "@/api/generated/gateways/gateways";
 
-import { checkGatewayConnection, validateGatewayUrl } from "./gateway-form";
+import {
+  checkGatewayConnection,
+  parseGatewayDiagnostic,
+  validateGatewayUrl,
+} from "./gateway-form";
 
 vi.mock("@/api/generated/gateways/gateways", () => ({
   gatewaysStatusApiV1GatewaysStatusGet: vi.fn(),
@@ -150,5 +154,33 @@ describe("checkGatewayConnection", () => {
     });
 
     expect(result).toEqual({ ok: false, message: "missing required scope" });
+  });
+});
+
+describe("parseGatewayDiagnostic", () => {
+  it("maps pairing required into a warning diagnostic", () => {
+    expect(
+      parseGatewayDiagnostic(
+        "PAIRING_REQUIRED: Gateway requires device pairing approval. Approve the Mission Control device in Gateway Dashboard and retry.",
+      ),
+    ).toEqual({
+      code: "PAIRING_REQUIRED",
+      summary: "需要先完成设备配对",
+      detail: "去远端 Gateway Dashboard 批准 Mission Control 设备，然后再重试保存。",
+      tone: "warning",
+    });
+  });
+
+  it("maps transport errors into a direct diagnostic", () => {
+    expect(
+      parseGatewayDiagnostic(
+        "TRANSPORT_ERROR: Gateway transport error. Verify the remote gateway URL, network reachability, and WebSocket availability.",
+      ),
+    ).toEqual({
+      code: "TRANSPORT_ERROR",
+      summary: "Gateway 网络或 WebSocket 连接异常",
+      detail: "检查远端地址、端口、安全组、反向代理和 WebSocket 握手是否正常。",
+      tone: "error",
+    });
   });
 });

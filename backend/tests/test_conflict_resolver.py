@@ -30,4 +30,3 @@ def test_conflict_resolver_prefers_latest_timestamp() -> None:
         ),
     )
     assert winner == "mission_control"
-

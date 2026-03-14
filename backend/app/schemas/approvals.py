@@ -95,3 +95,42 @@ class ApprovalRead(ApprovalBase):
     agent_id: UUID | None = None
     created_at: datetime
     resolved_at: datetime | None = None
+
+
+class ApprovalRuleBase(SQLModel):
+    """Shared fields for approval rules."""
+
+    name: str
+    description: str | None = None
+    trigger_on_high_risk: bool = False
+    trigger_on_tool_usage: str | None = None
+    trigger_on_domain: str | None = None
+    override_policy: str = "post_review"
+    is_active: bool = True
+
+
+class ApprovalRuleCreate(ApprovalRuleBase):
+    """Payload for creating an approval rule."""
+
+    organization_id: UUID
+
+
+class ApprovalRuleUpdate(SQLModel):
+    """Payload for updating an approval rule."""
+
+    name: str | None = None
+    description: str | None = None
+    trigger_on_high_risk: bool | None = None
+    trigger_on_tool_usage: str | None = None
+    trigger_on_domain: str | None = None
+    override_policy: str | None = None
+    is_active: bool | None = None
+
+
+class ApprovalRuleRead(ApprovalRuleBase):
+    """Payload returned for approval rules."""
+
+    id: UUID
+    organization_id: UUID
+    created_at: datetime
+    updated_at: datetime

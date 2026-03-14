@@ -23,10 +23,19 @@ from app.schemas.missions import (
     SubtaskUpdate,
 )
 from app.services.missions.orchestrator import MissionOrchestrator
+from app.services.missions.status_machine import (
+    MISSION_STATUS_COMPLETED,
+    MISSION_STATUS_FAILED,
+    MISSION_STATUS_PENDING,
+    MISSION_STATUS_PENDING_APPROVAL,
+    ensure_mission_transition,
+)
+from app.services.missions.timeline import timeline_meta_for_event
 
 if TYPE_CHECKING:
-    from app.core.auth import AuthContext
     from sqlmodel.ext.asyncio.session import AsyncSession
+
+    from app.core.auth import AuthContext
 
 router = APIRouter(prefix="/missions", tags=["missions"])
 
@@ -230,6 +239,10 @@ async def mission_timeline(
         MissionTimelineEntry(
             timestamp=event.created_at,
             event_type=event.event_type,
+            stage=str(timeline_meta_for_event(event.event_type)["stage"]),
+            stage_label=str(timeline_meta_for_event(event.event_type)["stage_label"]),
+            tone=str(timeline_meta_for_event(event.event_type)["tone"]),
+            status_hint=timeline_meta_for_event(event.event_type)["status_hint"],
             message=event.message,
             agent_id=event.agent_id,
         )
@@ -247,12 +260,15 @@ async def approve_mission(
     mission = await Mission.objects.by_id(mission_id).first(session)
     if mission is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    if mission.status != "pending_approval":
+    if mission.status != MISSION_STATUS_PENDING_APPROVAL:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Mission is not in pending_approval state",
         )
-    mission.status = "pending"
+    ensure_mission_transition(mission.status, MISSION_STATUS_PENDING)
+    mission.status = MISSION_STATUS_PENDING
+    if mission.approval_policy == "pre_approve":
+        mission.approval_policy = "auto"
     mission.updated_at = utcnow()
     session.add(mission)
     await session.commit()
@@ -271,17 +287,23 @@ async def review_mission(
     mission = await Mission.objects.by_id(mission_id).first(session)
     if mission is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    if mission.status not in {"pending_approval", "completed", "failed"}:
+    if mission.status not in {
+        MISSION_STATUS_PENDING_APPROVAL,
+        MISSION_STATUS_COMPLETED,
+        MISSION_STATUS_FAILED,
+    }:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Mission is not ready for review",
         )
 
-    if payload.status == "failed":
-        mission.status = "failed"
+    if payload.status == MISSION_STATUS_FAILED:
+        ensure_mission_transition(mission.status, MISSION_STATUS_FAILED)
+        mission.status = MISSION_STATUS_FAILED
         mission.error_message = payload.error_message or mission.error_message
     else:
-        mission.status = "completed"
+        ensure_mission_transition(mission.status, MISSION_STATUS_COMPLETED)
+        mission.status = MISSION_STATUS_COMPLETED
         mission.result_summary = payload.result_summary or mission.result_summary
         mission.result_evidence = payload.result_evidence or mission.result_evidence
         mission.result_risk = payload.result_risk or mission.result_risk

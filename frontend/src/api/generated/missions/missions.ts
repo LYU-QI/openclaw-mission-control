@@ -4,7 +4,10 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -17,1836 +20,1589 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   HTTPValidationError,
   ListMissionsApiV1MissionsGetParams,
   MissionCreate,
+  MissionDispatchRequest,
   MissionRead,
+  MissionTimelineEntry,
   MissionUpdate,
   SubtaskCreate,
   SubtaskRead,
-  SubtaskUpdate,
-} from ".././model";
+  SubtaskUpdate
+} from '.././model';
 
-import { customFetch } from "../../mutator";
+import { customFetch } from '../../mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * Create a new mission from a task.
  * @summary Create Mission
  */
 export type createMissionApiV1MissionsPostResponse201 = {
-  data: MissionRead;
-  status: 201;
-};
+  data: MissionRead
+  status: 201
+}
 
 export type createMissionApiV1MissionsPostResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type createMissionApiV1MissionsPostResponseSuccess = (createMissionApiV1MissionsPostResponse201) & {
+  headers: Headers;
+};
+export type createMissionApiV1MissionsPostResponseError = (createMissionApiV1MissionsPostResponse422) & {
+  headers: Headers;
 };
 
-export type createMissionApiV1MissionsPostResponseSuccess =
-  createMissionApiV1MissionsPostResponse201 & {
-    headers: Headers;
-  };
-export type createMissionApiV1MissionsPostResponseError =
-  createMissionApiV1MissionsPostResponse422 & {
-    headers: Headers;
-  };
-
-export type createMissionApiV1MissionsPostResponse =
-  | createMissionApiV1MissionsPostResponseSuccess
-  | createMissionApiV1MissionsPostResponseError;
+export type createMissionApiV1MissionsPostResponse = (createMissionApiV1MissionsPostResponseSuccess | createMissionApiV1MissionsPostResponseError)
 
 export const getCreateMissionApiV1MissionsPostUrl = () => {
-  return `/api/v1/missions`;
-};
 
-export const createMissionApiV1MissionsPost = async (
-  missionCreate: MissionCreate,
-  options?: RequestInit,
-): Promise<createMissionApiV1MissionsPostResponse> => {
-  return customFetch<createMissionApiV1MissionsPostResponse>(
-    getCreateMissionApiV1MissionsPostUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(missionCreate),
-    },
-  );
-};
 
-export const getCreateMissionApiV1MissionsPostMutationOptions = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>,
-    TError,
-    { data: MissionCreate },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>,
-  TError,
-  { data: MissionCreate },
-  TContext
-> => {
-  const mutationKey = ["createMissionApiV1MissionsPost"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>,
-    { data: MissionCreate }
-  > = (props) => {
-    const { data } = props ?? {};
+  return `/api/v1/missions`
+}
 
-    return createMissionApiV1MissionsPost(data, requestOptions);
-  };
+export const createMissionApiV1MissionsPost = async (missionCreate: MissionCreate, options?: RequestInit): Promise<createMissionApiV1MissionsPostResponse> => {
+  
+  return customFetch<createMissionApiV1MissionsPostResponse>(getCreateMissionApiV1MissionsPostUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      missionCreate,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type CreateMissionApiV1MissionsPostMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>
->;
-export type CreateMissionApiV1MissionsPostMutationBody = MissionCreate;
-export type CreateMissionApiV1MissionsPostMutationError = HTTPValidationError;
 
-/**
+
+export const getCreateMissionApiV1MissionsPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>, TError,{data: MissionCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>, TError,{data: MissionCreate}, TContext> => {
+
+const mutationKey = ['createMissionApiV1MissionsPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>, {data: MissionCreate}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createMissionApiV1MissionsPost(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateMissionApiV1MissionsPostMutationResult = NonNullable<Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>>
+    export type CreateMissionApiV1MissionsPostMutationBody = MissionCreate
+    export type CreateMissionApiV1MissionsPostMutationError = HTTPValidationError
+
+    /**
  * @summary Create Mission
  */
-export const useCreateMissionApiV1MissionsPost = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>,
-      TError,
-      { data: MissionCreate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>,
-  TError,
-  { data: MissionCreate },
-  TContext
-> => {
-  return useMutation(
-    getCreateMissionApiV1MissionsPostMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useCreateMissionApiV1MissionsPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>, TError,{data: MissionCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createMissionApiV1MissionsPost>>,
+        TError,
+        {data: MissionCreate},
+        TContext
+      > => {
+      return useMutation(getCreateMissionApiV1MissionsPostMutationOptions(options), queryClient);
+    }
+    /**
  * List missions, optionally filtered by board, task, or status.
  * @summary List Missions
  */
 export type listMissionsApiV1MissionsGetResponse200 = {
-  data: MissionRead[];
-  status: 200;
-};
+  data: MissionRead[]
+  status: 200
+}
 
 export type listMissionsApiV1MissionsGetResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type listMissionsApiV1MissionsGetResponseSuccess = (listMissionsApiV1MissionsGetResponse200) & {
+  headers: Headers;
+};
+export type listMissionsApiV1MissionsGetResponseError = (listMissionsApiV1MissionsGetResponse422) & {
+  headers: Headers;
 };
 
-export type listMissionsApiV1MissionsGetResponseSuccess =
-  listMissionsApiV1MissionsGetResponse200 & {
-    headers: Headers;
-  };
-export type listMissionsApiV1MissionsGetResponseError =
-  listMissionsApiV1MissionsGetResponse422 & {
-    headers: Headers;
-  };
+export type listMissionsApiV1MissionsGetResponse = (listMissionsApiV1MissionsGetResponseSuccess | listMissionsApiV1MissionsGetResponseError)
 
-export type listMissionsApiV1MissionsGetResponse =
-  | listMissionsApiV1MissionsGetResponseSuccess
-  | listMissionsApiV1MissionsGetResponseError;
-
-export const getListMissionsApiV1MissionsGetUrl = (
-  params?: ListMissionsApiV1MissionsGetParams,
-) => {
+export const getListMissionsApiV1MissionsGetUrl = (params?: ListMissionsApiV1MissionsGetParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/api/v1/missions?${stringifiedParams}`
-    : `/api/v1/missions`;
-};
+  return stringifiedParams.length > 0 ? `/api/v1/missions?${stringifiedParams}` : `/api/v1/missions`
+}
 
-export const listMissionsApiV1MissionsGet = async (
-  params?: ListMissionsApiV1MissionsGetParams,
-  options?: RequestInit,
-): Promise<listMissionsApiV1MissionsGetResponse> => {
-  return customFetch<listMissionsApiV1MissionsGetResponse>(
-    getListMissionsApiV1MissionsGetUrl(params),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+export const listMissionsApiV1MissionsGet = async (params?: ListMissionsApiV1MissionsGetParams, options?: RequestInit): Promise<listMissionsApiV1MissionsGetResponse> => {
+  
+  return customFetch<listMissionsApiV1MissionsGetResponse>(getListMissionsApiV1MissionsGetUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getListMissionsApiV1MissionsGetQueryKey = (
-  params?: ListMissionsApiV1MissionsGetParams,
+
+
+
+
+export const getListMissionsApiV1MissionsGetQueryKey = (params?: ListMissionsApiV1MissionsGetParams,) => {
+    return [
+    `/api/v1/missions`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getListMissionsApiV1MissionsGetQueryOptions = <TData = Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError = HTTPValidationError>(params?: ListMissionsApiV1MissionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return [`/api/v1/missions`, ...(params ? [params] : [])] as const;
-};
 
-export const getListMissionsApiV1MissionsGetQueryOptions = <
-  TData = Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-  TError = HTTPValidationError,
->(
-  params?: ListMissionsApiV1MissionsGetParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getListMissionsApiV1MissionsGetQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getListMissionsApiV1MissionsGetQueryKey(params);
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>
-  > = ({ signal }) =>
-    listMissionsApiV1MissionsGet(params, { signal, ...requestOptions });
+  
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>> = ({ signal }) => listMissionsApiV1MissionsGet(params, { signal, ...requestOptions });
 
-export type ListMissionsApiV1MissionsGetQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>
->;
-export type ListMissionsApiV1MissionsGetQueryError = HTTPValidationError;
+      
 
-export function useListMissionsApiV1MissionsGet<
-  TData = Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-  TError = HTTPValidationError,
->(
-  params: undefined | ListMissionsApiV1MissionsGetParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListMissionsApiV1MissionsGetQueryResult = NonNullable<Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>>
+export type ListMissionsApiV1MissionsGetQueryError = HTTPValidationError
+
+
+export function useListMissionsApiV1MissionsGet<TData = Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError = HTTPValidationError>(
+ params: undefined |  ListMissionsApiV1MissionsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
           TError,
           Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListMissionsApiV1MissionsGet<
-  TData = Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-  TError = HTTPValidationError,
->(
-  params?: ListMissionsApiV1MissionsGetParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMissionsApiV1MissionsGet<TData = Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError = HTTPValidationError>(
+ params?: ListMissionsApiV1MissionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
           TError,
           Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListMissionsApiV1MissionsGet<
-  TData = Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-  TError = HTTPValidationError,
->(
-  params?: ListMissionsApiV1MissionsGetParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMissionsApiV1MissionsGet<TData = Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError = HTTPValidationError>(
+ params?: ListMissionsApiV1MissionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Missions
  */
 
-export function useListMissionsApiV1MissionsGet<
-  TData = Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-  TError = HTTPValidationError,
->(
-  params?: ListMissionsApiV1MissionsGetParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getListMissionsApiV1MissionsGetQueryOptions(
-    params,
-    options,
-  );
+export function useListMissionsApiV1MissionsGet<TData = Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError = HTTPValidationError>(
+ params?: ListMissionsApiV1MissionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMissionsApiV1MissionsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getListMissionsApiV1MissionsGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Retrieve a single mission by ID.
  * @summary Get Mission
  */
 export type getMissionApiV1MissionsMissionIdGetResponse200 = {
-  data: MissionRead;
-  status: 200;
-};
+  data: MissionRead
+  status: 200
+}
 
 export type getMissionApiV1MissionsMissionIdGetResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type getMissionApiV1MissionsMissionIdGetResponseSuccess = (getMissionApiV1MissionsMissionIdGetResponse200) & {
+  headers: Headers;
+};
+export type getMissionApiV1MissionsMissionIdGetResponseError = (getMissionApiV1MissionsMissionIdGetResponse422) & {
+  headers: Headers;
 };
 
-export type getMissionApiV1MissionsMissionIdGetResponseSuccess =
-  getMissionApiV1MissionsMissionIdGetResponse200 & {
-    headers: Headers;
-  };
-export type getMissionApiV1MissionsMissionIdGetResponseError =
-  getMissionApiV1MissionsMissionIdGetResponse422 & {
-    headers: Headers;
-  };
+export type getMissionApiV1MissionsMissionIdGetResponse = (getMissionApiV1MissionsMissionIdGetResponseSuccess | getMissionApiV1MissionsMissionIdGetResponseError)
 
-export type getMissionApiV1MissionsMissionIdGetResponse =
-  | getMissionApiV1MissionsMissionIdGetResponseSuccess
-  | getMissionApiV1MissionsMissionIdGetResponseError;
+export const getGetMissionApiV1MissionsMissionIdGetUrl = (missionId: string,) => {
 
-export const getGetMissionApiV1MissionsMissionIdGetUrl = (
-  missionId: string,
+
+  
+
+  return `/api/v1/missions/${missionId}`
+}
+
+export const getMissionApiV1MissionsMissionIdGet = async (missionId: string, options?: RequestInit): Promise<getMissionApiV1MissionsMissionIdGetResponse> => {
+  
+  return customFetch<getMissionApiV1MissionsMissionIdGetResponse>(getGetMissionApiV1MissionsMissionIdGetUrl(missionId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetMissionApiV1MissionsMissionIdGetQueryKey = (missionId: string,) => {
+    return [
+    `/api/v1/missions/${missionId}`
+    ] as const;
+    }
+
+    
+export const getGetMissionApiV1MissionsMissionIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError = HTTPValidationError>(missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return `/api/v1/missions/${missionId}`;
-};
 
-export const getMissionApiV1MissionsMissionIdGet = async (
-  missionId: string,
-  options?: RequestInit,
-): Promise<getMissionApiV1MissionsMissionIdGetResponse> => {
-  return customFetch<getMissionApiV1MissionsMissionIdGetResponse>(
-    getGetMissionApiV1MissionsMissionIdGetUrl(missionId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-export const getGetMissionApiV1MissionsMissionIdGetQueryKey = (
-  missionId: string,
-) => {
-  return [`/api/v1/missions/${missionId}`] as const;
-};
+  const queryKey =  queryOptions?.queryKey ?? getGetMissionApiV1MissionsMissionIdGetQueryKey(missionId);
 
-export const getGetMissionApiV1MissionsMissionIdGetQueryOptions = <
-  TData = Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-  TError = HTTPValidationError,
->(
-  missionId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getGetMissionApiV1MissionsMissionIdGetQueryKey(missionId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>> = ({ signal }) => getMissionApiV1MissionsMissionIdGet(missionId, { signal, ...requestOptions });
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>
-  > = ({ signal }) =>
-    getMissionApiV1MissionsMissionIdGet(missionId, {
-      signal,
-      ...requestOptions,
-    });
+      
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!missionId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+      
 
-export type GetMissionApiV1MissionsMissionIdGetQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>
->;
-export type GetMissionApiV1MissionsMissionIdGetQueryError = HTTPValidationError;
+   return  { queryKey, queryFn, enabled: !!(missionId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-export function useGetMissionApiV1MissionsMissionIdGet<
-  TData = Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-  TError = HTTPValidationError,
->(
-  missionId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+export type GetMissionApiV1MissionsMissionIdGetQueryResult = NonNullable<Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>>
+export type GetMissionApiV1MissionsMissionIdGetQueryError = HTTPValidationError
+
+
+export function useGetMissionApiV1MissionsMissionIdGet<TData = Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError = HTTPValidationError>(
+ missionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
           TError,
           Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetMissionApiV1MissionsMissionIdGet<
-  TData = Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-  TError = HTTPValidationError,
->(
-  missionId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMissionApiV1MissionsMissionIdGet<TData = Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError = HTTPValidationError>(
+ missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
           TError,
           Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetMissionApiV1MissionsMissionIdGet<
-  TData = Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-  TError = HTTPValidationError,
->(
-  missionId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMissionApiV1MissionsMissionIdGet<TData = Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError = HTTPValidationError>(
+ missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Mission
  */
 
-export function useGetMissionApiV1MissionsMissionIdGet<
-  TData = Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-  TError = HTTPValidationError,
->(
-  missionId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetMissionApiV1MissionsMissionIdGetQueryOptions(
-    missionId,
-    options,
-  );
+export function useGetMissionApiV1MissionsMissionIdGet<TData = Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError = HTTPValidationError>(
+ missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMissionApiV1MissionsMissionIdGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetMissionApiV1MissionsMissionIdGetQueryOptions(missionId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Update a mission.
  * @summary Update Mission
  */
 export type updateMissionApiV1MissionsMissionIdPatchResponse200 = {
-  data: MissionRead;
-  status: 200;
-};
+  data: MissionRead
+  status: 200
+}
 
 export type updateMissionApiV1MissionsMissionIdPatchResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type updateMissionApiV1MissionsMissionIdPatchResponseSuccess = (updateMissionApiV1MissionsMissionIdPatchResponse200) & {
+  headers: Headers;
+};
+export type updateMissionApiV1MissionsMissionIdPatchResponseError = (updateMissionApiV1MissionsMissionIdPatchResponse422) & {
+  headers: Headers;
 };
 
-export type updateMissionApiV1MissionsMissionIdPatchResponseSuccess =
-  updateMissionApiV1MissionsMissionIdPatchResponse200 & {
-    headers: Headers;
-  };
-export type updateMissionApiV1MissionsMissionIdPatchResponseError =
-  updateMissionApiV1MissionsMissionIdPatchResponse422 & {
-    headers: Headers;
-  };
+export type updateMissionApiV1MissionsMissionIdPatchResponse = (updateMissionApiV1MissionsMissionIdPatchResponseSuccess | updateMissionApiV1MissionsMissionIdPatchResponseError)
 
-export type updateMissionApiV1MissionsMissionIdPatchResponse =
-  | updateMissionApiV1MissionsMissionIdPatchResponseSuccess
-  | updateMissionApiV1MissionsMissionIdPatchResponseError;
+export const getUpdateMissionApiV1MissionsMissionIdPatchUrl = (missionId: string,) => {
 
-export const getUpdateMissionApiV1MissionsMissionIdPatchUrl = (
-  missionId: string,
-) => {
-  return `/api/v1/missions/${missionId}`;
-};
 
-export const updateMissionApiV1MissionsMissionIdPatch = async (
-  missionId: string,
-  missionUpdate: MissionUpdate,
-  options?: RequestInit,
-): Promise<updateMissionApiV1MissionsMissionIdPatchResponse> => {
-  return customFetch<updateMissionApiV1MissionsMissionIdPatchResponse>(
-    getUpdateMissionApiV1MissionsMissionIdPatchUrl(missionId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(missionUpdate),
-    },
-  );
-};
+  
 
-export const getUpdateMissionApiV1MissionsMissionIdPatchMutationOptions = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>,
-    TError,
-    { missionId: string; data: MissionUpdate },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>,
-  TError,
-  { missionId: string; data: MissionUpdate },
-  TContext
-> => {
-  const mutationKey = ["updateMissionApiV1MissionsMissionIdPatch"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/missions/${missionId}`
+}
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>,
-    { missionId: string; data: MissionUpdate }
-  > = (props) => {
-    const { missionId, data } = props ?? {};
+export const updateMissionApiV1MissionsMissionIdPatch = async (missionId: string,
+    missionUpdate: MissionUpdate, options?: RequestInit): Promise<updateMissionApiV1MissionsMissionIdPatchResponse> => {
+  
+  return customFetch<updateMissionApiV1MissionsMissionIdPatchResponse>(getUpdateMissionApiV1MissionsMissionIdPatchUrl(missionId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      missionUpdate,)
+  }
+);}
 
-    return updateMissionApiV1MissionsMissionIdPatch(
-      missionId,
-      data,
-      requestOptions,
-    );
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type UpdateMissionApiV1MissionsMissionIdPatchMutationResult =
-  NonNullable<
-    Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>
-  >;
-export type UpdateMissionApiV1MissionsMissionIdPatchMutationBody =
-  MissionUpdate;
-export type UpdateMissionApiV1MissionsMissionIdPatchMutationError =
-  HTTPValidationError;
 
-/**
+export const getUpdateMissionApiV1MissionsMissionIdPatchMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>, TError,{missionId: string;data: MissionUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>, TError,{missionId: string;data: MissionUpdate}, TContext> => {
+
+const mutationKey = ['updateMissionApiV1MissionsMissionIdPatch'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>, {missionId: string;data: MissionUpdate}> = (props) => {
+          const {missionId,data} = props ?? {};
+
+          return  updateMissionApiV1MissionsMissionIdPatch(missionId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateMissionApiV1MissionsMissionIdPatchMutationResult = NonNullable<Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>>
+    export type UpdateMissionApiV1MissionsMissionIdPatchMutationBody = MissionUpdate
+    export type UpdateMissionApiV1MissionsMissionIdPatchMutationError = HTTPValidationError
+
+    /**
  * @summary Update Mission
  */
-export const useUpdateMissionApiV1MissionsMissionIdPatch = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>,
-      TError,
-      { missionId: string; data: MissionUpdate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>,
-  TError,
-  { missionId: string; data: MissionUpdate },
-  TContext
-> => {
-  return useMutation(
-    getUpdateMissionApiV1MissionsMissionIdPatchMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useUpdateMissionApiV1MissionsMissionIdPatch = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>, TError,{missionId: string;data: MissionUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateMissionApiV1MissionsMissionIdPatch>>,
+        TError,
+        {missionId: string;data: MissionUpdate},
+        TContext
+      > => {
+      return useMutation(getUpdateMissionApiV1MissionsMissionIdPatchMutationOptions(options), queryClient);
+    }
+    /**
  * Dispatch a mission to the OpenClaw execution engine.
  * @summary Dispatch Mission
  */
 export type dispatchMissionApiV1MissionsMissionIdDispatchPostResponse200 = {
-  data: MissionRead;
-  status: 200;
-};
+  data: MissionRead
+  status: 200
+}
 
 export type dispatchMissionApiV1MissionsMissionIdDispatchPostResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type dispatchMissionApiV1MissionsMissionIdDispatchPostResponseSuccess = (dispatchMissionApiV1MissionsMissionIdDispatchPostResponse200) & {
+  headers: Headers;
+};
+export type dispatchMissionApiV1MissionsMissionIdDispatchPostResponseError = (dispatchMissionApiV1MissionsMissionIdDispatchPostResponse422) & {
+  headers: Headers;
 };
 
-export type dispatchMissionApiV1MissionsMissionIdDispatchPostResponseSuccess =
-  dispatchMissionApiV1MissionsMissionIdDispatchPostResponse200 & {
-    headers: Headers;
-  };
-export type dispatchMissionApiV1MissionsMissionIdDispatchPostResponseError =
-  dispatchMissionApiV1MissionsMissionIdDispatchPostResponse422 & {
-    headers: Headers;
-  };
+export type dispatchMissionApiV1MissionsMissionIdDispatchPostResponse = (dispatchMissionApiV1MissionsMissionIdDispatchPostResponseSuccess | dispatchMissionApiV1MissionsMissionIdDispatchPostResponseError)
 
-export type dispatchMissionApiV1MissionsMissionIdDispatchPostResponse =
-  | dispatchMissionApiV1MissionsMissionIdDispatchPostResponseSuccess
-  | dispatchMissionApiV1MissionsMissionIdDispatchPostResponseError;
+export const getDispatchMissionApiV1MissionsMissionIdDispatchPostUrl = (missionId: string,) => {
 
-export const getDispatchMissionApiV1MissionsMissionIdDispatchPostUrl = (
-  missionId: string,
-) => {
-  return `/api/v1/missions/${missionId}/dispatch`;
-};
 
-export const dispatchMissionApiV1MissionsMissionIdDispatchPost = async (
-  missionId: string,
-  options?: RequestInit,
-): Promise<dispatchMissionApiV1MissionsMissionIdDispatchPostResponse> => {
-  return customFetch<dispatchMissionApiV1MissionsMissionIdDispatchPostResponse>(
-    getDispatchMissionApiV1MissionsMissionIdDispatchPostUrl(missionId),
-    {
-      ...options,
-      method: "POST",
-    },
-  );
-};
+  
 
-export const getDispatchMissionApiV1MissionsMissionIdDispatchPostMutationOptions =
-  <TError = HTTPValidationError, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>
-      >,
-      TError,
-      { missionId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  }): UseMutationOptions<
-    Awaited<
-      ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>
-    >,
-    TError,
-    { missionId: string },
-    TContext
-  > => {
-    const mutationKey = ["dispatchMissionApiV1MissionsMissionIdDispatchPost"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-      ? options.mutation &&
-        "mutationKey" in options.mutation &&
-        options.mutation.mutationKey
-        ? options
-        : { ...options, mutation: { ...options.mutation, mutationKey } }
-      : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/missions/${missionId}/dispatch`
+}
 
-    const mutationFn: MutationFunction<
-      Awaited<
-        ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>
-      >,
-      { missionId: string }
-    > = (props) => {
-      const { missionId } = props ?? {};
+export const dispatchMissionApiV1MissionsMissionIdDispatchPost = async (missionId: string,
+    missionDispatchRequestNull: MissionDispatchRequest | null, options?: RequestInit): Promise<dispatchMissionApiV1MissionsMissionIdDispatchPostResponse> => {
+  
+  return customFetch<dispatchMissionApiV1MissionsMissionIdDispatchPostResponse>(getDispatchMissionApiV1MissionsMissionIdDispatchPostUrl(missionId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      missionDispatchRequestNull,)
+  }
+);}
 
-      return dispatchMissionApiV1MissionsMissionIdDispatchPost(
-        missionId,
-        requestOptions,
-      );
-    };
 
-    return { mutationFn, ...mutationOptions };
-  };
 
-export type DispatchMissionApiV1MissionsMissionIdDispatchPostMutationResult =
-  NonNullable<
-    Awaited<
-      ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>
-    >
-  >;
 
-export type DispatchMissionApiV1MissionsMissionIdDispatchPostMutationError =
-  HTTPValidationError;
+export const getDispatchMissionApiV1MissionsMissionIdDispatchPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>>, TError,{missionId: string;data: MissionDispatchRequest | null}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>>, TError,{missionId: string;data: MissionDispatchRequest | null}, TContext> => {
 
-/**
+const mutationKey = ['dispatchMissionApiV1MissionsMissionIdDispatchPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>>, {missionId: string;data: MissionDispatchRequest | null}> = (props) => {
+          const {missionId,data} = props ?? {};
+
+          return  dispatchMissionApiV1MissionsMissionIdDispatchPost(missionId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DispatchMissionApiV1MissionsMissionIdDispatchPostMutationResult = NonNullable<Awaited<ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>>>
+    export type DispatchMissionApiV1MissionsMissionIdDispatchPostMutationBody = MissionDispatchRequest | null
+    export type DispatchMissionApiV1MissionsMissionIdDispatchPostMutationError = HTTPValidationError
+
+    /**
  * @summary Dispatch Mission
  */
-export const useDispatchMissionApiV1MissionsMissionIdDispatchPost = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>
-      >,
-      TError,
-      { missionId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>>,
-  TError,
-  { missionId: string },
-  TContext
-> => {
-  return useMutation(
-    getDispatchMissionApiV1MissionsMissionIdDispatchPostMutationOptions(
-      options,
-    ),
-    queryClient,
-  );
-};
-/**
+export const useDispatchMissionApiV1MissionsMissionIdDispatchPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>>, TError,{missionId: string;data: MissionDispatchRequest | null}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof dispatchMissionApiV1MissionsMissionIdDispatchPost>>,
+        TError,
+        {missionId: string;data: MissionDispatchRequest | null},
+        TContext
+      > => {
+      return useMutation(getDispatchMissionApiV1MissionsMissionIdDispatchPostMutationOptions(options), queryClient);
+    }
+    /**
  * Mark a dispatched mission as started.
  * @summary Start Mission
  */
 export type startMissionApiV1MissionsMissionIdStartPostResponse200 = {
-  data: MissionRead;
-  status: 200;
-};
+  data: MissionRead
+  status: 200
+}
 
 export type startMissionApiV1MissionsMissionIdStartPostResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type startMissionApiV1MissionsMissionIdStartPostResponseSuccess = (startMissionApiV1MissionsMissionIdStartPostResponse200) & {
+  headers: Headers;
+};
+export type startMissionApiV1MissionsMissionIdStartPostResponseError = (startMissionApiV1MissionsMissionIdStartPostResponse422) & {
+  headers: Headers;
 };
 
-export type startMissionApiV1MissionsMissionIdStartPostResponseSuccess =
-  startMissionApiV1MissionsMissionIdStartPostResponse200 & {
-    headers: Headers;
-  };
-export type startMissionApiV1MissionsMissionIdStartPostResponseError =
-  startMissionApiV1MissionsMissionIdStartPostResponse422 & {
-    headers: Headers;
-  };
+export type startMissionApiV1MissionsMissionIdStartPostResponse = (startMissionApiV1MissionsMissionIdStartPostResponseSuccess | startMissionApiV1MissionsMissionIdStartPostResponseError)
 
-export type startMissionApiV1MissionsMissionIdStartPostResponse =
-  | startMissionApiV1MissionsMissionIdStartPostResponseSuccess
-  | startMissionApiV1MissionsMissionIdStartPostResponseError;
+export const getStartMissionApiV1MissionsMissionIdStartPostUrl = (missionId: string,) => {
 
-export const getStartMissionApiV1MissionsMissionIdStartPostUrl = (
-  missionId: string,
-) => {
-  return `/api/v1/missions/${missionId}/start`;
-};
 
-export const startMissionApiV1MissionsMissionIdStartPost = async (
-  missionId: string,
-  options?: RequestInit,
-): Promise<startMissionApiV1MissionsMissionIdStartPostResponse> => {
-  return customFetch<startMissionApiV1MissionsMissionIdStartPostResponse>(
-    getStartMissionApiV1MissionsMissionIdStartPostUrl(missionId),
-    {
-      ...options,
-      method: "POST",
-    },
-  );
-};
+  
 
-export const getStartMissionApiV1MissionsMissionIdStartPostMutationOptions = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>,
-    TError,
-    { missionId: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>,
-  TError,
-  { missionId: string },
-  TContext
-> => {
-  const mutationKey = ["startMissionApiV1MissionsMissionIdStartPost"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/missions/${missionId}/start`
+}
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>,
-    { missionId: string }
-  > = (props) => {
-    const { missionId } = props ?? {};
+export const startMissionApiV1MissionsMissionIdStartPost = async (missionId: string, options?: RequestInit): Promise<startMissionApiV1MissionsMissionIdStartPostResponse> => {
+  
+  return customFetch<startMissionApiV1MissionsMissionIdStartPostResponse>(getStartMissionApiV1MissionsMissionIdStartPostUrl(missionId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
 
-    return startMissionApiV1MissionsMissionIdStartPost(
-      missionId,
-      requestOptions,
-    );
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type StartMissionApiV1MissionsMissionIdStartPostMutationResult =
-  NonNullable<
-    Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>
-  >;
 
-export type StartMissionApiV1MissionsMissionIdStartPostMutationError =
-  HTTPValidationError;
+export const getStartMissionApiV1MissionsMissionIdStartPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>, TError,{missionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>, TError,{missionId: string}, TContext> => {
 
-/**
+const mutationKey = ['startMissionApiV1MissionsMissionIdStartPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>, {missionId: string}> = (props) => {
+          const {missionId} = props ?? {};
+
+          return  startMissionApiV1MissionsMissionIdStartPost(missionId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartMissionApiV1MissionsMissionIdStartPostMutationResult = NonNullable<Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>>
+    
+    export type StartMissionApiV1MissionsMissionIdStartPostMutationError = HTTPValidationError
+
+    /**
  * @summary Start Mission
  */
-export const useStartMissionApiV1MissionsMissionIdStartPost = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>,
-      TError,
-      { missionId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>,
-  TError,
-  { missionId: string },
-  TContext
-> => {
-  return useMutation(
-    getStartMissionApiV1MissionsMissionIdStartPostMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useStartMissionApiV1MissionsMissionIdStartPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>, TError,{missionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof startMissionApiV1MissionsMissionIdStartPost>>,
+        TError,
+        {missionId: string},
+        TContext
+      > => {
+      return useMutation(getStartMissionApiV1MissionsMissionIdStartPostMutationOptions(options), queryClient);
+    }
+    /**
  * Mark a mission as completed with results.
  * @summary Complete Mission
  */
 export type completeMissionApiV1MissionsMissionIdCompletePostResponse200 = {
-  data: MissionRead;
-  status: 200;
-};
+  data: MissionRead
+  status: 200
+}
 
 export type completeMissionApiV1MissionsMissionIdCompletePostResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type completeMissionApiV1MissionsMissionIdCompletePostResponseSuccess = (completeMissionApiV1MissionsMissionIdCompletePostResponse200) & {
+  headers: Headers;
+};
+export type completeMissionApiV1MissionsMissionIdCompletePostResponseError = (completeMissionApiV1MissionsMissionIdCompletePostResponse422) & {
+  headers: Headers;
 };
 
-export type completeMissionApiV1MissionsMissionIdCompletePostResponseSuccess =
-  completeMissionApiV1MissionsMissionIdCompletePostResponse200 & {
-    headers: Headers;
-  };
-export type completeMissionApiV1MissionsMissionIdCompletePostResponseError =
-  completeMissionApiV1MissionsMissionIdCompletePostResponse422 & {
-    headers: Headers;
-  };
+export type completeMissionApiV1MissionsMissionIdCompletePostResponse = (completeMissionApiV1MissionsMissionIdCompletePostResponseSuccess | completeMissionApiV1MissionsMissionIdCompletePostResponseError)
 
-export type completeMissionApiV1MissionsMissionIdCompletePostResponse =
-  | completeMissionApiV1MissionsMissionIdCompletePostResponseSuccess
-  | completeMissionApiV1MissionsMissionIdCompletePostResponseError;
+export const getCompleteMissionApiV1MissionsMissionIdCompletePostUrl = (missionId: string,) => {
 
-export const getCompleteMissionApiV1MissionsMissionIdCompletePostUrl = (
-  missionId: string,
-) => {
-  return `/api/v1/missions/${missionId}/complete`;
-};
 
-export const completeMissionApiV1MissionsMissionIdCompletePost = async (
-  missionId: string,
-  missionUpdate: MissionUpdate,
-  options?: RequestInit,
-): Promise<completeMissionApiV1MissionsMissionIdCompletePostResponse> => {
-  return customFetch<completeMissionApiV1MissionsMissionIdCompletePostResponse>(
-    getCompleteMissionApiV1MissionsMissionIdCompletePostUrl(missionId),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(missionUpdate),
-    },
-  );
-};
+  
 
-export const getCompleteMissionApiV1MissionsMissionIdCompletePostMutationOptions =
-  <TError = HTTPValidationError, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>
-      >,
-      TError,
-      { missionId: string; data: MissionUpdate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  }): UseMutationOptions<
-    Awaited<
-      ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>
-    >,
-    TError,
-    { missionId: string; data: MissionUpdate },
-    TContext
-  > => {
-    const mutationKey = ["completeMissionApiV1MissionsMissionIdCompletePost"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-      ? options.mutation &&
-        "mutationKey" in options.mutation &&
-        options.mutation.mutationKey
-        ? options
-        : { ...options, mutation: { ...options.mutation, mutationKey } }
-      : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/missions/${missionId}/complete`
+}
 
-    const mutationFn: MutationFunction<
-      Awaited<
-        ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>
-      >,
-      { missionId: string; data: MissionUpdate }
-    > = (props) => {
-      const { missionId, data } = props ?? {};
+export const completeMissionApiV1MissionsMissionIdCompletePost = async (missionId: string,
+    missionUpdate: MissionUpdate, options?: RequestInit): Promise<completeMissionApiV1MissionsMissionIdCompletePostResponse> => {
+  
+  return customFetch<completeMissionApiV1MissionsMissionIdCompletePostResponse>(getCompleteMissionApiV1MissionsMissionIdCompletePostUrl(missionId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      missionUpdate,)
+  }
+);}
 
-      return completeMissionApiV1MissionsMissionIdCompletePost(
-        missionId,
-        data,
-        requestOptions,
-      );
-    };
 
-    return { mutationFn, ...mutationOptions };
-  };
 
-export type CompleteMissionApiV1MissionsMissionIdCompletePostMutationResult =
-  NonNullable<
-    Awaited<
-      ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>
-    >
-  >;
-export type CompleteMissionApiV1MissionsMissionIdCompletePostMutationBody =
-  MissionUpdate;
-export type CompleteMissionApiV1MissionsMissionIdCompletePostMutationError =
-  HTTPValidationError;
 
-/**
+export const getCompleteMissionApiV1MissionsMissionIdCompletePostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>>, TError,{missionId: string;data: MissionUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>>, TError,{missionId: string;data: MissionUpdate}, TContext> => {
+
+const mutationKey = ['completeMissionApiV1MissionsMissionIdCompletePost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>>, {missionId: string;data: MissionUpdate}> = (props) => {
+          const {missionId,data} = props ?? {};
+
+          return  completeMissionApiV1MissionsMissionIdCompletePost(missionId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteMissionApiV1MissionsMissionIdCompletePostMutationResult = NonNullable<Awaited<ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>>>
+    export type CompleteMissionApiV1MissionsMissionIdCompletePostMutationBody = MissionUpdate
+    export type CompleteMissionApiV1MissionsMissionIdCompletePostMutationError = HTTPValidationError
+
+    /**
  * @summary Complete Mission
  */
-export const useCompleteMissionApiV1MissionsMissionIdCompletePost = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>
-      >,
-      TError,
-      { missionId: string; data: MissionUpdate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>>,
-  TError,
-  { missionId: string; data: MissionUpdate },
-  TContext
-> => {
-  return useMutation(
-    getCompleteMissionApiV1MissionsMissionIdCompletePostMutationOptions(
-      options,
-    ),
-    queryClient,
-  );
-};
-/**
+export const useCompleteMissionApiV1MissionsMissionIdCompletePost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>>, TError,{missionId: string;data: MissionUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof completeMissionApiV1MissionsMissionIdCompletePost>>,
+        TError,
+        {missionId: string;data: MissionUpdate},
+        TContext
+      > => {
+      return useMutation(getCompleteMissionApiV1MissionsMissionIdCompletePostMutationOptions(options), queryClient);
+    }
+    /**
  * Mark a mission as failed.
  * @summary Fail Mission
  */
 export type failMissionApiV1MissionsMissionIdFailPostResponse200 = {
-  data: MissionRead;
-  status: 200;
-};
+  data: MissionRead
+  status: 200
+}
 
 export type failMissionApiV1MissionsMissionIdFailPostResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type failMissionApiV1MissionsMissionIdFailPostResponseSuccess = (failMissionApiV1MissionsMissionIdFailPostResponse200) & {
+  headers: Headers;
+};
+export type failMissionApiV1MissionsMissionIdFailPostResponseError = (failMissionApiV1MissionsMissionIdFailPostResponse422) & {
+  headers: Headers;
 };
 
-export type failMissionApiV1MissionsMissionIdFailPostResponseSuccess =
-  failMissionApiV1MissionsMissionIdFailPostResponse200 & {
-    headers: Headers;
-  };
-export type failMissionApiV1MissionsMissionIdFailPostResponseError =
-  failMissionApiV1MissionsMissionIdFailPostResponse422 & {
-    headers: Headers;
-  };
+export type failMissionApiV1MissionsMissionIdFailPostResponse = (failMissionApiV1MissionsMissionIdFailPostResponseSuccess | failMissionApiV1MissionsMissionIdFailPostResponseError)
 
-export type failMissionApiV1MissionsMissionIdFailPostResponse =
-  | failMissionApiV1MissionsMissionIdFailPostResponseSuccess
-  | failMissionApiV1MissionsMissionIdFailPostResponseError;
+export const getFailMissionApiV1MissionsMissionIdFailPostUrl = (missionId: string,) => {
 
-export const getFailMissionApiV1MissionsMissionIdFailPostUrl = (
-  missionId: string,
-) => {
-  return `/api/v1/missions/${missionId}/fail`;
-};
 
-export const failMissionApiV1MissionsMissionIdFailPost = async (
-  missionId: string,
-  missionUpdate: MissionUpdate,
-  options?: RequestInit,
-): Promise<failMissionApiV1MissionsMissionIdFailPostResponse> => {
-  return customFetch<failMissionApiV1MissionsMissionIdFailPostResponse>(
-    getFailMissionApiV1MissionsMissionIdFailPostUrl(missionId),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(missionUpdate),
-    },
-  );
-};
+  
 
-export const getFailMissionApiV1MissionsMissionIdFailPostMutationOptions = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>,
-    TError,
-    { missionId: string; data: MissionUpdate },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>,
-  TError,
-  { missionId: string; data: MissionUpdate },
-  TContext
-> => {
-  const mutationKey = ["failMissionApiV1MissionsMissionIdFailPost"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/missions/${missionId}/fail`
+}
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>,
-    { missionId: string; data: MissionUpdate }
-  > = (props) => {
-    const { missionId, data } = props ?? {};
+export const failMissionApiV1MissionsMissionIdFailPost = async (missionId: string,
+    missionUpdate: MissionUpdate, options?: RequestInit): Promise<failMissionApiV1MissionsMissionIdFailPostResponse> => {
+  
+  return customFetch<failMissionApiV1MissionsMissionIdFailPostResponse>(getFailMissionApiV1MissionsMissionIdFailPostUrl(missionId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      missionUpdate,)
+  }
+);}
 
-    return failMissionApiV1MissionsMissionIdFailPost(
-      missionId,
-      data,
-      requestOptions,
-    );
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type FailMissionApiV1MissionsMissionIdFailPostMutationResult =
-  NonNullable<
-    Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>
-  >;
-export type FailMissionApiV1MissionsMissionIdFailPostMutationBody =
-  MissionUpdate;
-export type FailMissionApiV1MissionsMissionIdFailPostMutationError =
-  HTTPValidationError;
 
-/**
+export const getFailMissionApiV1MissionsMissionIdFailPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>, TError,{missionId: string;data: MissionUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>, TError,{missionId: string;data: MissionUpdate}, TContext> => {
+
+const mutationKey = ['failMissionApiV1MissionsMissionIdFailPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>, {missionId: string;data: MissionUpdate}> = (props) => {
+          const {missionId,data} = props ?? {};
+
+          return  failMissionApiV1MissionsMissionIdFailPost(missionId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FailMissionApiV1MissionsMissionIdFailPostMutationResult = NonNullable<Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>>
+    export type FailMissionApiV1MissionsMissionIdFailPostMutationBody = MissionUpdate
+    export type FailMissionApiV1MissionsMissionIdFailPostMutationError = HTTPValidationError
+
+    /**
  * @summary Fail Mission
  */
-export const useFailMissionApiV1MissionsMissionIdFailPost = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>,
-      TError,
-      { missionId: string; data: MissionUpdate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>,
-  TError,
-  { missionId: string; data: MissionUpdate },
-  TContext
-> => {
-  return useMutation(
-    getFailMissionApiV1MissionsMissionIdFailPostMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useFailMissionApiV1MissionsMissionIdFailPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>, TError,{missionId: string;data: MissionUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof failMissionApiV1MissionsMissionIdFailPost>>,
+        TError,
+        {missionId: string;data: MissionUpdate},
+        TContext
+      > => {
+      return useMutation(getFailMissionApiV1MissionsMissionIdFailPostMutationOptions(options), queryClient);
+    }
+    /**
  * Cancel a pending or running mission.
  * @summary Cancel Mission
  */
 export type cancelMissionApiV1MissionsMissionIdCancelPostResponse200 = {
-  data: MissionRead;
-  status: 200;
-};
+  data: MissionRead
+  status: 200
+}
 
 export type cancelMissionApiV1MissionsMissionIdCancelPostResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type cancelMissionApiV1MissionsMissionIdCancelPostResponseSuccess = (cancelMissionApiV1MissionsMissionIdCancelPostResponse200) & {
+  headers: Headers;
+};
+export type cancelMissionApiV1MissionsMissionIdCancelPostResponseError = (cancelMissionApiV1MissionsMissionIdCancelPostResponse422) & {
+  headers: Headers;
 };
 
-export type cancelMissionApiV1MissionsMissionIdCancelPostResponseSuccess =
-  cancelMissionApiV1MissionsMissionIdCancelPostResponse200 & {
-    headers: Headers;
-  };
-export type cancelMissionApiV1MissionsMissionIdCancelPostResponseError =
-  cancelMissionApiV1MissionsMissionIdCancelPostResponse422 & {
-    headers: Headers;
-  };
+export type cancelMissionApiV1MissionsMissionIdCancelPostResponse = (cancelMissionApiV1MissionsMissionIdCancelPostResponseSuccess | cancelMissionApiV1MissionsMissionIdCancelPostResponseError)
 
-export type cancelMissionApiV1MissionsMissionIdCancelPostResponse =
-  | cancelMissionApiV1MissionsMissionIdCancelPostResponseSuccess
-  | cancelMissionApiV1MissionsMissionIdCancelPostResponseError;
+export const getCancelMissionApiV1MissionsMissionIdCancelPostUrl = (missionId: string,) => {
 
-export const getCancelMissionApiV1MissionsMissionIdCancelPostUrl = (
-  missionId: string,
-) => {
-  return `/api/v1/missions/${missionId}/cancel`;
-};
 
-export const cancelMissionApiV1MissionsMissionIdCancelPost = async (
-  missionId: string,
-  options?: RequestInit,
-): Promise<cancelMissionApiV1MissionsMissionIdCancelPostResponse> => {
-  return customFetch<cancelMissionApiV1MissionsMissionIdCancelPostResponse>(
-    getCancelMissionApiV1MissionsMissionIdCancelPostUrl(missionId),
-    {
-      ...options,
-      method: "POST",
-    },
-  );
-};
+  
 
-export const getCancelMissionApiV1MissionsMissionIdCancelPostMutationOptions = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>,
-    TError,
-    { missionId: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>,
-  TError,
-  { missionId: string },
-  TContext
-> => {
-  const mutationKey = ["cancelMissionApiV1MissionsMissionIdCancelPost"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/missions/${missionId}/cancel`
+}
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>,
-    { missionId: string }
-  > = (props) => {
-    const { missionId } = props ?? {};
+export const cancelMissionApiV1MissionsMissionIdCancelPost = async (missionId: string, options?: RequestInit): Promise<cancelMissionApiV1MissionsMissionIdCancelPostResponse> => {
+  
+  return customFetch<cancelMissionApiV1MissionsMissionIdCancelPostResponse>(getCancelMissionApiV1MissionsMissionIdCancelPostUrl(missionId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
 
-    return cancelMissionApiV1MissionsMissionIdCancelPost(
-      missionId,
-      requestOptions,
-    );
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type CancelMissionApiV1MissionsMissionIdCancelPostMutationResult =
-  NonNullable<
-    Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>
-  >;
 
-export type CancelMissionApiV1MissionsMissionIdCancelPostMutationError =
-  HTTPValidationError;
+export const getCancelMissionApiV1MissionsMissionIdCancelPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>, TError,{missionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>, TError,{missionId: string}, TContext> => {
 
-/**
+const mutationKey = ['cancelMissionApiV1MissionsMissionIdCancelPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>, {missionId: string}> = (props) => {
+          const {missionId} = props ?? {};
+
+          return  cancelMissionApiV1MissionsMissionIdCancelPost(missionId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelMissionApiV1MissionsMissionIdCancelPostMutationResult = NonNullable<Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>>
+    
+    export type CancelMissionApiV1MissionsMissionIdCancelPostMutationError = HTTPValidationError
+
+    /**
  * @summary Cancel Mission
  */
-export const useCancelMissionApiV1MissionsMissionIdCancelPost = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>,
-      TError,
-      { missionId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>,
-  TError,
-  { missionId: string },
-  TContext
-> => {
-  return useMutation(
-    getCancelMissionApiV1MissionsMissionIdCancelPostMutationOptions(options),
-    queryClient,
-  );
+export const useCancelMissionApiV1MissionsMissionIdCancelPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>, TError,{missionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof cancelMissionApiV1MissionsMissionIdCancelPost>>,
+        TError,
+        {missionId: string},
+        TContext
+      > => {
+      return useMutation(getCancelMissionApiV1MissionsMissionIdCancelPostMutationOptions(options), queryClient);
+    }
+    /**
+ * Return a mission execution timeline built from activity events.
+ * @summary Mission Timeline
+ */
+export type missionTimelineApiV1MissionsMissionIdTimelineGetResponse200 = {
+  data: MissionTimelineEntry[]
+  status: 200
+}
+
+export type missionTimelineApiV1MissionsMissionIdTimelineGetResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type missionTimelineApiV1MissionsMissionIdTimelineGetResponseSuccess = (missionTimelineApiV1MissionsMissionIdTimelineGetResponse200) & {
+  headers: Headers;
 };
+export type missionTimelineApiV1MissionsMissionIdTimelineGetResponseError = (missionTimelineApiV1MissionsMissionIdTimelineGetResponse422) & {
+  headers: Headers;
+};
+
+export type missionTimelineApiV1MissionsMissionIdTimelineGetResponse = (missionTimelineApiV1MissionsMissionIdTimelineGetResponseSuccess | missionTimelineApiV1MissionsMissionIdTimelineGetResponseError)
+
+export const getMissionTimelineApiV1MissionsMissionIdTimelineGetUrl = (missionId: string,) => {
+
+
+  
+
+  return `/api/v1/missions/${missionId}/timeline`
+}
+
+export const missionTimelineApiV1MissionsMissionIdTimelineGet = async (missionId: string, options?: RequestInit): Promise<missionTimelineApiV1MissionsMissionIdTimelineGetResponse> => {
+  
+  return customFetch<missionTimelineApiV1MissionsMissionIdTimelineGetResponse>(getMissionTimelineApiV1MissionsMissionIdTimelineGetUrl(missionId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getMissionTimelineApiV1MissionsMissionIdTimelineGetQueryKey = (missionId: string,) => {
+    return [
+    `/api/v1/missions/${missionId}/timeline`
+    ] as const;
+    }
+
+    
+export const getMissionTimelineApiV1MissionsMissionIdTimelineGetQueryOptions = <TData = Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError = HTTPValidationError>(missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMissionTimelineApiV1MissionsMissionIdTimelineGetQueryKey(missionId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>> = ({ signal }) => missionTimelineApiV1MissionsMissionIdTimelineGet(missionId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(missionId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MissionTimelineApiV1MissionsMissionIdTimelineGetQueryResult = NonNullable<Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>>
+export type MissionTimelineApiV1MissionsMissionIdTimelineGetQueryError = HTTPValidationError
+
+
+export function useMissionTimelineApiV1MissionsMissionIdTimelineGet<TData = Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError = HTTPValidationError>(
+ missionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>,
+          TError,
+          Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMissionTimelineApiV1MissionsMissionIdTimelineGet<TData = Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError = HTTPValidationError>(
+ missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>,
+          TError,
+          Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMissionTimelineApiV1MissionsMissionIdTimelineGet<TData = Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError = HTTPValidationError>(
+ missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
+ * @summary Mission Timeline
+ */
+
+export function useMissionTimelineApiV1MissionsMissionIdTimelineGet<TData = Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError = HTTPValidationError>(
+ missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof missionTimelineApiV1MissionsMissionIdTimelineGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMissionTimelineApiV1MissionsMissionIdTimelineGetQueryOptions(missionId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+/**
+ * Approve a mission waiting for pre-approval and continue dispatch.
+ * @summary Approve Mission
+ */
+export type approveMissionApiV1MissionsMissionIdApprovePostResponse200 = {
+  data: MissionRead
+  status: 200
+}
+
+export type approveMissionApiV1MissionsMissionIdApprovePostResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type approveMissionApiV1MissionsMissionIdApprovePostResponseSuccess = (approveMissionApiV1MissionsMissionIdApprovePostResponse200) & {
+  headers: Headers;
+};
+export type approveMissionApiV1MissionsMissionIdApprovePostResponseError = (approveMissionApiV1MissionsMissionIdApprovePostResponse422) & {
+  headers: Headers;
+};
+
+export type approveMissionApiV1MissionsMissionIdApprovePostResponse = (approveMissionApiV1MissionsMissionIdApprovePostResponseSuccess | approveMissionApiV1MissionsMissionIdApprovePostResponseError)
+
+export const getApproveMissionApiV1MissionsMissionIdApprovePostUrl = (missionId: string,) => {
+
+
+  
+
+  return `/api/v1/missions/${missionId}/approve`
+}
+
+export const approveMissionApiV1MissionsMissionIdApprovePost = async (missionId: string, options?: RequestInit): Promise<approveMissionApiV1MissionsMissionIdApprovePostResponse> => {
+  
+  return customFetch<approveMissionApiV1MissionsMissionIdApprovePostResponse>(getApproveMissionApiV1MissionsMissionIdApprovePostUrl(missionId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getApproveMissionApiV1MissionsMissionIdApprovePostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveMissionApiV1MissionsMissionIdApprovePost>>, TError,{missionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof approveMissionApiV1MissionsMissionIdApprovePost>>, TError,{missionId: string}, TContext> => {
+
+const mutationKey = ['approveMissionApiV1MissionsMissionIdApprovePost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof approveMissionApiV1MissionsMissionIdApprovePost>>, {missionId: string}> = (props) => {
+          const {missionId} = props ?? {};
+
+          return  approveMissionApiV1MissionsMissionIdApprovePost(missionId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ApproveMissionApiV1MissionsMissionIdApprovePostMutationResult = NonNullable<Awaited<ReturnType<typeof approveMissionApiV1MissionsMissionIdApprovePost>>>
+    
+    export type ApproveMissionApiV1MissionsMissionIdApprovePostMutationError = HTTPValidationError
+
+    /**
+ * @summary Approve Mission
+ */
+export const useApproveMissionApiV1MissionsMissionIdApprovePost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveMissionApiV1MissionsMissionIdApprovePost>>, TError,{missionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof approveMissionApiV1MissionsMissionIdApprovePost>>,
+        TError,
+        {missionId: string},
+        TContext
+      > => {
+      return useMutation(getApproveMissionApiV1MissionsMissionIdApprovePostMutationOptions(options), queryClient);
+    }
+    /**
+ * Review a post-review mission and finalize as completed/failed.
+ * @summary Review Mission
+ */
+export type reviewMissionApiV1MissionsMissionIdReviewPostResponse200 = {
+  data: MissionRead
+  status: 200
+}
+
+export type reviewMissionApiV1MissionsMissionIdReviewPostResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type reviewMissionApiV1MissionsMissionIdReviewPostResponseSuccess = (reviewMissionApiV1MissionsMissionIdReviewPostResponse200) & {
+  headers: Headers;
+};
+export type reviewMissionApiV1MissionsMissionIdReviewPostResponseError = (reviewMissionApiV1MissionsMissionIdReviewPostResponse422) & {
+  headers: Headers;
+};
+
+export type reviewMissionApiV1MissionsMissionIdReviewPostResponse = (reviewMissionApiV1MissionsMissionIdReviewPostResponseSuccess | reviewMissionApiV1MissionsMissionIdReviewPostResponseError)
+
+export const getReviewMissionApiV1MissionsMissionIdReviewPostUrl = (missionId: string,) => {
+
+
+  
+
+  return `/api/v1/missions/${missionId}/review`
+}
+
+export const reviewMissionApiV1MissionsMissionIdReviewPost = async (missionId: string,
+    missionUpdate: MissionUpdate, options?: RequestInit): Promise<reviewMissionApiV1MissionsMissionIdReviewPostResponse> => {
+  
+  return customFetch<reviewMissionApiV1MissionsMissionIdReviewPostResponse>(getReviewMissionApiV1MissionsMissionIdReviewPostUrl(missionId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      missionUpdate,)
+  }
+);}
+
+
+
+
+export const getReviewMissionApiV1MissionsMissionIdReviewPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewMissionApiV1MissionsMissionIdReviewPost>>, TError,{missionId: string;data: MissionUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reviewMissionApiV1MissionsMissionIdReviewPost>>, TError,{missionId: string;data: MissionUpdate}, TContext> => {
+
+const mutationKey = ['reviewMissionApiV1MissionsMissionIdReviewPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviewMissionApiV1MissionsMissionIdReviewPost>>, {missionId: string;data: MissionUpdate}> = (props) => {
+          const {missionId,data} = props ?? {};
+
+          return  reviewMissionApiV1MissionsMissionIdReviewPost(missionId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReviewMissionApiV1MissionsMissionIdReviewPostMutationResult = NonNullable<Awaited<ReturnType<typeof reviewMissionApiV1MissionsMissionIdReviewPost>>>
+    export type ReviewMissionApiV1MissionsMissionIdReviewPostMutationBody = MissionUpdate
+    export type ReviewMissionApiV1MissionsMissionIdReviewPostMutationError = HTTPValidationError
+
+    /**
+ * @summary Review Mission
+ */
+export const useReviewMissionApiV1MissionsMissionIdReviewPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewMissionApiV1MissionsMissionIdReviewPost>>, TError,{missionId: string;data: MissionUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reviewMissionApiV1MissionsMissionIdReviewPost>>,
+        TError,
+        {missionId: string;data: MissionUpdate},
+        TContext
+      > => {
+      return useMutation(getReviewMissionApiV1MissionsMissionIdReviewPostMutationOptions(options), queryClient);
+    }
+    /**
  * List all subtasks for a mission.
  * @summary List Subtasks
  */
 export type listSubtasksApiV1MissionsMissionIdSubtasksGetResponse200 = {
-  data: SubtaskRead[];
-  status: 200;
-};
+  data: SubtaskRead[]
+  status: 200
+}
 
 export type listSubtasksApiV1MissionsMissionIdSubtasksGetResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type listSubtasksApiV1MissionsMissionIdSubtasksGetResponseSuccess = (listSubtasksApiV1MissionsMissionIdSubtasksGetResponse200) & {
+  headers: Headers;
+};
+export type listSubtasksApiV1MissionsMissionIdSubtasksGetResponseError = (listSubtasksApiV1MissionsMissionIdSubtasksGetResponse422) & {
+  headers: Headers;
 };
 
-export type listSubtasksApiV1MissionsMissionIdSubtasksGetResponseSuccess =
-  listSubtasksApiV1MissionsMissionIdSubtasksGetResponse200 & {
-    headers: Headers;
-  };
-export type listSubtasksApiV1MissionsMissionIdSubtasksGetResponseError =
-  listSubtasksApiV1MissionsMissionIdSubtasksGetResponse422 & {
-    headers: Headers;
-  };
+export type listSubtasksApiV1MissionsMissionIdSubtasksGetResponse = (listSubtasksApiV1MissionsMissionIdSubtasksGetResponseSuccess | listSubtasksApiV1MissionsMissionIdSubtasksGetResponseError)
 
-export type listSubtasksApiV1MissionsMissionIdSubtasksGetResponse =
-  | listSubtasksApiV1MissionsMissionIdSubtasksGetResponseSuccess
-  | listSubtasksApiV1MissionsMissionIdSubtasksGetResponseError;
+export const getListSubtasksApiV1MissionsMissionIdSubtasksGetUrl = (missionId: string,) => {
 
-export const getListSubtasksApiV1MissionsMissionIdSubtasksGetUrl = (
-  missionId: string,
+
+  
+
+  return `/api/v1/missions/${missionId}/subtasks`
+}
+
+export const listSubtasksApiV1MissionsMissionIdSubtasksGet = async (missionId: string, options?: RequestInit): Promise<listSubtasksApiV1MissionsMissionIdSubtasksGetResponse> => {
+  
+  return customFetch<listSubtasksApiV1MissionsMissionIdSubtasksGetResponse>(getListSubtasksApiV1MissionsMissionIdSubtasksGetUrl(missionId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListSubtasksApiV1MissionsMissionIdSubtasksGetQueryKey = (missionId: string,) => {
+    return [
+    `/api/v1/missions/${missionId}/subtasks`
+    ] as const;
+    }
+
+    
+export const getListSubtasksApiV1MissionsMissionIdSubtasksGetQueryOptions = <TData = Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError = HTTPValidationError>(missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return `/api/v1/missions/${missionId}/subtasks`;
-};
 
-export const listSubtasksApiV1MissionsMissionIdSubtasksGet = async (
-  missionId: string,
-  options?: RequestInit,
-): Promise<listSubtasksApiV1MissionsMissionIdSubtasksGetResponse> => {
-  return customFetch<listSubtasksApiV1MissionsMissionIdSubtasksGetResponse>(
-    getListSubtasksApiV1MissionsMissionIdSubtasksGetUrl(missionId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-export const getListSubtasksApiV1MissionsMissionIdSubtasksGetQueryKey = (
-  missionId: string,
-) => {
-  return [`/api/v1/missions/${missionId}/subtasks`] as const;
-};
+  const queryKey =  queryOptions?.queryKey ?? getListSubtasksApiV1MissionsMissionIdSubtasksGetQueryKey(missionId);
 
-export const getListSubtasksApiV1MissionsMissionIdSubtasksGetQueryOptions = <
-  TData = Awaited<
-    ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-  >,
-  TError = HTTPValidationError,
->(
-  missionId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-        >,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getListSubtasksApiV1MissionsMissionIdSubtasksGetQueryKey(missionId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>> = ({ signal }) => listSubtasksApiV1MissionsMissionIdSubtasksGet(missionId, { signal, ...requestOptions });
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>
-  > = ({ signal }) =>
-    listSubtasksApiV1MissionsMissionIdSubtasksGet(missionId, {
-      signal,
-      ...requestOptions,
-    });
+      
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!missionId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+      
 
-export type ListSubtasksApiV1MissionsMissionIdSubtasksGetQueryResult =
-  NonNullable<
-    Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>
-  >;
-export type ListSubtasksApiV1MissionsMissionIdSubtasksGetQueryError =
-  HTTPValidationError;
+   return  { queryKey, queryFn, enabled: !!(missionId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-export function useListSubtasksApiV1MissionsMissionIdSubtasksGet<
-  TData = Awaited<
-    ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-  >,
-  TError = HTTPValidationError,
->(
-  missionId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-        >,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+export type ListSubtasksApiV1MissionsMissionIdSubtasksGetQueryResult = NonNullable<Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>>
+export type ListSubtasksApiV1MissionsMissionIdSubtasksGetQueryError = HTTPValidationError
+
+
+export function useListSubtasksApiV1MissionsMissionIdSubtasksGet<TData = Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError = HTTPValidationError>(
+ missionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<
-            ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-          >,
+          Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>,
           TError,
-          Awaited<
-            ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-          >
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListSubtasksApiV1MissionsMissionIdSubtasksGet<
-  TData = Awaited<
-    ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-  >,
-  TError = HTTPValidationError,
->(
-  missionId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-        >,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+          Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSubtasksApiV1MissionsMissionIdSubtasksGet<TData = Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError = HTTPValidationError>(
+ missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<
-            ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-          >,
+          Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>,
           TError,
-          Awaited<
-            ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-          >
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListSubtasksApiV1MissionsMissionIdSubtasksGet<
-  TData = Awaited<
-    ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-  >,
-  TError = HTTPValidationError,
->(
-  missionId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-        >,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+          Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSubtasksApiV1MissionsMissionIdSubtasksGet<TData = Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError = HTTPValidationError>(
+ missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Subtasks
  */
 
-export function useListSubtasksApiV1MissionsMissionIdSubtasksGet<
-  TData = Awaited<
-    ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-  >,
-  TError = HTTPValidationError,
->(
-  missionId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<
-          ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>
-        >,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions =
-    getListSubtasksApiV1MissionsMissionIdSubtasksGetQueryOptions(
-      missionId,
-      options,
-    );
+export function useListSubtasksApiV1MissionsMissionIdSubtasksGet<TData = Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError = HTTPValidationError>(
+ missionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubtasksApiV1MissionsMissionIdSubtasksGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getListSubtasksApiV1MissionsMissionIdSubtasksGetQueryOptions(missionId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Create a subtask for a mission.
  * @summary Create Subtask
  */
 export type createSubtaskApiV1MissionsMissionIdSubtasksPostResponse201 = {
-  data: SubtaskRead;
-  status: 201;
-};
+  data: SubtaskRead
+  status: 201
+}
 
 export type createSubtaskApiV1MissionsMissionIdSubtasksPostResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type createSubtaskApiV1MissionsMissionIdSubtasksPostResponseSuccess = (createSubtaskApiV1MissionsMissionIdSubtasksPostResponse201) & {
+  headers: Headers;
+};
+export type createSubtaskApiV1MissionsMissionIdSubtasksPostResponseError = (createSubtaskApiV1MissionsMissionIdSubtasksPostResponse422) & {
+  headers: Headers;
 };
 
-export type createSubtaskApiV1MissionsMissionIdSubtasksPostResponseSuccess =
-  createSubtaskApiV1MissionsMissionIdSubtasksPostResponse201 & {
-    headers: Headers;
-  };
-export type createSubtaskApiV1MissionsMissionIdSubtasksPostResponseError =
-  createSubtaskApiV1MissionsMissionIdSubtasksPostResponse422 & {
-    headers: Headers;
-  };
+export type createSubtaskApiV1MissionsMissionIdSubtasksPostResponse = (createSubtaskApiV1MissionsMissionIdSubtasksPostResponseSuccess | createSubtaskApiV1MissionsMissionIdSubtasksPostResponseError)
 
-export type createSubtaskApiV1MissionsMissionIdSubtasksPostResponse =
-  | createSubtaskApiV1MissionsMissionIdSubtasksPostResponseSuccess
-  | createSubtaskApiV1MissionsMissionIdSubtasksPostResponseError;
+export const getCreateSubtaskApiV1MissionsMissionIdSubtasksPostUrl = (missionId: string,) => {
 
-export const getCreateSubtaskApiV1MissionsMissionIdSubtasksPostUrl = (
-  missionId: string,
-) => {
-  return `/api/v1/missions/${missionId}/subtasks`;
-};
 
-export const createSubtaskApiV1MissionsMissionIdSubtasksPost = async (
-  missionId: string,
-  subtaskCreate: SubtaskCreate,
-  options?: RequestInit,
-): Promise<createSubtaskApiV1MissionsMissionIdSubtasksPostResponse> => {
-  return customFetch<createSubtaskApiV1MissionsMissionIdSubtasksPostResponse>(
-    getCreateSubtaskApiV1MissionsMissionIdSubtasksPostUrl(missionId),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(subtaskCreate),
-    },
-  );
-};
+  
 
-export const getCreateSubtaskApiV1MissionsMissionIdSubtasksPostMutationOptions =
-  <TError = HTTPValidationError, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>
-      >,
-      TError,
-      { missionId: string; data: SubtaskCreate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  }): UseMutationOptions<
-    Awaited<ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>>,
-    TError,
-    { missionId: string; data: SubtaskCreate },
-    TContext
-  > => {
-    const mutationKey = ["createSubtaskApiV1MissionsMissionIdSubtasksPost"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-      ? options.mutation &&
-        "mutationKey" in options.mutation &&
-        options.mutation.mutationKey
-        ? options
-        : { ...options, mutation: { ...options.mutation, mutationKey } }
-      : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/missions/${missionId}/subtasks`
+}
 
-    const mutationFn: MutationFunction<
-      Awaited<
-        ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>
-      >,
-      { missionId: string; data: SubtaskCreate }
-    > = (props) => {
-      const { missionId, data } = props ?? {};
+export const createSubtaskApiV1MissionsMissionIdSubtasksPost = async (missionId: string,
+    subtaskCreate: SubtaskCreate, options?: RequestInit): Promise<createSubtaskApiV1MissionsMissionIdSubtasksPostResponse> => {
+  
+  return customFetch<createSubtaskApiV1MissionsMissionIdSubtasksPostResponse>(getCreateSubtaskApiV1MissionsMissionIdSubtasksPostUrl(missionId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      subtaskCreate,)
+  }
+);}
 
-      return createSubtaskApiV1MissionsMissionIdSubtasksPost(
-        missionId,
-        data,
-        requestOptions,
-      );
-    };
 
-    return { mutationFn, ...mutationOptions };
-  };
 
-export type CreateSubtaskApiV1MissionsMissionIdSubtasksPostMutationResult =
-  NonNullable<
-    Awaited<ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>>
-  >;
-export type CreateSubtaskApiV1MissionsMissionIdSubtasksPostMutationBody =
-  SubtaskCreate;
-export type CreateSubtaskApiV1MissionsMissionIdSubtasksPostMutationError =
-  HTTPValidationError;
 
-/**
+export const getCreateSubtaskApiV1MissionsMissionIdSubtasksPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>>, TError,{missionId: string;data: SubtaskCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>>, TError,{missionId: string;data: SubtaskCreate}, TContext> => {
+
+const mutationKey = ['createSubtaskApiV1MissionsMissionIdSubtasksPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>>, {missionId: string;data: SubtaskCreate}> = (props) => {
+          const {missionId,data} = props ?? {};
+
+          return  createSubtaskApiV1MissionsMissionIdSubtasksPost(missionId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSubtaskApiV1MissionsMissionIdSubtasksPostMutationResult = NonNullable<Awaited<ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>>>
+    export type CreateSubtaskApiV1MissionsMissionIdSubtasksPostMutationBody = SubtaskCreate
+    export type CreateSubtaskApiV1MissionsMissionIdSubtasksPostMutationError = HTTPValidationError
+
+    /**
  * @summary Create Subtask
  */
-export const useCreateSubtaskApiV1MissionsMissionIdSubtasksPost = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>
-      >,
-      TError,
-      { missionId: string; data: SubtaskCreate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>>,
-  TError,
-  { missionId: string; data: SubtaskCreate },
-  TContext
-> => {
-  return useMutation(
-    getCreateSubtaskApiV1MissionsMissionIdSubtasksPostMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useCreateSubtaskApiV1MissionsMissionIdSubtasksPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>>, TError,{missionId: string;data: SubtaskCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createSubtaskApiV1MissionsMissionIdSubtasksPost>>,
+        TError,
+        {missionId: string;data: SubtaskCreate},
+        TContext
+      > => {
+      return useMutation(getCreateSubtaskApiV1MissionsMissionIdSubtasksPostMutationOptions(options), queryClient);
+    }
+    /**
  * Update a subtask's status and result.
  * @summary Update Subtask
  */
 export type updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse200 = {
-  data: SubtaskRead;
-  status: 200;
-};
+  data: SubtaskRead
+  status: 200
+}
 
 export type updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponseSuccess = (updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse200) & {
+  headers: Headers;
+};
+export type updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponseError = (updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse422) & {
+  headers: Headers;
 };
 
-export type updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponseSuccess =
-  updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse200 & {
-    headers: Headers;
-  };
-export type updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponseError =
-  updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse422 & {
-    headers: Headers;
-  };
+export type updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse = (updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponseSuccess | updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponseError)
 
-export type updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse =
-  | updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponseSuccess
-  | updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponseError;
+export const getUpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchUrl = (subtaskId: string,) => {
 
-export const getUpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchUrl = (
-  subtaskId: string,
-) => {
-  return `/api/v1/missions/subtasks/${subtaskId}`;
-};
 
-export const updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch = async (
-  subtaskId: string,
-  subtaskUpdate: SubtaskUpdate,
-  options?: RequestInit,
-): Promise<updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse> => {
-  return customFetch<updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse>(
-    getUpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchUrl(subtaskId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(subtaskUpdate),
-    },
-  );
-};
+  
 
-export const getUpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchMutationOptions =
-  <TError = HTTPValidationError, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>
-      >,
-      TError,
-      { subtaskId: string; data: SubtaskUpdate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  }): UseMutationOptions<
-    Awaited<
-      ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>
-    >,
-    TError,
-    { subtaskId: string; data: SubtaskUpdate },
-    TContext
-  > => {
-    const mutationKey = ["updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-      ? options.mutation &&
-        "mutationKey" in options.mutation &&
-        options.mutation.mutationKey
-        ? options
-        : { ...options, mutation: { ...options.mutation, mutationKey } }
-      : { mutation: { mutationKey }, request: undefined };
+  return `/api/v1/missions/subtasks/${subtaskId}`
+}
 
-    const mutationFn: MutationFunction<
-      Awaited<
-        ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>
-      >,
-      { subtaskId: string; data: SubtaskUpdate }
-    > = (props) => {
-      const { subtaskId, data } = props ?? {};
+export const updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch = async (subtaskId: string,
+    subtaskUpdate: SubtaskUpdate, options?: RequestInit): Promise<updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse> => {
+  
+  return customFetch<updateSubtaskApiV1MissionsSubtasksSubtaskIdPatchResponse>(getUpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchUrl(subtaskId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      subtaskUpdate,)
+  }
+);}
 
-      return updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch(
-        subtaskId,
-        data,
-        requestOptions,
-      );
-    };
 
-    return { mutationFn, ...mutationOptions };
-  };
 
-export type UpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchMutationResult =
-  NonNullable<
-    Awaited<ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>>
-  >;
-export type UpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchMutationBody =
-  SubtaskUpdate;
-export type UpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchMutationError =
-  HTTPValidationError;
 
-/**
+export const getUpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>>, TError,{subtaskId: string;data: SubtaskUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>>, TError,{subtaskId: string;data: SubtaskUpdate}, TContext> => {
+
+const mutationKey = ['updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>>, {subtaskId: string;data: SubtaskUpdate}> = (props) => {
+          const {subtaskId,data} = props ?? {};
+
+          return  updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch(subtaskId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchMutationResult = NonNullable<Awaited<ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>>>
+    export type UpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchMutationBody = SubtaskUpdate
+    export type UpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchMutationError = HTTPValidationError
+
+    /**
  * @summary Update Subtask
  */
-export const useUpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatch = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<
-        ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>
-      >,
-      TError,
-      { subtaskId: string; data: SubtaskUpdate },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>>,
-  TError,
-  { subtaskId: string; data: SubtaskUpdate },
-  TContext
-> => {
-  return useMutation(
-    getUpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchMutationOptions(options),
-    queryClient,
-  );
+export const useUpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatch = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>>, TError,{subtaskId: string;data: SubtaskUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateSubtaskApiV1MissionsSubtasksSubtaskIdPatch>>,
+        TError,
+        {subtaskId: string;data: SubtaskUpdate},
+        TContext
+      > => {
+      return useMutation(getUpdateSubtaskApiV1MissionsSubtasksSubtaskIdPatchMutationOptions(options), queryClient);
+    }
+    /**
+ * Reset and redispatch a subtask into its dedicated OpenClaw session.
+ * @summary Redispatch Subtask
+ */
+export type redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponse200 = {
+  data: SubtaskRead
+  status: 200
+}
+
+export type redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+    
+export type redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponseSuccess = (redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponse200) & {
+  headers: Headers;
 };
+export type redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponseError = (redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponse422) & {
+  headers: Headers;
+};
+
+export type redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponse = (redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponseSuccess | redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponseError)
+
+export const getRedispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostUrl = (subtaskId: string,) => {
+
+
+  
+
+  return `/api/v1/missions/subtasks/${subtaskId}/redispatch`
+}
+
+export const redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPost = async (subtaskId: string, options?: RequestInit): Promise<redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponse> => {
+  
+  return customFetch<redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostResponse>(getRedispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostUrl(subtaskId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getRedispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPost>>, TError,{subtaskId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPost>>, TError,{subtaskId: string}, TContext> => {
+
+const mutationKey = ['redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPost>>, {subtaskId: string}> = (props) => {
+          const {subtaskId} = props ?? {};
+
+          return  redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPost(subtaskId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RedispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostMutationResult = NonNullable<Awaited<ReturnType<typeof redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPost>>>
+    
+    export type RedispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostMutationError = HTTPValidationError
+
+    /**
+ * @summary Redispatch Subtask
+ */
+export const useRedispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPost>>, TError,{subtaskId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof redispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPost>>,
+        TError,
+        {subtaskId: string},
+        TContext
+      > => {
+      return useMutation(getRedispatchSubtaskApiV1MissionsSubtasksSubtaskIdRedispatchPostMutationOptions(options), queryClient);
+    }
+    

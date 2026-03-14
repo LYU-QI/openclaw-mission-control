@@ -28,14 +28,13 @@ def test_aggregator_returns_completed_without_failures() -> None:
             ],
         ),
     )
-    assert result.status == "completed"
     assert result.anomalies == []
     assert "completed=2" in result.summary
     assert result.risk == "low"
     assert result.evidence["stats"]["completed"] == 2
 
 
-def test_aggregator_returns_pending_approval_for_non_auto_policy() -> None:
+def test_aggregator_keeps_output_structured_for_non_auto_policy() -> None:
     mission = Mission(
         id=uuid4(),
         task_id=uuid4(),
@@ -53,7 +52,6 @@ def test_aggregator_returns_pending_approval_for_non_auto_policy() -> None:
             ],
         ),
     )
-    assert result.status == "pending_approval"
     assert len(result.anomalies) == 1
     assert result.risk == "high"
     assert "retry" in result.next_action.lower()

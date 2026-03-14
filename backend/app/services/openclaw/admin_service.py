@@ -105,9 +105,11 @@ class GatewayAdminLifecycleService(OpenClawDBService):
         return gateway
 
     async def find_main_agent(self, gateway: Gateway) -> Agent | None:
+        """Find the Gateway's main agent by matching the session key pattern."""
+        main_session_key = GatewayAgentIdentity.session_key(gateway)
         return (
             await Agent.objects.filter_by(gateway_id=gateway.id)
-            .filter(col(Agent.board_id).is_(None))
+            .filter(Agent.openclaw_session_id == main_session_key)
             .first(self.session)
         )
 
@@ -271,8 +273,49 @@ class GatewayAdminLifecycleService(OpenClawDBService):
             notify=True,
         )
 
+    async def upsert_system_agent_record(self, gateway: Gateway, role: str) -> tuple[Agent, bool]:
+        changed = False
+        # Derive a stable session key for system roles
+        session_key = f"mc-gateway-{gateway.id}-{role.replace('_', '-')}"
+        agent = (
+            await Agent.objects.filter_by(gateway_id=gateway.id, system_role=role)
+            .first(self.session)
+        )
+        
+        role_display_names = {
+            "orchestrator": "Orchestrator",
+            "sync_agent": "Sync Agent",
+            "comms_agent": "Comms Agent",
+        }
+        name = f"{gateway.name} {role_display_names.get(role, role.title())}"
+        
+        if agent is None:
+            agent = Agent(
+                name=name,
+                system_role=role,
+                status="provisioning",
+                board_id=None,
+                gateway_id=gateway.id,
+                is_board_lead=False,
+                openclaw_session_id=session_key,
+                heartbeat_config=DEFAULT_HEARTBEAT_CONFIG.copy(),
+            )
+            self.session.add(agent)
+            changed = True
+        
+        if agent.name != name or agent.openclaw_session_id != session_key:
+            agent.name = name
+            agent.openclaw_session_id = session_key
+            changed = True
+            
+        if changed:
+            agent.updated_at = utcnow()
+            self.session.add(agent)
+        return agent, changed
+
     async def ensure_gateway_agents_exist(self, gateways: list[Gateway]) -> None:
         for gateway in gateways:
+            # 1. Ensure Main/Lead Agent
             agent, gateway_changed = await self.upsert_main_agent_record(gateway)
             has_gateway_entry = await self.gateway_has_main_agent_entry(gateway)
             needs_provision = (
@@ -286,6 +329,28 @@ class GatewayAdminLifecycleService(OpenClawDBService):
                     action="provision",
                     notify=False,
                 )
+            
+            # 2. Ensure System Role Agents (Orchestrator, Sync, Comms) Serial Provisioning with Delays
+            import asyncio
+            
+            async def _safe_provision(role_name: str, agent_obj: Agent, existing_changed: bool):
+                if existing_changed or not bool(agent_obj.agent_token_hash):
+                    # Add a small buffer before each provision to avoid rate limiting on config.patch
+                    await asyncio.sleep(2.0)
+                    try:
+                         await self.provision_main_agent_record(
+                            gateway,
+                            agent_obj,
+                            user=None,
+                            action="provision",
+                            notify=True,
+                        )
+                    except Exception as e:
+                        self.logger.error(f"Failed to provision system agent {role_name}: {e}")
+
+            for role in ["orchestrator", "sync_agent", "comms_agent"]:
+                sys_agent, sys_changed = await self.upsert_system_agent_record(gateway, role)
+                await _safe_provision(role, sys_agent, sys_changed)
 
     async def clear_agent_foreign_keys(self, *, agent_id: UUID) -> None:
         now = utcnow()
@@ -361,3 +426,81 @@ class GatewayAdminLifecycleService(OpenClawDBService):
         )
         self.logger.info("gateway.templates.sync.success gateway_id=%s", gateway.id)
         return result
+
+    async def check_gateway_health(self, gateway: Gateway) -> "GatewayHealthCheckStatus":
+        """Run diagnostic probes against the gateway and return its health status."""
+        from app.schemas.gateways import GatewayHealthCheckStatus
+
+        status = GatewayHealthCheckStatus()
+
+        if not gateway.url:
+            status.last_error = "Gateway URL not configured"
+            return status
+
+        config = GatewayClientConfig(
+            url=gateway.url,
+            token=gateway.token,
+            allow_insecure_tls=gateway.allow_insecure_tls,
+            disable_device_pairing=gateway.disable_device_pairing,
+        )
+
+        from app.services.openclaw.gateway_rpc import check_websocket_reachable
+
+        status.ws_connected = await check_websocket_reachable(config)
+
+        try:
+            compat_result = await check_gateway_version_compatibility(config)
+            status.http_reachable = True
+            if compat_result.compatible:
+                status.rpc_callable = True
+            else:
+                status.last_error = compat_result.message or "Gateway runtime not compatible"
+                return status
+        except OpenClawGatewayError as exc:
+            status.last_error = normalize_gateway_error_message(str(exc))
+            return status
+
+        target_id = GatewayAgentIdentity.openclaw_agent_id(gateway)
+        try:
+            await openclaw_call("agents.files.list", {"agentId": target_id}, config=config)
+            status.session_active = True
+        except OpenClawGatewayError as exc:
+            # Sync local Agent status to offline when Gateway session is lost
+            agent = await self.find_main_agent(gateway)
+            if agent and agent.status in ("idle", "busy", "online"):
+                self.logger.warning(
+                    "gateway.health.sync_offline agent_id=%s gateway_id=%s reason=session_lost",
+                    agent.id,
+                    gateway.id,
+                )
+                agent.status = "offline"
+                self.session.add(agent)
+                await self.session.commit()
+
+            msg = str(exc).lower()
+            if any(marker in msg for marker in ("not found", "unknown agent", "no such agent")):
+                status.last_error = "Gateway main agent session lost or pending"
+            else:
+                status.last_error = normalize_gateway_error_message(str(exc))
+            return status
+
+        agent = await self.find_main_agent(gateway)
+        if agent:
+            if agent.status in ("idle", "busy", "online"):
+                status.agent_checked_in = True
+            else:
+                # Agent exists but status is not online - sync it to online since we just confirmed session is active
+                if agent.status == "offline":
+                    self.logger.info(
+                        "gateway.health.sync_online agent_id=%s gateway_id=%s",
+                        agent.id,
+                        gateway.id,
+                    )
+                    agent.status = "online"
+                    self.session.add(agent)
+                    await self.session.commit()
+                status.last_error = agent.last_provision_error or f"Agent status is {agent.status}"
+        else:
+            status.last_error = "Main agent not provisioned in local database"
+
+        return status

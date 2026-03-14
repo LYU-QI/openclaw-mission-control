@@ -18,6 +18,7 @@ import {
 } from "@/components/tables/DataTable";
 import { dateCell, linkifyCell } from "@/components/tables/cell-formatters";
 import { truncateText as truncate } from "@/lib/formatters";
+import { GatewayHealthBadge } from "@/components/gateways/GatewayHealthBadge";
 
 type GatewaysTableProps = {
   gateways: GatewayRead[];
@@ -30,6 +31,8 @@ type GatewaysTableProps = {
   columnOrder?: string[];
   disableSorting?: boolean;
   onDelete?: (gateway: GatewayRead) => void;
+  onSync?: (gateway: GatewayRead) => void;
+  syncingGatewayId?: string | null;
   emptyMessage?: string;
   emptyState?: Omit<DataTableEmptyState, "icon"> & {
     icon?: DataTableEmptyState["icon"];
@@ -62,6 +65,8 @@ export function GatewaysTable({
   columnOrder,
   disableSorting = false,
   onDelete,
+  onSync,
+  syncingGatewayId,
   emptyMessage = "No gateways found.",
   emptyState,
 }: GatewaysTableProps) {
@@ -106,6 +111,13 @@ export function GatewaysTable({
         ),
       },
       {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => (
+          <GatewayHealthBadge gatewayId={row.original.id} />
+        ),
+      },
+      {
         accessorKey: "updated_at",
         header: "Updated",
         cell: ({ row }) => dateCell(row.original.updated_at),
@@ -139,8 +151,27 @@ export function GatewaysTable({
       rowActions={
         showActions
           ? {
-              getEditHref: (gateway) => `/gateways/${gateway.id}/edit`,
-              onDelete,
+              actions: [
+                {
+                  key: "sync",
+                  label: syncingGatewayId ? "..." : "Sync",
+                  onClick: onSync,
+                  className:
+                    syncingGatewayId === undefined
+                      ? ""
+                      : "min-w-[4rem] text-center",
+                },
+                {
+                  key: "edit",
+                  label: "Edit",
+                  href: (gateway: GatewayRead) => `/gateways/${gateway.id}/edit`,
+                },
+                {
+                  key: "delete",
+                  label: "Delete",
+                  onClick: onDelete,
+                },
+              ].filter(Boolean) as any,
             }
           : undefined
       }

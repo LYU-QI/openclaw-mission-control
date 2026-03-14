@@ -10,21 +10,25 @@ from sqlmodel import select
 
 from app.api.deps import AUTH_DEP, SESSION_DEP
 from app.core.time import utcnow
-from app.models.notifications import NotificationConfig, NotificationLog
+from app.models.notifications import NotificationConfig, NotificationLog, NotificationTemplate
 from app.schemas.notifications import (
-    NotificationConfirmRequest,
-    NotificationConfirmResponse,
     NotificationConfigCreate,
     NotificationConfigRead,
     NotificationConfigUpdate,
+    NotificationConfirmRequest,
+    NotificationConfirmResponse,
     NotificationLogRead,
+    NotificationTemplateCreate,
+    NotificationTemplateRead,
+    NotificationTemplateUpdate,
     NotificationTestResponse,
 )
 from app.services.notification.notification_service import NotificationService
 
 if TYPE_CHECKING:
-    from app.core.auth import AuthContext
     from sqlmodel.ext.asyncio.session import AsyncSession
+
+    from app.core.auth import AuthContext
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 
@@ -141,9 +145,13 @@ async def list_notification_logs(
     auth: AuthContext = AUTH_DEP,
 ) -> list[NotificationLog]:
     """List notification delivery logs."""
-    stmt = select(NotificationLog).order_by(
-        NotificationLog.created_at.desc(),  # type: ignore[attr-defined]
-    ).limit(limit)
+    stmt = (
+        select(NotificationLog)
+        .order_by(
+            NotificationLog.created_at.desc(),  # type: ignore[attr-defined]
+        )
+        .limit(limit)
+    )
     if config_id:
         stmt = stmt.where(NotificationLog.notification_config_id == config_id)
     if event_type:
@@ -180,3 +188,93 @@ async def confirm_notification(
         status=log.status,
         message="Confirmation recorded",
     )
+
+
+@router.post(
+    "/templates",
+    response_model=NotificationTemplateRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_notification_template(
+    payload: NotificationTemplateCreate,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> NotificationTemplate:
+    """Create a notification template."""
+    template = NotificationTemplate(
+        organization_id=payload.organization_id,
+        event_type=payload.event_type,
+        title=payload.title,
+        template_type=payload.template_type,
+        content_format=payload.content_format,
+        is_active=payload.is_active,
+    )
+    session.add(template)
+    await session.commit()
+    await session.refresh(template)
+    return template
+
+
+@router.get("/templates", response_model=list[NotificationTemplateRead])
+async def list_notification_templates(
+    organization_id: UUID | None = None,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> list[NotificationTemplate]:
+    """List notification templates."""
+    stmt = select(NotificationTemplate).order_by(
+        NotificationTemplate.created_at.desc(),  # type: ignore[attr-defined]
+    )
+    if organization_id:
+        stmt = stmt.where(NotificationTemplate.organization_id == organization_id)
+    result = await session.exec(stmt)
+    return list(result.all())
+
+
+@router.get("/templates/{template_id}", response_model=NotificationTemplateRead)
+async def get_notification_template(
+    template_id: UUID,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> NotificationTemplate:
+    """Retrieve a notification template."""
+    template = await NotificationTemplate.objects.by_id(template_id).first(session)
+    if template is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return template
+
+
+@router.patch("/templates/{template_id}", response_model=NotificationTemplateRead)
+async def update_notification_template(
+    template_id: UUID,
+    payload: NotificationTemplateUpdate,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> NotificationTemplate:
+    """Update a notification template."""
+    template = await NotificationTemplate.objects.by_id(template_id).first(session)
+    if template is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    update_data = payload.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(template, key, value)
+    template.updated_at = utcnow()
+    session.add(template)
+    await session.commit()
+    await session.refresh(template)
+    return template
+
+
+@router.delete("/templates/{template_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_notification_template(
+    template_id: UUID,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> None:
+    """Delete a notification template."""
+    template = await NotificationTemplate.objects.by_id(template_id).first(session)
+    if template is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    await session.delete(template)
+    await session.commit()

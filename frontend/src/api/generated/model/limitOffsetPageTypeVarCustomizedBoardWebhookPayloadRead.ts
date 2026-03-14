@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { BoardWebhookPayloadRead } from "./boardWebhookPayloadRead";
+import type { BoardWebhookPayloadRead } from './boardWebhookPayloadRead';
 
 export interface LimitOffsetPageTypeVarCustomizedBoardWebhookPayloadRead {
   items: BoardWebhookPayloadRead[];

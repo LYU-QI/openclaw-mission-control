@@ -19,6 +19,7 @@ import {
   getListGatewaysApiV1GatewaysGetQueryKey,
   useDeleteGatewayApiV1GatewaysGatewayIdDelete,
   useListGatewaysApiV1GatewaysGet,
+  useSyncGatewayTemplatesApiV1GatewaysGatewayIdTemplatesSyncPost,
 } from "@/api/generated/gateways/gateways";
 import { createOptimisticListDeleteMutation } from "@/lib/list-delete";
 import { useOrganizationMembership } from "@/lib/use-organization-membership";
@@ -87,6 +88,18 @@ export default function GatewaysPage() {
     deleteMutation.mutate({ gatewayId: deleteTarget.id });
   };
 
+  const syncMutation = useSyncGatewayTemplatesApiV1GatewaysGatewayIdTemplatesSyncPost({
+    mutation: {
+      onSuccess: () => {
+        gatewaysQuery.refetch();
+      },
+    },
+  });
+
+  const handleSync = (gateway: GatewayRead) => {
+    syncMutation.mutate({ gatewayId: gateway.id });
+  };
+
   return (
     <>
       <DashboardPageLayout
@@ -122,6 +135,10 @@ export default function GatewaysPage() {
             showActions
             stickyHeader
             onDelete={setDeleteTarget}
+            onSync={handleSync}
+            syncingGatewayId={
+              syncMutation.isPending ? syncMutation.variables?.gatewayId : null
+            }
             emptyState={{
               title: "No gateways yet",
               description:

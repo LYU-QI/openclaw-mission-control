@@ -18,4 +18,5 @@ class MissionSubagentIdentity:
 
     @staticmethod
     def label(subtask: MissionSubtask) -> str:
-        return f"Subagent {subtask.order + 1}: {subtask.label}"
+        short_id = str(subtask.mission_id)[:8]
+        return f"[{short_id}] Subagent {subtask.order + 1}: {subtask.label}"

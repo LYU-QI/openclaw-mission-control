@@ -5,6 +5,4 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TaskCardReadCustomFieldValues = {
-  [key: string]: unknown | null;
-} | null;
+export type TaskCardReadCustomFieldValues = {[key: string]: unknown | null} | null;

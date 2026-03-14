@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { MissionReadConstraints } from "./missionReadConstraints";
-import type { MissionReadResultEvidence } from "./missionReadResultEvidence";
+import type { MissionReadConstraints } from './missionReadConstraints';
+import type { MissionReadResultEvidence } from './missionReadResultEvidence';
 
 /**
  * Mission payload returned from read endpoints.

@@ -18,6 +18,7 @@ from app.db.pagination import paginate
 from app.db.session import get_session
 from app.models.activity_events import ActivityEvent
 from app.models.agents import Agent
+from app.models.approval_rules import ApprovalRule
 from app.models.approval_task_links import ApprovalTaskLink
 from app.models.approvals import Approval
 from app.models.board_group_memory import BoardGroupMemory
@@ -37,6 +38,7 @@ from app.models.task_dependencies import TaskDependency
 from app.models.task_fingerprints import TaskFingerprint
 from app.models.tasks import Task
 from app.models.users import User
+from app.schemas.approvals import ApprovalRuleCreate, ApprovalRuleRead, ApprovalRuleUpdate
 from app.schemas.common import OkResponse
 from app.schemas.organizations import (
     OrganizationActiveUpdate,
@@ -728,3 +730,75 @@ async def accept_org_invite(
 
     user = await User.objects.by_id(member.user_id).first(session)
     return _member_to_read(member, user)
+
+
+@router.get(
+    "/me/approval-rules",
+    response_model=DefaultLimitOffsetPage[ApprovalRuleRead],
+)
+async def list_org_approval_rules(
+    session: AsyncSession = SESSION_DEP,
+    ctx: OrganizationContext = ORG_ADMIN_DEP,
+) -> LimitOffsetPage[ApprovalRuleRead]:
+    """List approval rules for the active organization."""
+    statement = (
+        ApprovalRule.objects.filter_by(organization_id=ctx.organization.id)
+        .order_by(col(ApprovalRule.created_at).desc())
+        .statement
+    )
+    return await paginate(session, statement)
+
+
+@router.post("/me/approval-rules", response_model=ApprovalRuleRead)
+async def create_org_approval_rule(
+    payload: ApprovalRuleCreate,
+    session: AsyncSession = SESSION_DEP,
+    ctx: OrganizationContext = ORG_ADMIN_DEP,
+) -> ApprovalRuleRead:
+    """Create an approval rule for the active organization."""
+    rule = ApprovalRule(
+        organization_id=ctx.organization.id,
+        name=payload.name,
+        description=payload.description,
+        trigger_on_high_risk=payload.trigger_on_high_risk,
+        trigger_on_tool_usage=payload.trigger_on_tool_usage,
+        trigger_on_domain=payload.trigger_on_domain,
+        override_policy=payload.override_policy,
+        is_active=payload.is_active,
+    )
+    session.add(rule)
+    await session.commit()
+    await session.refresh(rule)
+    return ApprovalRuleRead.model_validate(rule, from_attributes=True)
+
+
+@router.patch("/me/approval-rules/{rule_id}", response_model=ApprovalRuleRead)
+async def update_org_approval_rule(
+    rule_id: UUID,
+    payload: ApprovalRuleUpdate,
+    session: AsyncSession = SESSION_DEP,
+    ctx: OrganizationContext = ORG_ADMIN_DEP,
+) -> ApprovalRuleRead:
+    """Update an approval rule."""
+    rule = await ApprovalRule.objects.by_id(rule_id).first(session)
+    if rule is None or rule.organization_id != ctx.organization.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    updates = payload.model_dump(exclude_unset=True)
+    rule = await crud.patch(session, rule, updates)
+    return ApprovalRuleRead.model_validate(rule, from_attributes=True)
+
+
+@router.delete("/me/approval-rules/{rule_id}", response_model=OkResponse)
+async def delete_org_approval_rule(
+    rule_id: UUID,
+    session: AsyncSession = SESSION_DEP,
+    ctx: OrganizationContext = ORG_ADMIN_DEP,
+) -> OkResponse:
+    """Delete an approval rule."""
+    rule = await ApprovalRule.objects.by_id(rule_id).first(session)
+    if rule is None or rule.organization_id != ctx.organization.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    await crud.delete(session, rule)
+    return OkResponse()

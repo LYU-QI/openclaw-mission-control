@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { ActivityTaskCommentFeedItemRead } from "./activityTaskCommentFeedItemRead";
+import type { ActivityTaskCommentFeedItemRead } from './activityTaskCommentFeedItemRead';
 
 export interface LimitOffsetPageTypeVarCustomizedActivityTaskCommentFeedItemRead {
   items: ActivityTaskCommentFeedItemRead[];

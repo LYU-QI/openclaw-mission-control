@@ -8,7 +8,4 @@
 /**
  * Error payload. Agents should rely on `code` when present and default to `message` for fallback display.
  */
-export type LLMErrorResponseDetail =
-  | string
-  | { [key: string]: unknown }
-  | unknown[];
+export type LLMErrorResponseDetail = string | { [key: string]: unknown } | unknown[];

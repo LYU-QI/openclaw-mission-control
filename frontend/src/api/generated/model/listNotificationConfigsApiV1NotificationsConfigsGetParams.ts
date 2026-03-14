@@ -6,5 +6,5 @@
  */
 
 export type ListNotificationConfigsApiV1NotificationsConfigsGetParams = {
-  organization_id?: string | null;
+organization_id?: string | null;
 };

@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { BoardMemoryRead } from "./boardMemoryRead";
+import type { BoardMemoryRead } from './boardMemoryRead';
 
 export interface LimitOffsetPageTypeVarCustomizedBoardMemoryRead {
   items: BoardMemoryRead[];

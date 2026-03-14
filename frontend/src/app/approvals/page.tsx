@@ -274,7 +274,7 @@ function GlobalApprovalsInner() {
           });
         },
         onError: (error) => {
-          setCreateError(error.message ?? "Unable to create approval.");
+          setCreateError((error as Error).message ?? "Unable to create approval.");
         },
       },
     );

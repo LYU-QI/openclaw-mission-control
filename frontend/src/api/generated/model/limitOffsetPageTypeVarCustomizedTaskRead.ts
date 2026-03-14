@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TaskRead } from "./taskRead";
+import type { TaskRead } from './taskRead';
 
 export interface LimitOffsetPageTypeVarCustomizedTaskRead {
   items: TaskRead[];

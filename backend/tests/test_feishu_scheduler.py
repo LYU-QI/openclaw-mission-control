@@ -31,7 +31,9 @@ class _FakeSession:
         return _FakeExecResult(self._rows)
 
 
-def _build_config(*, minutes_since_sync: int | None, interval_minutes: int = 15) -> FeishuSyncConfig:
+def _build_config(
+    *, minutes_since_sync: int | None, interval_minutes: int = 15
+) -> FeishuSyncConfig:
     return FeishuSyncConfig(
         organization_id=uuid4(),
         board_id=uuid4(),
@@ -41,9 +43,9 @@ def _build_config(*, minutes_since_sync: int | None, interval_minutes: int = 15)
         bitable_table_id="table",
         field_mapping={"title": "title"},
         sync_interval_minutes=interval_minutes,
-        last_sync_at=None
-        if minutes_since_sync is None
-        else utcnow() - timedelta(minutes=minutes_since_sync),
+        last_sync_at=(
+            None if minutes_since_sync is None else utcnow() - timedelta(minutes=minutes_since_sync)
+        ),
         enabled=True,
     )
 

@@ -2,6 +2,7 @@
 
 from app.models.activity_events import ActivityEvent
 from app.models.agents import Agent
+from app.models.approval_rules import ApprovalRule
 from app.models.approval_task_links import ApprovalTaskLink
 from app.models.approvals import Approval
 from app.models.board_group_memory import BoardGroupMemory
@@ -14,7 +15,7 @@ from app.models.boards import Board
 from app.models.feishu_sync import FeishuSyncConfig, FeishuTaskMapping
 from app.models.gateways import Gateway
 from app.models.missions import Mission, MissionSubtask
-from app.models.notifications import NotificationConfig, NotificationLog
+from app.models.notifications import NotificationConfig, NotificationLog, NotificationTemplate
 from app.models.organization_board_access import OrganizationBoardAccess
 from app.models.organization_invite_board_access import OrganizationInviteBoardAccess
 from app.models.organization_invites import OrganizationInvite
@@ -37,6 +38,7 @@ __all__ = [
     "ActivityEvent",
     "Agent",
     "ApprovalTaskLink",
+    "ApprovalRule",
     "Approval",
     "BoardGroupMemory",
     "BoardWebhook",
@@ -54,6 +56,7 @@ __all__ = [
     "MissionSubtask",
     "NotificationConfig",
     "NotificationLog",
+    "NotificationTemplate",
     "SkillPack",
     "Organization",
     "BoardTaskCustomField",
@@ -70,4 +73,3 @@ __all__ = [
     "TagAssignment",
     "User",
 ]
-

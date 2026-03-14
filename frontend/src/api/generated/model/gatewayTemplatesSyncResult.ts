@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { GatewayTemplatesSyncError } from "./gatewayTemplatesSyncError";
+import type { GatewayTemplatesSyncError } from './gatewayTemplatesSyncError';
 
 /**
  * Summary payload returned by gateway template sync endpoints.

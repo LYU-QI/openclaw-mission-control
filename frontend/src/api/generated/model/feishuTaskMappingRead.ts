@@ -13,9 +13,13 @@ export interface FeishuTaskMappingRead {
   sync_config_id: string;
   feishu_record_id: string;
   task_id: string;
+  task_title?: string | null;
   last_feishu_update: string | null;
   last_mc_update: string | null;
   sync_hash: string | null;
+  has_conflict?: boolean;
+  conflict_at?: string | null;
+  conflict_message?: string | null;
   created_at: string;
   updated_at: string;
 }

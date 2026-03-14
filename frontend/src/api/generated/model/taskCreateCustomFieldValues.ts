@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TaskCreateCustomFieldValues = { [key: string]: unknown | null };
+export type TaskCreateCustomFieldValues = {[key: string]: unknown | null};

@@ -486,6 +486,25 @@ async def openclaw_call(
         raise OpenClawGatewayError(str(exc)) from exc
 
 
+async def check_websocket_reachable(config: GatewayConfig) -> bool:
+    """Verify that a basic WebSocket connection can be established."""
+    gateway_url = _build_gateway_url(config)
+    origin = _build_control_ui_origin(gateway_url) if config.disable_device_pairing else None
+    ssl_context = _create_ssl_context(config)
+    connect_kwargs: dict[str, Any] = {"ping_interval": None}
+    if origin is not None:
+        connect_kwargs["origin"] = origin
+    if ssl_context is not None:
+        connect_kwargs["ssl"] = ssl_context
+    result = False
+    try:
+        async with websockets.connect(gateway_url, **connect_kwargs):
+            result = True
+    except Exception:
+        result = False
+    return result
+
+
 async def openclaw_connect_metadata(*, config: GatewayConfig) -> object:
     """Open a gateway connection and return the connect/hello payload."""
     gateway_url = _build_gateway_url(config)

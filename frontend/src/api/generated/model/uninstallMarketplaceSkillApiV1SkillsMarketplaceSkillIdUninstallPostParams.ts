@@ -5,7 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type UninstallMarketplaceSkillApiV1SkillsMarketplaceSkillIdUninstallPostParams =
-  {
-    gateway_id: string;
-  };
+export type UninstallMarketplaceSkillApiV1SkillsMarketplaceSkillIdUninstallPostParams = {
+gateway_id: string;
+};

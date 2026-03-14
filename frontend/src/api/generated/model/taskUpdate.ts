@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TaskUpdateCustomFieldValues } from "./taskUpdateCustomFieldValues";
+import type { TaskUpdateCustomFieldValues } from './taskUpdateCustomFieldValues';
 
 /**
  * Payload for partial task updates.
@@ -12,10 +12,19 @@ import type { TaskUpdateCustomFieldValues } from "./taskUpdateCustomFieldValues"
 export interface TaskUpdate {
   title?: string | null;
   description?: string | null;
-  status?: "inbox" | "in_progress" | "review" | "done" | null;
+  status?: 'inbox' | 'in_progress' | 'review' | 'done' | null;
   priority?: string | null;
   due_at?: string | null;
   assigned_agent_id?: string | null;
+  owner_name?: string | null;
+  owner_feishu_id?: string | null;
+  milestone?: string | null;
+  external_source?: string | null;
+  external_id?: string | null;
+  result_summary?: string | null;
+  result_evidence_link?: string | null;
+  result_risk?: string | null;
+  result_next_action?: string | null;
   depends_on_task_ids?: string[] | null;
   tag_ids?: string[] | null;
   custom_field_values?: TaskUpdateCustomFieldValues;

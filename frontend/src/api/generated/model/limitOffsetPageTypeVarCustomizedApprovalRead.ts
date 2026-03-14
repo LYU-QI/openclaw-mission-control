@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { ApprovalRead } from "./approvalRead";
+import type { ApprovalRead } from './approvalRead';
 
 export interface LimitOffsetPageTypeVarCustomizedApprovalRead {
   items: ApprovalRead[];

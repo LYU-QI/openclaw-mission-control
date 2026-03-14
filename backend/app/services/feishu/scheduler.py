@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from app.core.config import settings
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.core.config import settings
 from app.core.time import utcnow
 from app.models.feishu_sync import FeishuSyncConfig
 from app.services.queue import QueuedTask, enqueue_task

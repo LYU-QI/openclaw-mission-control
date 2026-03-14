@@ -83,3 +83,37 @@ class NotificationConfirmResponse(SQLModel):
     ok: bool
     status: str
     message: str = ""
+
+
+class NotificationTemplateBase(SQLModel):
+    """Shared fields for notification templates."""
+
+    event_type: str
+    title: str
+    template_type: str = "blue"
+    content_format: str | None = None
+    is_active: bool = True
+
+
+class NotificationTemplateCreate(NotificationTemplateBase):
+    """Payload for creating a notification template."""
+
+    organization_id: UUID
+
+
+class NotificationTemplateUpdate(SQLModel):
+    """Payload for updating a notification template."""
+
+    title: str | None = None
+    template_type: str | None = None
+    content_format: str | None = None
+    is_active: bool | None = None
+
+
+class NotificationTemplateRead(NotificationTemplateBase):
+    """Payload returned for notification templates."""
+
+    id: UUID
+    organization_id: UUID
+    created_at: datetime
+    updated_at: datetime

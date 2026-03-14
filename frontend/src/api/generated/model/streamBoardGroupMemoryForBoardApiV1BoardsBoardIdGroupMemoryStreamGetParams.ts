@@ -5,8 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type StreamBoardGroupMemoryForBoardApiV1BoardsBoardIdGroupMemoryStreamGetParams =
-  {
-    since?: string | null;
-    is_chat?: boolean | null;
-  };
+export type StreamBoardGroupMemoryForBoardApiV1BoardsBoardIdGroupMemoryStreamGetParams = {
+since?: string | null;
+is_chat?: boolean | null;
+};

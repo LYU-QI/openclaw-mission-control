@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { NotificationConfigCreateChannelConfig } from "./notificationConfigCreateChannelConfig";
+import type { NotificationConfigCreateChannelConfig } from './notificationConfigCreateChannelConfig';
 
 /**
  * Payload for creating a notification configuration.

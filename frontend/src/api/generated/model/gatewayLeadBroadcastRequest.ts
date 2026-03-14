@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { GatewayLeadBroadcastRequestKind } from "./gatewayLeadBroadcastRequestKind";
+import type { GatewayLeadBroadcastRequestKind } from './gatewayLeadBroadcastRequestKind';
 
 /**
  * Request payload for broadcasting a message to multiple board leads.

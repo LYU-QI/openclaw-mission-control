@@ -6,15 +6,15 @@
  */
 
 export type ListBoardsApiV1BoardsGetParams = {
-  gateway_id?: string | null;
-  board_group_id?: string | null;
-  /**
-   * @minimum 1
-   * @maximum 200
-   */
-  limit?: number;
-  /**
-   * @minimum 0
-   */
-  offset?: number;
+gateway_id?: string | null;
+board_group_id?: string | null;
+/**
+ * @minimum 1
+ * @maximum 200
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
 };

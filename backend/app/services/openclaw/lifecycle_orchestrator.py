@@ -23,6 +23,7 @@ from app.services.openclaw.db_agent_state import (
     mint_agent_token,
 )
 from app.services.openclaw.db_service import OpenClawDBService
+from app.services.openclaw.error_messages import normalize_gateway_error_message
 from app.services.openclaw.gateway_rpc import OpenClawGatewayError
 from app.services.openclaw.lifecycle_queue import (
     QueuedAgentLifecycleReconcile,
@@ -120,7 +121,7 @@ class AgentLifecycleOrchestrator(OpenClawDBService):
                 wakeup_verb=wakeup_verb,
             )
         except OpenClawGatewayError as exc:
-            locked.last_provision_error = str(exc)
+            locked.last_provision_error = normalize_gateway_error_message(str(exc))
             locked.updated_at = utcnow()
             self.session.add(locked)
             await self.session.commit()
@@ -132,7 +133,7 @@ class AgentLifecycleOrchestrator(OpenClawDBService):
                 ) from exc
             return locked
         except (OSError, RuntimeError, ValueError) as exc:
-            locked.last_provision_error = str(exc)
+            locked.last_provision_error = normalize_gateway_error_message(str(exc))
             locked.updated_at = utcnow()
             self.session.add(locked)
             await self.session.commit()

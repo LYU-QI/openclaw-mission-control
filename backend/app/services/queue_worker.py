@@ -11,12 +11,12 @@ from dataclasses import dataclass
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.db.session import async_session_maker
-from app.services.feishu.scheduler import schedule_feishu_sync
 from app.services.feishu.queue_tasks import TASK_TYPE as FEISHU_SYNC_TASK_TYPE
 from app.services.feishu.queue_tasks import (
     process_feishu_queue_task,
     requeue_feishu_queue_task,
 )
+from app.services.feishu.scheduler import schedule_feishu_sync
 from app.services.missions.subtask_timeout import fail_timed_out_subtasks
 from app.services.openclaw.lifecycle_queue import TASK_TYPE as LIFECYCLE_RECONCILE_TASK_TYPE
 from app.services.openclaw.lifecycle_queue import (

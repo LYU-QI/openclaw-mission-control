@@ -10,18 +10,8 @@
  */
 export interface TaskCustomFieldDefinitionUpdate {
   label?: string | null;
-  field_type?:
-    | "text"
-    | "text_long"
-    | "integer"
-    | "decimal"
-    | "boolean"
-    | "date"
-    | "date_time"
-    | "url"
-    | "json"
-    | null;
-  ui_visibility?: "always" | "if_set" | "hidden" | null;
+  field_type?: 'text' | 'text_long' | 'integer' | 'decimal' | 'boolean' | 'date' | 'date_time' | 'url' | 'json' | null;
+  ui_visibility?: 'always' | 'if_set' | 'hidden' | null;
   validation_regex?: string | null;
   description?: string | null;
   required?: boolean | null;

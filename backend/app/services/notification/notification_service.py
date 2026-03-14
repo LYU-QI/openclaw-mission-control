@@ -12,6 +12,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.core.config import settings
 from app.models.notifications import NotificationConfig, NotificationLog
 from app.services.notification.feishu_bot import send_feishu_webhook
+from app.services.notification.templates import build_feishu_card_payload
 
 logger = logging.getLogger(__name__)
 
@@ -110,39 +111,19 @@ class NotificationService:
         if not webhook_url:
             return {"error": "No webhook_url configured"}
 
-        # Build card message
         event_type = payload.get("event_type", "unknown")
         message = payload.get("message", "")
-
-        card_content = {
-            "header": {
-                "title": {
-                    "tag": "plain_text",
-                    "content": self._get_event_title(event_type),
-                },
-                "template": self._get_event_color(event_type),
-            },
-            "elements": [
-                {
-                    "tag": "div",
-                    "text": {
-                        "tag": "lark_md",
-                        "content": message,
-                    },
-                },
-            ],
-        }
+        card_payload = build_feishu_card_payload(
+            event_type=str(event_type),
+            message=str(message),
+            payload=payload,
+        )
 
         response = send_feishu_webhook(
             webhook_url=webhook_url,
-            payload={
-            "msg_type": "interactive",
-            "card": card_content,
-            },
+            payload=card_payload,
             secret=str(
-                channel_config.get("webhook_secret")
-                or settings.feishu_bot_webhook_secret
-                or ""
+                channel_config.get("webhook_secret") or settings.feishu_bot_webhook_secret or ""
             ),
         )
         return response
@@ -170,29 +151,6 @@ class NotificationService:
         with urlopen(req, timeout=10) as resp:  # noqa: S310
             return _json.loads(resp.read())  # type: ignore[no-any-return]
 
-    @staticmethod
-    def _get_event_title(event_type: str) -> str:
-        titles: dict[str, str] = {
-            "mission_created": "📋 新任务已创建",
-            "mission_dispatched": "🚀 任务已下发",
-            "mission_started": "⚡ 任务开始执行",
-            "mission_completed": "✅ 任务执行完成",
-            "mission_failed": "❌ 任务执行失败",
-            "approval_requested": "⚠️ 需要人工审批",
-            "feishu_sync_pull": "🔄 飞书同步完成",
-            "feishu_sync_push": "📤 结果已回写飞书",
-        }
-        return titles.get(event_type, f"📢 {event_type}")
-
-    @staticmethod
-    def _get_event_color(event_type: str) -> str:
-        colors: dict[str, str] = {
-            "mission_completed": "green",
-            "mission_failed": "red",
-            "approval_requested": "orange",
-        }
-        return colors.get(event_type, "blue")
-
     async def test_notification(self, config_id: UUID) -> dict[str, Any]:
         """Send a test notification to verify channel configuration."""
         config = await NotificationConfig.objects.by_id(config_id).first(self.session)
@@ -206,6 +164,9 @@ class NotificationService:
                 message="🔔 这是一条测试通知。\n\nMission Control 通知服务已连接成功！",
             )
             await self.session.commit()
-            return {"ok": log.status == "sent", "message": log.error_message or "Test sent successfully"}
+            return {
+                "ok": log.status == "sent",
+                "message": log.error_message or "Test sent successfully",
+            }
         except Exception as e:
             return {"ok": False, "message": str(e)}

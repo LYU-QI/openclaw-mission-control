@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TaskCreateCustomFieldValues } from "./taskCreateCustomFieldValues";
-import type { TaskCreateStatus } from "./taskCreateStatus";
+import type { TaskCreateCustomFieldValues } from './taskCreateCustomFieldValues';
+import type { TaskCreateStatus } from './taskCreateStatus';
 
 /**
  * Payload for creating a task.
@@ -17,6 +17,9 @@ export interface TaskCreate {
   priority?: string;
   due_at?: string | null;
   assigned_agent_id?: string | null;
+  owner_name?: string | null;
+  owner_feishu_id?: string | null;
+  milestone?: string | null;
   depends_on_task_ids?: string[];
   tag_ids?: string[];
   created_by_user_id?: string | null;

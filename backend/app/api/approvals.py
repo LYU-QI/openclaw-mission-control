@@ -346,7 +346,9 @@ async def _apply_mission_state_from_approval(
     mission.status = "completed" if approved else "failed"
     rejection_recommendation = _build_rejection_recommendation(approval)
     mission.error_message = None if approved else "Mission review rejected by approver."
-    mission.result_next_action = mission.result_next_action if approved else rejection_recommendation
+    mission.result_next_action = (
+        mission.result_next_action if approved else rejection_recommendation
+    )
     mission.updated_at = utcnow()
     session.add(mission)
 
@@ -362,9 +364,7 @@ async def _apply_mission_state_from_approval(
     record_activity(
         session,
         event_type=event_type,
-        message=(
-            f"Mission approval {approval.status}: mission {mission.id}"
-        ),
+        message=(f"Mission approval {approval.status}: mission {mission.id}"),
         task_id=mission.task_id,
         board_id=mission.board_id,
         agent_id=mission.agent_id,

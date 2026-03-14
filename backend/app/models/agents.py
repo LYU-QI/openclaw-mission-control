@@ -24,6 +24,7 @@ class Agent(QueryModel, table=True):
     board_id: UUID | None = Field(default=None, foreign_key="boards.id", index=True)
     gateway_id: UUID = Field(foreign_key="gateways.id", index=True)
     name: str = Field(index=True)
+    system_role: str | None = Field(default=None, index=True)
     status: str = Field(default="provisioning", index=True)
     openclaw_session_id: str | None = Field(default=None, index=True)
     agent_token_hash: str | None = Field(default=None, index=True)

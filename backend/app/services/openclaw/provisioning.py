@@ -375,9 +375,19 @@ def _build_context(
     main_session_key = GatewayAgentIdentity.session_key(gateway)
     identity_context = _identity_context(agent)
     user_context = _user_context(user)
+    
+    # Derive role tag for tools.md
+    role_tag = "agent-worker"
+    if agent.is_board_lead:
+        role_tag = "agent-lead"
+    if agent.system_role:
+        role_tag = f"agent-{agent.system_role.replace('_', '-')}"
+
     return {
         "agent_name": agent.name,
         "agent_id": agent_id,
+        "system_role": agent.system_role or "",
+        "role_tag": role_tag,
         "board_id": str(board.id),
         "board_name": board.name,
         "board_type": board.board_type,
@@ -415,9 +425,17 @@ def _build_main_context(
     base_url = settings.base_url
     identity_context = _identity_context(agent)
     user_context = _user_context(user)
+
+    # Main agent historically uses agent-main tag
+    role_tag = "agent-main"
+    if agent.system_role:
+        role_tag = f"agent-{agent.system_role.replace('_', '-')}"
+
     return {
         "agent_name": agent.name,
         "agent_id": str(agent.id),
+        "system_role": agent.system_role or "",
+        "role_tag": role_tag,
         "is_main_agent": "true",
         "session_key": agent.openclaw_session_id or "",
         "base_url": base_url,
@@ -480,7 +498,11 @@ def _render_agent_files(
         )
         if template_name == "SOUL.md":
             # Use shared Jinja soul template as the default implementation.
-            template_name = "BOARD_SOUL.md.j2"
+            system_role = context.get("system_role")
+            if system_role:
+                template_name = f"souls/{system_role}.SOUL.md.j2"
+            else:
+                template_name = "BOARD_SOUL.md.j2"
         path = _templates_root() / template_name
         if not path.exists():
             msg = f"Missing template file: {template_name}"
@@ -548,6 +570,9 @@ class GatewayControlPlane(ABC):
         entries: list[tuple[str, str, dict[str, Any]]],
     ) -> None:
         raise NotImplementedError
+
+
+
 
 
 class OpenClawGatewayControlPlane(GatewayControlPlane):
@@ -1059,6 +1084,29 @@ class GatewayMainAgentLifecycleManager(BaseAgentLifecycleManager):
         return preserved
 
 
+class GatewaySystemAgentLifecycleManager(BaseAgentLifecycleManager):
+    """Provisioning manager for organization system-role agents (orchestrator, etc)."""
+
+    def _agent_id(self, agent: Agent) -> str:
+        return GatewayAgentIdentity.system_agent_id(self._gateway, agent.system_role or "unknown")
+
+    def _build_context(
+        self,
+        *,
+        agent: Agent,
+        auth_token: str,
+        user: User | None,
+        board: Board | None,
+    ) -> dict[str, str]:
+        _ = board
+        return _build_main_context(agent, self._gateway, auth_token, user)
+
+    def _template_overrides(self, agent: Agent) -> dict[str, str] | None:
+        # System agents use their own specific SOUL templates, but for other files
+        # they mostly follow the main agent's pattern.
+        return MAIN_TEMPLATE_MAP
+
+
 def _control_plane_for_gateway(gateway: Gateway) -> OpenClawGatewayControlPlane:
     if not gateway.url:
         msg = "Gateway url is required"
@@ -1169,10 +1217,15 @@ class OpenClawGatewayProvisioner:
             session_key = (
                 agent.openclaw_session_id or GatewayAgentIdentity.session_key(gateway) or ""
             ).strip()
-            if not session_key:
-                msg = "gateway main agent session_key is required"
-                raise ValueError(msg)
-            manager_type: type[BaseAgentLifecycleManager] = GatewayMainAgentLifecycleManager
+            if agent.system_role:
+                # System agents MUST use their deterministic unique session keys to avoid sharing a channel.
+                session_key = GatewayAgentIdentity.system_session_key(gateway, agent.system_role)
+                manager_type: type[BaseAgentLifecycleManager] = GatewaySystemAgentLifecycleManager
+            else:
+                session_key = (
+                    agent.openclaw_session_id or GatewayAgentIdentity.session_key(gateway) or ""
+                ).strip()
+                manager_type = GatewayMainAgentLifecycleManager
         else:
             session_key = _session_key(agent)
             manager_type = BoardAgentLifecycleManager

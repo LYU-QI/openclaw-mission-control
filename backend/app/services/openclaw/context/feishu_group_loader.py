@@ -46,7 +46,9 @@ class FeishuGroupLoader:
             items = response.get("data", {}).get("items", [])
             lines: list[str] = []
             for item in items:
-                sender = item.get("sender", {}).get("sender_id", {}).get("open_id") or "unknown-sender"
+                sender = (
+                    item.get("sender", {}).get("sender_id", {}).get("open_id") or "unknown-sender"
+                )
                 body = item.get("body", {})
                 content = body.get("content", "")
                 if not isinstance(content, str):

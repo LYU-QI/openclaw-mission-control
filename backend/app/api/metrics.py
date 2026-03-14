@@ -21,6 +21,7 @@ from app.models.agents import Agent
 from app.models.approvals import Approval
 from app.models.boards import Board
 from app.models.tasks import Task
+from app.schemas.attention import AttentionSnapshot
 from app.schemas.metrics import (
     DashboardBucketKey,
     DashboardKpis,
@@ -36,6 +37,7 @@ from app.schemas.metrics import (
     DashboardWipSeriesSet,
 )
 from app.services.organizations import OrganizationContext, list_accessible_board_ids
+from app.services.watcher.attention import AttentionCollector
 
 router = APIRouter(prefix="/metrics", tags=["metrics"])
 
@@ -549,3 +551,21 @@ async def dashboard_metrics(
         wip=wip,
         pending_approvals=pending_approvals,
     )
+
+
+@router.get("/attention", response_model=AttentionSnapshot)
+async def attention_snapshot(
+    board_id: UUID | None = BOARD_ID_QUERY,
+    group_id: UUID | None = GROUP_ID_QUERY,
+    session: AsyncSession = SESSION_DEP,
+    ctx: OrganizationContext = ORG_MEMBER_DEP,
+) -> AttentionSnapshot:
+    """返回统一的 attention 快照，聚合失败子任务、超时子任务、停滞 mission 和待审批等异常。"""
+    board_ids = await _resolve_dashboard_board_ids(
+        session,
+        ctx=ctx,
+        board_id=board_id,
+        group_id=group_id,
+    )
+    collector = AttentionCollector(session)
+    return await collector.collect(board_ids=board_ids)

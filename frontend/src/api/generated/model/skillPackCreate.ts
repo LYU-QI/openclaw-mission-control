@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { SkillPackCreateMetadata } from "./skillPackCreateMetadata";
+import type { SkillPackCreateMetadata } from './skillPackCreateMetadata';
 
 /**
  * Payload used to register a pack URL in the organization.

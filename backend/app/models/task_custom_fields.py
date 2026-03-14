@@ -56,7 +56,7 @@ class BoardTaskCustomField(TenantScoped, table=True):
         UniqueConstraint(
             "board_id",
             "task_custom_field_definition_id",
-            name="uq_board_task_custom_fields_board_id_task_custom_field_definition_id",
+            name="uq_board_tcf_board_id_tcf_def_id",
         ),
     )
 
@@ -77,7 +77,7 @@ class TaskCustomFieldValue(TenantScoped, table=True):
         UniqueConstraint(
             "task_id",
             "task_custom_field_definition_id",
-            name="uq_task_custom_field_values_task_id_task_custom_field_definition_id",
+            name="uq_tcf_values_task_id_tcf_def_id",
         ),
     )
 

@@ -93,7 +93,7 @@ class SubtaskCreate(SQLModel):
 class SubtaskUpdate(SQLModel):
     """Payload for updating a mission subtask."""
 
-    status: str | None = None
+    status: Literal["pending", "running", "completed", "failed"] | None = None
     result_summary: str | None = None
     result_evidence: dict[str, Any] | None = None
     result_risk: str | None = None
@@ -111,7 +111,7 @@ class SubtaskRead(SQLModel):
     tool_scope: list[str] | None
     expected_output: str | None
     order: int
-    status: str
+    status: Literal["pending", "running", "completed", "failed"]
     assigned_subagent_id: str | None
     result_summary: str | None
     result_evidence: dict[str, Any] | None
@@ -134,6 +134,10 @@ class MissionTimelineEntry(SQLModel):
 
     timestamp: datetime
     event_type: str
+    stage: str
+    stage_label: str
+    tone: Literal["info", "success", "warning", "danger", "muted"]
+    status_hint: MissionStatus | None = None
     message: str | None = None
     subtask_id: UUID | None = None
     agent_id: UUID | None = None

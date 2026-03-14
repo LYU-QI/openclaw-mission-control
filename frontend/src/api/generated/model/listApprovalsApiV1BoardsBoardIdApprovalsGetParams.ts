@@ -6,14 +6,14 @@
  */
 
 export type ListApprovalsApiV1BoardsBoardIdApprovalsGetParams = {
-  status?: "pending" | "approved" | "rejected" | null;
-  /**
-   * @minimum 1
-   * @maximum 200
-   */
-  limit?: number;
-  /**
-   * @minimum 0
-   */
-  offset?: number;
+status?: 'pending' | 'approved' | 'rejected' | null;
+/**
+ * @minimum 1
+ * @maximum 200
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
 };

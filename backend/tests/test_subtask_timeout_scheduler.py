@@ -57,7 +57,9 @@ def test_fail_timed_out_subtasks_marks_old_running_subtask_failed(
                 assert count == 1
 
                 refreshed_subtask = (
-                    await session.exec(select(MissionSubtask).where(MissionSubtask.id == subtask.id))
+                    await session.exec(
+                        select(MissionSubtask).where(MissionSubtask.id == subtask.id)
+                    )
                 ).first()
                 assert refreshed_subtask is not None
                 assert refreshed_subtask.status == "failed"
@@ -100,7 +102,9 @@ def test_fail_timed_out_subtasks_ignores_recent_subtask(monkeypatch: pytest.Monk
                 assert count == 0
 
                 refreshed_subtask = (
-                    await session.exec(select(MissionSubtask).where(MissionSubtask.id == subtask.id))
+                    await session.exec(
+                        select(MissionSubtask).where(MissionSubtask.id == subtask.id)
+                    )
                 ).first()
                 assert refreshed_subtask is not None
                 assert refreshed_subtask.status == "running"

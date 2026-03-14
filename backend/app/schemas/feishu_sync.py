@@ -66,11 +66,21 @@ class FeishuTaskMappingRead(SQLModel):
     sync_config_id: UUID
     feishu_record_id: str
     task_id: UUID
+    task_title: str | None = None
     last_feishu_update: datetime | None
     last_mc_update: datetime | None
     sync_hash: str | None
+    has_conflict: bool = False
+    conflict_at: datetime | None = None
+    conflict_message: str | None = None
     created_at: datetime
     updated_at: datetime
+
+
+class FeishuConflictResolutionRequest(SQLModel):
+    """Payload for resolving one Feishu sync conflict."""
+
+    resolution: str
 
 
 class FeishuSyncTriggerResponse(SQLModel):
@@ -81,6 +91,8 @@ class FeishuSyncTriggerResponse(SQLModel):
     records_processed: int = 0
     records_created: int = 0
     records_updated: int = 0
+    records_skipped: int = 0
+    conflicts_count: int = 0
 
 
 class FeishuSyncHistoryEntry(SQLModel):

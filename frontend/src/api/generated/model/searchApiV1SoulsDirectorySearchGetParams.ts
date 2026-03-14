@@ -6,13 +6,13 @@
  */
 
 export type SearchApiV1SoulsDirectorySearchGetParams = {
-  /**
-   * @minLength 0
-   */
-  q?: string;
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
+/**
+ * @minLength 0
+ */
+q?: string;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
 };

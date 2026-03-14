@@ -24,10 +24,12 @@ from app.api.boards import router as boards_router
 from app.api.feishu_sync import router as feishu_sync_router
 from app.api.gateway import router as gateway_router
 from app.api.gateways import router as gateways_router
+from app.api.knowledge import router as knowledge_router
 from app.api.metrics import router as metrics_router
 from app.api.missions import router as missions_router
 from app.api.notifications import router as notifications_router
 from app.api.organizations import router as organizations_router
+from app.api.reports import router as reports_router
 from app.api.skills_marketplace import router as skills_marketplace_router
 from app.api.souls_directory import router as souls_directory_router
 from app.api.tags import router as tags_router
@@ -568,7 +570,9 @@ api_v1.include_router(tags_router)
 api_v1.include_router(missions_router)
 api_v1.include_router(feishu_sync_router)
 api_v1.include_router(notifications_router)
+api_v1.include_router(reports_router)
 api_v1.include_router(users_router)
+api_v1.include_router(knowledge_router)
 app.include_router(api_v1)
 
 add_pagination(app)

@@ -33,12 +33,12 @@ export function FeishuSyncConfigForm({ onSubmit }: Props) {
         });
       }}
     >
-      <h3 className="text-sm font-semibold text-slate-900">Create sync config</h3>
-      <Input value={appId} onChange={(e) => setAppId(e.target.value)} placeholder="App ID" />
+      <h3 className="text-sm font-semibold text-slate-900">新建同步配置</h3>
+      <Input value={appId} onChange={(e) => setAppId(e.target.value)} placeholder="Feishu App ID" />
       <Input
         value={appSecret}
         onChange={(e) => setAppSecret(e.target.value)}
-        placeholder="App Secret"
+        placeholder="Feishu App Secret"
       />
       <Input
         value={appToken}
@@ -50,8 +50,7 @@ export function FeishuSyncConfigForm({ onSubmit }: Props) {
         onChange={(e) => setTableId(e.target.value)}
         placeholder="Bitable table id"
       />
-      <Button type="submit">Create</Button>
+      <Button type="submit">创建配置</Button>
     </form>
   );
 }
-

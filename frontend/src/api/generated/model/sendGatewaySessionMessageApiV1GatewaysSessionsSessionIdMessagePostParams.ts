@@ -5,7 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type SendGatewaySessionMessageApiV1GatewaysSessionsSessionIdMessagePostParams =
-  {
-    board_id?: string | null;
-  };
+export type SendGatewaySessionMessageApiV1GatewaysSessionsSessionIdMessagePostParams = {
+board_id?: string | null;
+};

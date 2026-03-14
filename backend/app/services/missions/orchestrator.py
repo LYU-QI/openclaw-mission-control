@@ -15,17 +15,34 @@ from app.models.boards import Board
 from app.models.feishu_sync import FeishuSyncConfig
 from app.models.missions import Mission, MissionSubtask
 from app.models.tasks import Task
+from app.services.activity_log import record_activity
 from app.services.feishu.writeback_service import WritebackService
 from app.services.missions.approval_gate import ApprovalGate
 from app.services.missions.constraint_resolver import ConstraintResolver
 from app.services.missions.goal_builder import GoalBuilder
+from app.services.missions.status_machine import (
+    MISSION_STATUS_AGGREGATING,
+    MISSION_STATUS_CANCELLED,
+    MISSION_STATUS_COMPLETED,
+    MISSION_STATUS_DISPATCHED,
+    MISSION_STATUS_FAILED,
+    MISSION_STATUS_PENDING,
+    MISSION_STATUS_PENDING_APPROVAL,
+    MISSION_STATUS_RUNNING,
+    SUBTASK_STATUS_COMPLETED,
+    SUBTASK_STATUS_FAILED,
+    SUBTASK_STATUS_PENDING,
+    SUBTASK_STATUS_RUNNING,
+    SUBTASK_TERMINAL_STATUSES,
+    ensure_mission_transition,
+    ensure_subtask_transition,
+)
 from app.services.missions.status_tracker import MissionStatusTracker
 from app.services.notification.notification_service import NotificationService
 from app.services.openclaw.aggregator.aggregator import ResultAggregator
 from app.services.openclaw.context.loader import ContextLoader
 from app.services.openclaw.decomposer.decomposer import TaskDecomposer
 from app.services.openclaw.subagent_dispatch import SubagentDispatchService
-from app.services.activity_log import record_activity
 
 logger = logging.getLogger(__name__)
 
@@ -37,12 +54,13 @@ class MissionOrchestrator:
         self.session = session
         self.goal_builder = GoalBuilder()
         self.constraint_resolver = ConstraintResolver()
-        self.approval_gate = ApprovalGate()
+        self.approval_gate = ApprovalGate(session)
         self.status_tracker = MissionStatusTracker(session)
         self.notification_service = NotificationService(session)
         self.context_loader = ContextLoader()
         self.decomposer = TaskDecomposer()
         self.aggregator = ResultAggregator()
+        self._orchestrator_agent_id: UUID | None = None
 
     async def _notify_mission_event(self, mission: Mission, event_type: str, message: str) -> None:
         board = await Board.objects.by_id(mission.board_id).first(self.session)
@@ -55,6 +73,20 @@ class MissionOrchestrator:
             message=message,
             extra={"mission_id": str(mission.id), "task_id": str(mission.task_id)},
         )
+
+    async def _get_orchestrator_agent_id(self) -> UUID | None:
+        """Get the ID of the RIQI Orchestrator agent."""
+        if self._orchestrator_agent_id is not None:
+            return self._orchestrator_agent_id
+
+        from app.models.agents import Agent
+        result = await self.session.exec(
+            select(Agent).where(Agent.name == "RIQI Orchestrator")
+        )
+        agent = result.first()
+        if agent:
+            self._orchestrator_agent_id = agent.id
+        return self._orchestrator_agent_id
 
     async def create_mission(
         self,
@@ -78,8 +110,12 @@ class MissionOrchestrator:
             resolved_goal = goal or self.goal_builder.build(task=task, board=board)
             if resolved_constraints is None:
                 resolved_constraints = self.constraint_resolver.resolve(board=board)
-            if approval_policy == "auto":
-                resolved_policy = self.approval_gate.evaluate(board=board, task=task)
+            policy_decision = await self.approval_gate.resolve_policy(
+                board=board,
+                task=task,
+                requested_policy=approval_policy,
+            )
+            resolved_policy = policy_decision.policy
 
         mission = Mission(
             task_id=task_id,
@@ -103,6 +139,14 @@ class MissionOrchestrator:
             board_id=board_id,
             agent_id=agent_id,
         )
+        record_activity(
+            self.session,
+            event_type="task.comment",
+            message=f"🚀 智能体已启动分析任务。目标：{goal[:100]}",
+            task_id=task_id,
+            board_id=board_id,
+            agent_id=agent_id,
+        )
 
         await self.session.commit()
         await self.session.refresh(mission)
@@ -115,10 +159,33 @@ class MissionOrchestrator:
         if mission is None:
             raise ValueError(f"Mission {mission_id} not found")
 
-        if mission.status not in ("pending", "failed"):
+        if mission.status not in (MISSION_STATUS_PENDING, MISSION_STATUS_FAILED):
             raise ValueError(f"Cannot dispatch mission in status '{mission.status}'")
 
-        mission.status = "dispatched"
+        if mission.approval_policy == "pre_approve":
+            ensure_mission_transition(mission.status, MISSION_STATUS_PENDING_APPROVAL)
+            mission.status = MISSION_STATUS_PENDING_APPROVAL
+            mission.updated_at = utcnow()
+            self.session.add(mission)
+            record_activity(
+                self.session,
+                event_type="approval_requested",
+                message="Mission requires approval before dispatch",
+                task_id=mission.task_id,
+                board_id=mission.board_id,
+                agent_id=mission.agent_id,
+            )
+            await self.session.commit()
+            await self.session.refresh(mission)
+            await self._notify_mission_event(
+                mission,
+                "approval_requested",
+                "Mission requires approval before dispatch",
+            )
+            return mission
+
+        ensure_mission_transition(mission.status, MISSION_STATUS_DISPATCHED)
+        mission.status = MISSION_STATUS_DISPATCHED
         mission.dispatched_at = utcnow()
         mission.updated_at = utcnow()
         self.session.add(mission)
@@ -168,7 +235,7 @@ class MissionOrchestrator:
                     tool_scope=spec.tool_scope,
                     expected_output=spec.expected_output,
                     order=spec.order,
-                    status="pending",
+                    status=SUBTASK_STATUS_PENDING,
                 )
             )
 
@@ -267,9 +334,15 @@ class MissionOrchestrator:
             }
             for row in subtask_rows
         ]
-        aggregated = await self.aggregator.aggregate(mission=mission, subtask_results=subtask_results)
+        aggregated = await self.aggregator.aggregate(
+            mission=mission, subtask_results=subtask_results
+        )
+        approval_decision = await self.approval_gate.evaluate_result(
+            mission=mission, aggregated=aggregated
+        )
 
-        mission.status = aggregated.status
+        ensure_mission_transition(mission.status, approval_decision.status)
+        mission.status = approval_decision.status
         mission.completed_at = utcnow()
         mission.result_summary = result_summary or aggregated.summary
         mission.result_evidence = result_evidence or aggregated.evidence
@@ -278,7 +351,7 @@ class MissionOrchestrator:
         mission.updated_at = utcnow()
         self.session.add(mission)
         approval_requested = False
-        if mission.status == "pending_approval":
+        if mission.status == MISSION_STATUS_PENDING_APPROVAL:
             await self._ensure_pending_approval(mission=mission, aggregated=aggregated)
             approval_requested = True
 
@@ -303,6 +376,14 @@ class MissionOrchestrator:
             board_id=mission.board_id,
             agent_id=mission.agent_id,
         )
+        record_activity(
+            self.session,
+            event_type="task.comment",
+            message=f"🏁 任务全链路分析圆满完成。汇总结果：{mission.result_summary[:150] if mission.result_summary else '已就绪'}",
+            task_id=mission.task_id,
+            board_id=mission.board_id,
+            agent_id=mission.agent_id,
+        )
         if approval_requested:
             record_activity(
                 self.session,
@@ -315,7 +396,7 @@ class MissionOrchestrator:
 
         await self.session.commit()
         await self.session.refresh(mission)
-        if task and task.external_source == "feishu" and mission.status == "completed":
+        if task and task.external_source == "feishu" and mission.status == MISSION_STATUS_COMPLETED:
             config = (
                 await FeishuSyncConfig.objects.filter_by(board_id=mission.board_id, enabled=True)
                 .order_by(FeishuSyncConfig.updated_at.desc())
@@ -344,7 +425,8 @@ class MissionOrchestrator:
         if mission is None:
             raise ValueError(f"Mission {mission_id} not found")
 
-        mission.status = "failed"
+        ensure_mission_transition(mission.status, MISSION_STATUS_FAILED)
+        mission.status = MISSION_STATUS_FAILED
         mission.error_message = error_message
         mission.retry_count += 1
         mission.updated_at = utcnow()
@@ -361,7 +443,9 @@ class MissionOrchestrator:
 
         await self.session.commit()
         await self.session.refresh(mission)
-        await self._notify_mission_event(mission, "mission_failed", f"Mission failed: {error_message[:120]}")
+        await self._notify_mission_event(
+            mission, "mission_failed", f"Mission failed: {error_message[:120]}"
+        )
         return mission
 
     async def cancel_mission(self, mission_id: UUID) -> Mission:
@@ -370,10 +454,11 @@ class MissionOrchestrator:
         if mission is None:
             raise ValueError(f"Mission {mission_id} not found")
 
-        if mission.status in ("completed", "cancelled"):
+        if mission.status in (MISSION_STATUS_COMPLETED, MISSION_STATUS_CANCELLED):
             raise ValueError(f"Cannot cancel mission in status '{mission.status}'")
 
-        mission.status = "cancelled"
+        ensure_mission_transition(mission.status, MISSION_STATUS_CANCELLED)
+        mission.status = MISSION_STATUS_CANCELLED
         mission.updated_at = utcnow()
         self.session.add(mission)
 
@@ -440,7 +525,7 @@ class MissionOrchestrator:
         )
         if not rows:
             return False
-        return all(row.status in {"completed", "failed"} for row in rows)
+        return all(row.status in SUBTASK_TERMINAL_STATUSES for row in rows)
 
     async def update_subtask_status(
         self,
@@ -458,10 +543,11 @@ class MissionOrchestrator:
             raise ValueError(f"Subtask {subtask_id} not found")
         mission = await Mission.objects.by_id(subtask.mission_id).first(self.session)
 
+        ensure_subtask_transition(subtask.status, status)
         subtask.status = status
-        if status == "running":
+        if status == SUBTASK_STATUS_RUNNING:
             subtask.started_at = utcnow()
-        elif status in ("completed", "failed"):
+        elif status in (SUBTASK_STATUS_COMPLETED, SUBTASK_STATUS_FAILED):
             subtask.completed_at = utcnow()
 
         if result_summary is not None:
@@ -476,7 +562,8 @@ class MissionOrchestrator:
         self.session.add(subtask)
 
         if mission is not None:
-            if status == "running":
+            orch_agent_id = await self._get_orchestrator_agent_id()
+            if status == SUBTASK_STATUS_RUNNING:
                 record_activity(
                     self.session,
                     event_type="subtask_started",
@@ -485,7 +572,15 @@ class MissionOrchestrator:
                     board_id=mission.board_id,
                     agent_id=mission.agent_id,
                 )
-            elif status == "completed":
+                record_activity(
+                    self.session,
+                    event_type="task.comment",
+                    message=f"[执行者: 智能体 {subtask.order + 1}] 🛠️ 正在执行阶段：{subtask.label}",
+                    task_id=mission.task_id,
+                    board_id=mission.board_id,
+                    agent_id=orch_agent_id,
+                )
+            elif status == SUBTASK_STATUS_COMPLETED:
                 record_activity(
                     self.session,
                     event_type="subtask_completed",
@@ -494,7 +589,15 @@ class MissionOrchestrator:
                     board_id=mission.board_id,
                     agent_id=mission.agent_id,
                 )
-            elif status == "failed":
+                record_activity(
+                    self.session,
+                    event_type="task.comment",
+                    message=f"[执行者: 智能体 {subtask.order + 1}] ✅ 阶段性结果已达成 [{subtask.label}]：{subtask.result_summary or '已完成分析'}",
+                    task_id=mission.task_id,
+                    board_id=mission.board_id,
+                    agent_id=orch_agent_id,
+                )
+            elif status == SUBTASK_STATUS_FAILED:
                 record_activity(
                     self.session,
                     event_type="subtask_failed",
@@ -509,11 +612,12 @@ class MissionOrchestrator:
 
         if (
             mission is not None
-            and mission.status in {"dispatched", "running"}
-            and status in {"completed", "failed"}
+            and mission.status in {MISSION_STATUS_DISPATCHED, MISSION_STATUS_RUNNING}
+            and status in {SUBTASK_STATUS_COMPLETED, SUBTASK_STATUS_FAILED}
             and await self._all_subtasks_terminal(mission.id)
         ):
-            mission.status = "aggregating"
+            ensure_mission_transition(mission.status, MISSION_STATUS_AGGREGATING)
+            mission.status = MISSION_STATUS_AGGREGATING
             mission.updated_at = utcnow()
             self.session.add(mission)
             await self.session.commit()
@@ -539,7 +643,8 @@ class MissionOrchestrator:
         if mission is None:
             raise ValueError(f"Mission {subtask.mission_id} not found")
 
-        subtask.status = "pending"
+        ensure_subtask_transition(subtask.status, SUBTASK_STATUS_PENDING)
+        subtask.status = SUBTASK_STATUS_PENDING
         subtask.result_summary = None
         subtask.result_evidence = None
         subtask.result_risk = None
@@ -549,7 +654,8 @@ class MissionOrchestrator:
         subtask.updated_at = utcnow()
         self.session.add(subtask)
 
-        mission.status = "running"
+        ensure_mission_transition(mission.status, MISSION_STATUS_RUNNING)
+        mission.status = MISSION_STATUS_RUNNING
         mission.completed_at = None
         mission.error_message = None
         mission.updated_at = utcnow()

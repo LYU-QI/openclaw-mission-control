@@ -1,6 +1,9 @@
 import type { FormEvent } from "react";
 
-import type { GatewayCheckStatus } from "@/lib/gateway-form";
+import {
+  type GatewayCheckStatus,
+  parseGatewayDiagnostic,
+} from "@/lib/gateway-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -57,6 +60,12 @@ export function GatewayForm({
   onWorkspaceRootChange,
   onAllowInsecureTlsChange,
 }: GatewayFormProps) {
+  const diagnostic = parseGatewayDiagnostic(gatewayCheckMessage);
+  const diagnosticClassName =
+    diagnostic?.tone === "warning"
+      ? "border-amber-200 bg-amber-50 text-amber-900"
+      : "border-rose-200 bg-rose-50 text-rose-700";
+
   return (
     <form
       onSubmit={onSubmit}
@@ -91,7 +100,19 @@ export function GatewayForm({
           {gatewayUrlError ? (
             <p className="text-xs text-red-500">{gatewayUrlError}</p>
           ) : gatewayCheckStatus === "error" && gatewayCheckMessage ? (
-            <p className="text-xs text-red-500">{gatewayCheckMessage}</p>
+            <div className={`rounded-lg border p-3 text-xs ${diagnosticClassName}`}>
+              <p className="font-semibold">
+                {diagnostic?.summary ?? gatewayCheckMessage}
+              </p>
+              {diagnostic?.detail ? (
+                <p className="mt-1 opacity-90">{diagnostic.detail}</p>
+              ) : null}
+              {diagnostic?.code ? (
+                <p className="mt-2 font-mono text-[11px] opacity-70">
+                  {diagnostic.code}
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </div>
         <div className="space-y-2">

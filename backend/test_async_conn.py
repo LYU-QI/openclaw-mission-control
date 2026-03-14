@@ -6,11 +6,13 @@ if sys.platform == "win32":
 
 from psycopg import AsyncConnection
 
+
 async def test():
     conn = await AsyncConnection.connect(
         "postgresql://postgres:postgres@localhost:5432/mission_control"
     )
     print("Async connected!")
     await conn.close()
+
 
 asyncio.run(test())
