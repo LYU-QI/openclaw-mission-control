@@ -307,15 +307,32 @@ async def _resolve_mission_for_approval(
         mission = await Mission.objects.by_id(mission_id).first(session)
         if mission is not None:
             return mission
-    return (
+    # Try to find by approval_id
+    mission = (
         await Mission.objects.filter_by(approval_id=approval.id)
         .order_by(col(Mission.updated_at).desc())
         .first(session)
     )
+    if mission is not None:
+        return mission
+    # Fallback: find by task_id
+    if approval.task_id is not None:
+        return (
+            await Mission.objects.filter_by(task_id=approval.task_id)
+            .order_by(col(Mission.created_at).desc())
+            .first(session)
+        )
+    return None
 
 
 def _build_rejection_recommendation(approval: Approval) -> str:
     payload = approval.payload if isinstance(approval.payload, dict) else {}
+    
+    # Preferred: Explicit reason
+    reason = payload.get("reason")
+    if isinstance(reason, str) and reason.strip():
+        return reason.strip()
+
     anomalies = payload.get("anomalies")
     if isinstance(anomalies, list):
         hints = [str(item).strip() for item in anomalies if str(item).strip()]
@@ -357,8 +374,31 @@ async def _apply_mission_state_from_approval(
         task.status = "done" if approved else "inbox"
         if not approved:
             task.result_next_action = rejection_recommendation
+            # 如果打回，将委派对象恢复为执行该 Mission 的 Agent
+            if mission.agent_id:
+                task.assigned_agent_id = mission.agent_id
+                
         task.updated_at = utcnow()
         session.add(task)
+        await session.flush()
+
+        # 如果任务打回且开启了自动下发，则触发重新执行
+        if not approved:
+            try:
+                from app.models.feishu_sync import FeishuSyncConfig
+                from app.services.feishu.sync_service import SyncService
+                
+                # 查找该看板的飞书同步配置
+                sync_config = await session.exec(
+                    select(FeishuSyncConfig).where(FeishuSyncConfig.board_id == board.id)
+                )
+                config = sync_config.first()
+                if config and config.auto_dispatch:
+                    sync_service = SyncService(session, config)
+                    await sync_service._auto_create_and_dispatch_mission(task)
+                    logger.info("Automatically re-dispatched rejected task %s", task.id)
+            except Exception as e:
+                logger.error("Failed to auto-dispatch rejected task %s: %s", task.id, e)
 
     event_type = "approval_granted" if approved else "approval_rejected"
     record_activity(
@@ -369,6 +409,28 @@ async def _apply_mission_state_from_approval(
         board_id=mission.board_id,
         agent_id=mission.agent_id,
     )
+
+    # 在任务评论区记录决策结果
+    if task is not None:
+        if approved:
+            record_activity(
+                session,
+                event_type="task.comment",
+                message="✅ [Lead 决策] 审核通过，本轮交付符合预期目标，任务已归档。",
+                task_id=task.id,
+                board_id=board.id,
+                agent_id=approval.agent_id,
+            )
+        else:
+            record_activity(
+                session,
+                event_type="task.comment",
+                message=f"❌ [Lead 决策] 任务已打回。原因：{rejection_recommendation}",
+                task_id=task.id,
+                board_id=board.id,
+                agent_id=approval.agent_id,
+            )
+
     await session.commit()
 
     if approved and task is not None and task.external_source == "feishu":

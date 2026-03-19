@@ -6,13 +6,13 @@
  */
 
 export type ListBoardGroupsApiV1BoardGroupsGetParams = {
-/**
- * @minimum 1
- * @maximum 200
- */
-limit?: number;
-/**
- * @minimum 0
- */
-offset?: number;
+  /**
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /**
+   * @minimum 0
+   */
+  offset?: number;
 };

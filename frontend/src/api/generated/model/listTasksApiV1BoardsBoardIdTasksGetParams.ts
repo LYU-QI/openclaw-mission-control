@@ -6,16 +6,16 @@
  */
 
 export type ListTasksApiV1BoardsBoardIdTasksGetParams = {
-status?: string | null;
-assigned_agent_id?: string | null;
-unassigned?: boolean | null;
-/**
- * @minimum 1
- * @maximum 200
- */
-limit?: number;
-/**
- * @minimum 0
- */
-offset?: number;
+  status?: string | null;
+  assigned_agent_id?: string | null;
+  unassigned?: boolean | null;
+  /**
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /**
+   * @minimum 0
+   */
+  offset?: number;
 };

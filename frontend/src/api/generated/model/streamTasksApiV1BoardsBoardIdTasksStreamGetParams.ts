@@ -6,5 +6,5 @@
  */
 
 export type StreamTasksApiV1BoardsBoardIdTasksStreamGetParams = {
-since?: string | null;
+  since?: string | null;
 };

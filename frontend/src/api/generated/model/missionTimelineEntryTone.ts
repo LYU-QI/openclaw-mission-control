@@ -5,13 +5,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type MissionTimelineEntryTone = typeof MissionTimelineEntryTone[keyof typeof MissionTimelineEntryTone];
-
+export type MissionTimelineEntryTone =
+  (typeof MissionTimelineEntryTone)[keyof typeof MissionTimelineEntryTone];
 
 export const MissionTimelineEntryTone = {
-  info: 'info',
-  success: 'success',
-  warning: 'warning',
-  danger: 'danger',
-  muted: 'muted',
+  info: "info",
+  success: "success",
+  warning: "warning",
+  danger: "danger",
+  muted: "muted",
 } as const;

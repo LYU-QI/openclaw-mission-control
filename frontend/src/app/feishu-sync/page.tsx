@@ -10,6 +10,7 @@ import { DashboardSidebar } from "@/components/organisms/DashboardSidebar";
 import { DashboardShell } from "@/components/templates/DashboardShell";
 import { FeishuSyncConfigForm } from "@/components/feishu/FeishuSyncConfigForm";
 import { FieldMappingEditor } from "@/components/feishu/FieldMappingEditor";
+import { BoardMappingEditor } from "@/components/feishu/BoardMappingEditor";
 import { SyncHistoryTable } from "@/components/feishu/SyncHistoryTable";
 import { apiGet, apiPatch, apiPost } from "@/lib/mission-control-api";
 
@@ -21,6 +22,7 @@ type SyncConfig = {
   bitable_app_token: string;
   bitable_table_id: string;
   field_mapping: Record<string, string>;
+  board_mapping: Record<string, string>;
   sync_status: string;
   sync_direction?: string;
   last_sync_at?: string | null;
@@ -60,7 +62,12 @@ type TriggerResult = {
   conflicts_count: number;
 };
 
-const DEMO_ORG_ID = "3a9ff3b7-7f21-4e68-8c01-0919db770bcd"; // Personal organization
+type Board = {
+  id: string;
+  name: string;
+};
+
+const DEMO_ORG_ID = "ee32b8b7-fe7a-49bd-881d-b69b8dcc9a4e"; // Riqi organization
 
 export default function FeishuSyncPage() {
   const queryClient = useQueryClient();
@@ -69,6 +76,13 @@ export default function FeishuSyncPage() {
     queryFn: () => apiGet<SyncConfig[]>("/api/v1/feishu-sync/configs"),
   });
   const firstConfig = configsQuery.data?.[0];
+  const boardsQuery = useQuery({
+    queryKey: ["boards"],
+    queryFn: async () => {
+      const res = await apiGet<{ items: Board[] }>("/api/v1/boards");
+      return res.items;
+    },
+  });
   const historyQuery = useQuery({
     queryKey: ["feishu-sync-history", firstConfig?.id],
     enabled: Boolean(firstConfig?.id),
@@ -88,6 +102,7 @@ export default function FeishuSyncPage() {
       app_secret: string;
       bitable_app_token: string;
       bitable_table_id: string;
+      board_id?: string;
     }) =>
       apiPost<SyncConfig>("/api/v1/feishu-sync/configs", {
         organization_id: DEMO_ORG_ID,
@@ -122,6 +137,22 @@ export default function FeishuSyncPage() {
       await queryClient.invalidateQueries({ queryKey: ["feishu-sync-configs"] });
     },
   });
+
+  const updateBoardMappingMutation = useMutation({
+    mutationFn: ({
+      configId,
+      boardMapping,
+    }: {
+      configId: string;
+      boardMapping: Record<string, string>;
+    }) =>
+      apiPatch<SyncConfig>(`/api/v1/feishu-sync/configs/${configId}`, {
+        board_mapping: boardMapping,
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["feishu-sync-configs"] });
+    },
+  });
   const resolveConflictMutation = useMutation({
     mutationFn: ({
       configId,
@@ -146,6 +177,11 @@ export default function FeishuSyncPage() {
   const mapping = useMemo(
     () => firstConfig?.field_mapping ?? {},
     [firstConfig?.field_mapping],
+  );
+
+  const boardMapping = useMemo(
+    () => firstConfig?.board_mapping ?? {},
+    [firstConfig?.board_mapping],
   );
 
   return (
@@ -182,7 +218,12 @@ export default function FeishuSyncPage() {
               <div className="mt-4 grid gap-3 text-sm text-slate-700 md:grid-cols-2 xl:grid-cols-4">
                 <div className="rounded-lg bg-slate-50 px-3 py-2">
                   <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Board</p>
-                  <p className="mt-1 break-all font-medium">{firstConfig.board_id ?? "-"}</p>
+                  <p className="mt-1 break-all font-medium">
+                    {firstConfig.board_id
+                      ? boardsQuery.data?.find((b) => b.id === firstConfig.board_id)?.name ??
+                        firstConfig.board_id
+                      : "-"}
+                  </p>
                 </div>
                 <div className="rounded-lg bg-slate-50 px-3 py-2">
                   <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">同步方向</p>
@@ -297,6 +338,23 @@ export default function FeishuSyncPage() {
                 : undefined
             }
           />
+          {boardsQuery.data ? (
+            <BoardMappingEditor
+              boardMapping={boardMapping}
+              boards={boardsQuery.data}
+              isSaving={updateBoardMappingMutation.isPending}
+              onSave={
+                firstConfig
+                  ? async (nextMapping) => {
+                      await updateBoardMappingMutation.mutateAsync({
+                        configId: firstConfig.id,
+                        boardMapping: nextMapping,
+                      });
+                    }
+                  : undefined
+              }
+            />
+          ) : null}
           <div className="rounded-xl border border-slate-200 bg-white p-4">
             <h3 className="mb-3 text-sm font-semibold text-slate-900">最近映射记录</h3>
             <div className="space-y-2">

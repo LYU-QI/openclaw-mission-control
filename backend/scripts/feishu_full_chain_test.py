@@ -147,15 +147,28 @@ async def main():
             if approval:
                 from app.services.missions.orchestrator import MISSION_STATUS_COMPLETED
                 # 模拟审批授权
-                approval.status = "granted"
+                approval.status = "approved"
                 approval.resolved_at = utcnow()
                 session.add(approval)
                 # 触发 Mission 完成
                 mission.status = MISSION_STATUS_COMPLETED
                 mission.completed_at = utcnow()
                 session.add(mission)
+                
+                # 推进 Task 状态 (模拟 orchestrator 修复后的行为)
+                if task:
+                    task.status = "done"
+                    session.add(task)
+                
                 await session.commit()
-                print("✅ 审批已自动通过，任务已标记为完成。")
+                
+                # 显式触发飞书同步
+                from app.services.feishu.writeback_service import WritebackService
+                if task and task.external_source == "feishu":
+                    print("📤 正在同步 '已完成' 状态至飞书...")
+                    await WritebackService(session, config).push_task_result(task.id)
+                    
+                print("✅ 审批已自动通过，任务已标记为完成，并同步至飞书。")
         else:
              print(f"ℹ️ Mission 状态: {mission.status}，无需或已完成审批。")
 

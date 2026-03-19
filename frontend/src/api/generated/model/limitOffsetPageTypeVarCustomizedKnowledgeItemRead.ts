@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { KnowledgeItemRead } from './knowledgeItemRead';
+import type { KnowledgeItemRead } from "./knowledgeItemRead";
 
 export interface LimitOffsetPageTypeVarCustomizedKnowledgeItemRead {
   items: KnowledgeItemRead[];

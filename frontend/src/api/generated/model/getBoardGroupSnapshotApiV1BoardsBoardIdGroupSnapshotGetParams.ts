@@ -6,11 +6,11 @@
  */
 
 export type GetBoardGroupSnapshotApiV1BoardsBoardIdGroupSnapshotGetParams = {
-include_self?: boolean;
-include_done?: boolean;
-/**
- * @minimum 0
- * @maximum 100
- */
-per_board_task_limit?: number;
+  include_self?: boolean;
+  include_done?: boolean;
+  /**
+   * @minimum 0
+   * @maximum 100
+   */
+  per_board_task_limit?: number;
 };

@@ -411,6 +411,7 @@ def _build_context(
         "auth_token": auth_token,
         "main_session_key": main_session_key,
         "workspace_root": workspace_root,
+        "artifacts_url": f"{base_url}/api/v1/artifacts",
         **user_context,
         **identity_context,
     }
@@ -442,6 +443,7 @@ def _build_main_context(
         "auth_token": auth_token,
         "main_session_key": GatewayAgentIdentity.session_key(gateway),
         "workspace_root": gateway.workspace_root or "",
+        "artifacts_url": f"{base_url}/api/v1/artifacts",
         **user_context,
         **identity_context,
     }

@@ -96,6 +96,10 @@ class AgentBase(SQLModel):
         description="Template that helps define initial intent and behavior.",
         examples=["You are a senior incident response lead."],
     )
+    system_role: str | None = Field(
+        default=None,
+        description="System role for system agents (orchestrator, sync_agent, comms_agent).",
+    )
     soul_template: str | None = Field(
         default=None,
         description="Template representing deeper agent instructions.",
@@ -155,6 +159,10 @@ class AgentUpdate(SQLModel):
         default=None,
         description="Optional new board assignment.",
         examples=["22222222-2222-2222-2222-222222222222"],
+    )
+    system_role: str | None = Field(
+        default=None,
+        description="System role for system agents (orchestrator, sync_agent, comms_agent).",
     )
     is_gateway_main: bool | None = Field(
         default=None,

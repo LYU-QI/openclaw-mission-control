@@ -5,12 +5,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TaskReadStatus = typeof TaskReadStatus[keyof typeof TaskReadStatus];
-
+export type TaskReadStatus =
+  (typeof TaskReadStatus)[keyof typeof TaskReadStatus];
 
 export const TaskReadStatus = {
-  inbox: 'inbox',
-  in_progress: 'in_progress',
-  review: 'review',
-  done: 'done',
+  inbox: "inbox",
+  in_progress: "in_progress",
+  review: "review",
+  done: "done",
 } as const;

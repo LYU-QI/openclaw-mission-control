@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { SoulsDirectorySoulRef } from './soulsDirectorySoulRef';
+import type { SoulsDirectorySoulRef } from "./soulsDirectorySoulRef";
 
 /**
  * Response wrapper for directory search results.

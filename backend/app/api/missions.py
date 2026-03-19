@@ -13,6 +13,7 @@ from app.core.time import utcnow
 from app.models.activity_events import ActivityEvent
 from app.models.missions import Mission, MissionSubtask
 from app.schemas.missions import (
+    LeadAuditCallback,
     MissionCreate,
     MissionDispatchRequest,
     MissionRead,
@@ -37,7 +38,7 @@ if TYPE_CHECKING:
 
     from app.core.auth import AuthContext
 
-router = APIRouter(prefix="/missions", tags=["missions"])
+router = APIRouter(prefix="/missions", tags=["missions", "agent-orchestrator"])
 
 
 @router.post("", response_model=MissionRead, status_code=status.HTTP_201_CREATED)
@@ -387,5 +388,29 @@ async def redispatch_subtask(
     orchestrator = MissionOrchestrator(session)
     try:
         return await orchestrator.redispatch_subtask(subtask_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.patch("/{mission_id}/audit", tags=["missions", "agent-orchestrator", "agent-lead"])
+async def lead_audit_callback(
+    mission_id: UUID,
+    payload: LeadAuditCallback,
+    session: AsyncSession = SESSION_DEP,
+    auth: AuthContext = AUTH_DEP,
+) -> dict[str, str]:
+    """Callback endpoint for Lead Agent audit results."""
+    from app.services.missions.orchestrator import MissionOrchestrator
+
+    orchestrator = MissionOrchestrator(session)
+    try:
+        await orchestrator.handle_lead_audit(
+            mission_id=mission_id,
+            decision=payload.decision,
+            summary=payload.summary,
+            reason=payload.reason,
+            suggestions=payload.suggestions or [],
+        )
+        return {"status": "ok", "message": f"Mission {mission_id} audit processed"}
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

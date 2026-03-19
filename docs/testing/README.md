@@ -2,7 +2,17 @@
 
 This guide describes how to run Mission Control tests locally.
 
-## Playbooks and reports
+## Test Documentation
+
+### Test Plans, Cases & Reports
+```
+docs/testing/
+├── test-plans/      # 测试计划
+├── test-cases/      # 测试用例
+└── test-reports/    # 测试报告
+```
+
+### Playbooks and reports
 
 - [流程图测试覆盖清单](./flow-gap-checklist.zh-CN.md)
 - [飞书真实联调测试报告](./feishu-real-integration-report.zh-CN.md)

@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TaskUpdateCustomFieldValues } from './taskUpdateCustomFieldValues';
+import type { TaskUpdateCustomFieldValues } from "./taskUpdateCustomFieldValues";
 
 /**
  * Payload for partial task updates.
@@ -12,7 +12,7 @@ import type { TaskUpdateCustomFieldValues } from './taskUpdateCustomFieldValues'
 export interface TaskUpdate {
   title?: string | null;
   description?: string | null;
-  status?: 'inbox' | 'in_progress' | 'review' | 'done' | null;
+  status?: "inbox" | "in_progress" | "review" | "done" | null;
   priority?: string | null;
   due_at?: string | null;
   assigned_agent_id?: string | null;

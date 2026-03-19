@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TaskCommentRead } from './taskCommentRead';
+import type { TaskCommentRead } from "./taskCommentRead";
 
 export interface LimitOffsetPageTypeVarCustomizedTaskCommentRead {
   items: TaskCommentRead[];

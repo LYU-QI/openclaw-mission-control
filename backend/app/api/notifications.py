@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
     from app.core.auth import AuthContext
 
-router = APIRouter(prefix="/notifications", tags=["notifications"])
+router = APIRouter(prefix="/notifications", tags=["notifications", "agent-comms-agent"])
 
 
 @router.post(
@@ -132,6 +132,8 @@ async def delete_notification_config(
     logs = await session.exec(logs_stmt)
     for log in logs.all():
         await session.delete(log)
+
+    await session.flush()  # Ensure deletes are processed before deleting config
 
     await session.delete(config)
     await session.commit()

@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { OrganizationMemberRead } from './organizationMemberRead';
+import type { OrganizationMemberRead } from "./organizationMemberRead";
 
 export interface LimitOffsetPageTypeVarCustomizedOrganizationMemberRead {
   items: OrganizationMemberRead[];

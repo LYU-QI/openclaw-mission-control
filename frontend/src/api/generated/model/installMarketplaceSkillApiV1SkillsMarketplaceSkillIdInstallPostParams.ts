@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type InstallMarketplaceSkillApiV1SkillsMarketplaceSkillIdInstallPostParams = {
-gateway_id: string;
-};
+export type InstallMarketplaceSkillApiV1SkillsMarketplaceSkillIdInstallPostParams =
+  {
+    gateway_id: string;
+  };

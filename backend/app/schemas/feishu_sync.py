@@ -21,8 +21,10 @@ class FeishuSyncConfigCreate(SQLModel):
     bitable_app_token: str
     bitable_table_id: str
     field_mapping: dict[str, Any] = Field(default_factory=dict)
+    board_mapping: dict[str, str] = Field(default_factory=dict)
     sync_direction: str = "bidirectional"
     sync_interval_minutes: int = 15
+    auto_dispatch: bool = False
 
 
 class FeishuSyncConfigUpdate(SQLModel):
@@ -34,9 +36,11 @@ class FeishuSyncConfigUpdate(SQLModel):
     bitable_app_token: str | None = None
     bitable_table_id: str | None = None
     field_mapping: dict[str, Any] | None = None
+    board_mapping: dict[str, str] | None = None
     sync_direction: str | None = None
     sync_interval_minutes: int | None = None
     enabled: bool | None = None
+    auto_dispatch: bool | None = None
 
 
 class FeishuSyncConfigRead(SQLModel):
@@ -49,12 +53,14 @@ class FeishuSyncConfigRead(SQLModel):
     bitable_app_token: str
     bitable_table_id: str
     field_mapping: dict[str, Any]
+    board_mapping: dict[str, str]
     sync_direction: str
     sync_interval_minutes: int
     last_sync_at: datetime | None
     sync_status: str
     last_error: str | None
     enabled: bool
+    auto_dispatch: bool
     created_at: datetime
     updated_at: datetime
 

@@ -5,13 +5,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ReportMetricTone = typeof ReportMetricTone[keyof typeof ReportMetricTone];
-
+export type ReportMetricTone =
+  (typeof ReportMetricTone)[keyof typeof ReportMetricTone];
 
 export const ReportMetricTone = {
-  success: 'success',
-  warning: 'warning',
-  danger: 'danger',
-  info: 'info',
-  muted: 'muted',
+  success: "success",
+  warning: "warning",
+  danger: "danger",
+  info: "info",
+  muted: "muted",
 } as const;

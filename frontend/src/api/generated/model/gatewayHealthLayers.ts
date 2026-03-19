@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { GatewayHealthLayer } from './gatewayHealthLayer';
+import type { GatewayHealthLayer } from "./gatewayHealthLayer";
 
 /**
  * Layered gateway runtime diagnosis from transport to check-in.

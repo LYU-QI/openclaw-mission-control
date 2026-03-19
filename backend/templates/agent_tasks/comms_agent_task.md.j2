@@ -1,0 +1,61 @@
+# 通知任务：发送消息到飞书群
+
+## 消息内容
+
+### 基础信息
+- 事件类型: {{ event_type }}
+- 任务标题: {{ task_title }}
+- Mission ID: {{ mission_id }}
+
+{% if event_type == "mission_completed" %}
+### 任务完成
+- 结果摘要: {{ result_summary }}
+- 风险等级: {{ risk }}
+- 下一步: {{ next_action }}
+{% if subtask_results %}
+### 执行详情
+{{ subtask_results }}
+{% endif %}
+{% if artifact_links %}
+### 相关链接
+{% for link in artifact_links %}
+- {{ link }}
+{% endfor %}
+{% endif %}
+
+{% elif event_type == "mission_failed" %}
+### 任务失败
+- 失败原因: {{ error_message }}
+- 风险等级: {{ risk }}
+
+{% elif event_type == "approval_requested" %}
+### 需要审批
+- 审批类型: {{ approval_type }}
+- 审批内容: {{ approval_content }}
+- 审批链接: {{ approval_url }}
+
+{% elif event_type == "task_overdue" %}
+### 任务超时
+- 原定截止: {{ due_date }}
+- 超期天数: {{ overdue_days }}
+
+{% elif event_type == "reminder" %}
+### 提醒
+- 提醒内容: {{ reminder_content }}
+{% endif %}
+
+## 任务要求
+1. 使用飞书机器人发送卡片消息到指定群
+2. 消息格式使用 Interactive Card
+3. 确保消息内容专业、清晰
+4. 如果有相关链接，包含可点击的按钮
+
+## 输出格式
+请返回以下格式的 JSON：
+```json
+{
+  "sent": true,
+  "message_id": "xxx",
+  "error": null
+}
+```

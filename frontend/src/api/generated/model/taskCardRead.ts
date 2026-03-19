@@ -4,9 +4,9 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TagRef } from './tagRef';
-import type { TaskCardReadCustomFieldValues } from './taskCardReadCustomFieldValues';
-import type { TaskCardReadStatus } from './taskCardReadStatus';
+import type { TagRef } from "./tagRef";
+import type { TaskCardReadCustomFieldValues } from "./taskCardReadCustomFieldValues";
+import type { TaskCardReadStatus } from "./taskCardReadStatus";
 
 /**
  * Task read model enriched with assignee and approval counters.

@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { GatewayLeadBroadcastBoardResult } from './gatewayLeadBroadcastBoardResult';
+import type { GatewayLeadBroadcastBoardResult } from "./gatewayLeadBroadcastBoardResult";
 
 /**
  * Aggregate response for a lead broadcast operation.

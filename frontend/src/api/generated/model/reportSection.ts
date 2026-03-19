@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { ReportMetric } from './reportMetric';
+import type { ReportMetric } from "./reportMetric";
 
 /**
  * 报告中的一个段落。

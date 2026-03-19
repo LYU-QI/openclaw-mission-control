@@ -4,13 +4,13 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { SubtaskUpdateResultEvidence } from './subtaskUpdateResultEvidence';
+import type { SubtaskUpdateResultEvidence } from "./subtaskUpdateResultEvidence";
 
 /**
  * Payload for updating a mission subtask.
  */
 export interface SubtaskUpdate {
-  status?: 'pending' | 'running' | 'completed' | 'failed' | null;
+  status?: "pending" | "running" | "completed" | "failed" | null;
   result_summary?: string | null;
   result_evidence?: SubtaskUpdateResultEvidence;
   result_risk?: string | null;

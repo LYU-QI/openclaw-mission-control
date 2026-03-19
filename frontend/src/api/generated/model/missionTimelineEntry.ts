@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { MissionTimelineEntryTone } from './missionTimelineEntryTone';
+import type { MissionTimelineEntryTone } from "./missionTimelineEntryTone";
 
 /**
  * Single entry in the mission execution timeline.
@@ -15,7 +15,16 @@ export interface MissionTimelineEntry {
   stage: string;
   stage_label: string;
   tone: MissionTimelineEntryTone;
-  status_hint?: 'pending' | 'dispatched' | 'running' | 'aggregating' | 'completed' | 'failed' | 'pending_approval' | 'cancelled' | null;
+  status_hint?:
+    | "pending"
+    | "dispatched"
+    | "running"
+    | "aggregating"
+    | "completed"
+    | "failed"
+    | "pending_approval"
+    | "cancelled"
+    | null;
   message?: string | null;
   subtask_id?: string | null;
   agent_id?: string | null;

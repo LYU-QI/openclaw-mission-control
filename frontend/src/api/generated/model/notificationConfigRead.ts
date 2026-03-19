@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { NotificationConfigReadChannelConfig } from './notificationConfigReadChannelConfig';
+import type { NotificationConfigReadChannelConfig } from "./notificationConfigReadChannelConfig";
 
 /**
  * Notification configuration returned from read endpoints.
@@ -13,6 +13,7 @@ export interface NotificationConfigRead {
   id: string;
   organization_id: string;
   board_id: string | null;
+  name: string;
   channel_type: string;
   channel_config: NotificationConfigReadChannelConfig;
   notify_on_events: string[];

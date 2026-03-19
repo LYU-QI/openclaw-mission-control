@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { LLMErrorResponseDetail } from './lLMErrorResponseDetail';
+import type { LLMErrorResponseDetail } from "./lLMErrorResponseDetail";
 
 /**
  * Standardized LLM-facing error payload used by API contracts.

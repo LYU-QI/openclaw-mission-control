@@ -1,10 +1,28 @@
 # CLAUDE.md
 
-本文件为 Claude Code (claude.ai/code) 在本仓库中工作时提供指导。
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+---
 
 ## 项目概述
 
 OpenClaw Mission Control 是一个集中式运营平台，用于管理 OpenClaw 的 Agent、Gateway、Mission 和组织。提供工作编排、审批驱动的治理、飞书集成和 API 自动化能力。
+
+## 核心概念
+
+- **Gateway** - OpenClaw 运行时网关，负责执行 Agent 任务
+- **Board** - 任务看板，组织工作流
+- **Mission** - 任务执行单元，由 Orchestrator 协调
+- **Subtask** - Mission 的子任务，由 Worker Agents 执行
+- **Lead Agent** - 看板负责人，审核任务结果，生成评论
+- **Worker Agents (Subagents)** - 执行具体任务的临时 agent
+- **Orchestrator** - 协调 Mission 流程，分配 subtask 给 subagents
+
+## 飞书集成
+
+- **任务同步**：Bitable（多维表格）↔ Mission Control 双向同步
+- **消息通知**：任务完成、审批请求等推送到飞书群
+- **回写规则**：仅 `external_source == "feishu"` 的任务会回写到飞书多维表格
 
 ## 架构
 
@@ -57,7 +75,11 @@ Docker Compose 运行 5 个服务：`db`（Postgres 16）、`redis`（Redis 7）
 | `make format` | 自动格式化：isort + black（后端），prettier（前端） |
 | `make api-gen` | 重新生成 TS API 客户端（后端需运行在 :8000） |
 | `make docker-up` | 启动完整 Docker 服务栈 |
+| `make docker-watch` | Watch 模式（自动重建前端 UI 变更） |
+| `make docker-down` | 停止 Docker 服务栈 |
 | `make build` | Next.js 生产构建 |
+| `make docs-lint` | Markdown 文件 lint |
+| `make backend-migrate` | 应用数据库迁移 |
 
 ### 运行单个测试
 ```bash
@@ -77,6 +99,18 @@ docker compose -f compose.yml --env-file .env up -d db
 cd backend && uv run uvicorn app.main:app --reload --port 8000
 cd frontend && npm run dev
 ```
+
+### 快速启动（生产风格）
+```bash
+# 一键安装脚本（交互式）
+./install.sh
+# 或
+curl -fsSL https://raw.githubusercontent.com/abhi1693/openclaw-mission-control/master/install.sh | bash
+```
+
+### 健康检查
+- 后端：`http://localhost:8000/healthz`
+- 前端：`http://localhost:3000`
 
 ## 编码规范
 
@@ -105,3 +139,20 @@ GitHub Actions（`.github/workflows/ci.yml`）：lint、类型检查、作用域
 ## 配置
 
 通过 Pydantic Settings 的环境变量驱动。将 `.env.example` 复制为 `.env`。关键变量：`AUTH_MODE`、`DATABASE_URL`、`BASE_URL`、`LOCAL_AUTH_TOKEN`（或 `CLERK_SECRET_KEY`）、`RQ_REDIS_URL`、`FEISHU_APP_ID`/`FEISHU_APP_SECRET`。开发环境下 Alembic 迁移在启动时自动执行（`DB_AUTO_MIGRATE=true` 默认开启）。
+
+## 文档
+
+- 入口：`docs/README.md`
+- 架构：`docs/architecture/README.md`
+- 部署：`docs/deployment/README.md`
+- 开发：`docs/development/README.md`
+
+## 环境模板
+
+- 根目录：`.env.example`
+- 后端：`backend/.env.example`
+- 前端：`frontend/.env.example`
+
+## 用户全局规则
+
+本项目使用 `~/.claude/rules/` 中的全局规则（编码风格、测试、Git 工作流、性能优化等）。Claude Code 会自动应用这些规则。

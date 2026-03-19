@@ -76,6 +76,10 @@ class Settings(BaseSettings):
     feishu_sync_default_interval_minutes: int = 15
     feishu_sync_scheduler_interval_seconds: float = 30.0
 
+    # Agent-based notification (when enabled, Comms Agent will send notifications)
+    enable_agent_notifications: bool = False
+    enable_agent_sync: bool = False
+
     # Mission subtask timeout scanning
     mission_subtask_timeout_minutes: int = 30
     mission_subtask_scheduler_interval_seconds: float = 30.0

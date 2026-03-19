@@ -5,17 +5,17 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TaskCustomFieldDefinitionReadFieldType = typeof TaskCustomFieldDefinitionReadFieldType[keyof typeof TaskCustomFieldDefinitionReadFieldType];
-
+export type TaskCustomFieldDefinitionReadFieldType =
+  (typeof TaskCustomFieldDefinitionReadFieldType)[keyof typeof TaskCustomFieldDefinitionReadFieldType];
 
 export const TaskCustomFieldDefinitionReadFieldType = {
-  text: 'text',
-  text_long: 'text_long',
-  integer: 'integer',
-  decimal: 'decimal',
-  boolean: 'boolean',
-  date: 'date',
-  date_time: 'date_time',
-  url: 'url',
-  json: 'json',
+  text: "text",
+  text_long: "text_long",
+  integer: "integer",
+  decimal: "decimal",
+  boolean: "boolean",
+  date: "date",
+  date_time: "date_time",
+  url: "url",
+  json: "json",
 } as const;

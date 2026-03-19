@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { SubtaskReadResultEvidence } from './subtaskReadResultEvidence';
-import type { SubtaskReadStatus } from './subtaskReadStatus';
+import type { SubtaskReadResultEvidence } from "./subtaskReadResultEvidence";
+import type { SubtaskReadStatus } from "./subtaskReadStatus";
 
 /**
  * Subtask payload returned from read endpoints.

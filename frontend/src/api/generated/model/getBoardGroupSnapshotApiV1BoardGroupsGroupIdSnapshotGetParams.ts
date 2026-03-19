@@ -6,6 +6,6 @@
  */
 
 export type GetBoardGroupSnapshotApiV1BoardGroupsGroupIdSnapshotGetParams = {
-include_done?: boolean;
-per_board_task_limit?: number;
+  include_done?: boolean;
+  per_board_task_limit?: number;
 };

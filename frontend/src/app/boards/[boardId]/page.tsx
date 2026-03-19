@@ -22,6 +22,7 @@ import {
   RefreshCcw,
   Settings,
   ShieldCheck,
+  Trash2,
   X,
 } from "lucide-react";
 
@@ -79,6 +80,7 @@ import {
 import {
   createTaskApiV1BoardsBoardIdTasksPost,
   createTaskCommentApiV1BoardsBoardIdTasksTaskIdCommentsPost,
+  deleteAllBoardTasksApiV1BoardsBoardIdTasksAllDelete,
   deleteTaskApiV1BoardsBoardIdTasksTaskIdDelete,
   listTaskCommentsApiV1BoardsBoardIdTasksTaskIdCommentsGet,
   streamTasksApiV1BoardsBoardIdTasksStreamGet,
@@ -2130,7 +2132,8 @@ export default function BoardDetailPage() {
   const assigneeById = useMemo(() => {
     const map = new Map<string, string>();
     agents
-      .filter((agent) => !boardId || agent.board_id === boardId)
+      // Include agents that belong to this board OR system agents (board_id: null like Orchestrator)
+      .filter((agent) => !boardId || agent.board_id === boardId || agent.board_id === null)
       .forEach((agent) => {
         map.set(agent.id, agent.name);
       });
@@ -3222,15 +3225,36 @@ export default function BoardDetailPage() {
                     <Activity className="h-4 w-4" />
                   </Button>
                   {isOrgAdmin ? (
-                    <button
-                      type="button"
-                      onClick={() => router.push(`/boards/${boardId}/edit`)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
-                      aria-label="Board settings"
-                      title="Board settings"
-                    >
-                      <Settings className="h-4 w-4" />
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!confirm("确定要删除看板中的所有任务吗？此操作不可恢复。")) return;
+                          if (!boardId) { alert("无效的看板ID"); return; }
+                          try {
+                            await deleteAllBoardTasksApiV1BoardsBoardIdTasksAllDelete(boardId);
+                            window.location.reload();
+                          } catch (e: any) {
+                            const errorDetail = e?.data?.detail || e?.message || String(e);
+                            alert("删除失败: " + (typeof errorDetail === 'object' ? JSON.stringify(errorDetail) : errorDetail));
+                          }
+                        }}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-red-600 transition hover:border-red-300 hover:bg-red-50"
+                        aria-label="Delete all tasks"
+                        title="Delete all tasks"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/boards/${boardId}/edit`)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
+                        aria-label="Board settings"
+                        title="Board settings"
+                      >
+                        <Settings className="h-4 w-4" />
+                      </button>
+                    </>
                   ) : null}
                 </div>
               </div>
@@ -3944,13 +3968,15 @@ export default function BoardDetailPage() {
               <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
                 <BoardChatComposer
                   placeholder={
-                    canWrite
-                      ? "Write a message for the assigned agent. Tag @lead or @name."
-                      : "Read-only access. Comments are disabled."
+                    !canWrite
+                      ? "Read-only access. Comments are disabled."
+                      : selectedTask?.status !== "review"
+                      ? "Comments to lead agent are only available when task is in review status."
+                      : "Write a message for the assigned agent. Tag @lead or @name."
                   }
                   isSending={isPostingComment}
                   onSend={handlePostComment}
-                  disabled={!canWrite}
+                  disabled={!canWrite || selectedTask?.status !== "review"}
                   mentionSuggestions={boardChatMentionSuggestions}
                 />
                 {postCommentError ? (
@@ -3959,6 +3985,10 @@ export default function BoardDetailPage() {
                 {!canWrite ? (
                   <p className="text-xs text-slate-500">
                     Read-only access. You cannot post comments on this board.
+                  </p>
+                ) : selectedTask?.status !== "review" ? (
+                  <p className="text-xs text-slate-500">
+                    💡 Comments to the lead agent are only enabled when the task is in <span className="font-semibold">review</span> status.
                   </p>
                 ) : null}
               </div>

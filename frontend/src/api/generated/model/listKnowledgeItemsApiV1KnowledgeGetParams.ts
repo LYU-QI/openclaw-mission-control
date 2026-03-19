@@ -6,16 +6,16 @@
  */
 
 export type ListKnowledgeItemsApiV1KnowledgeGetParams = {
-board_id?: string | null;
-item_type?: string | null;
-status?: string | null;
-/**
- * @minimum 1
- * @maximum 200
- */
-limit?: number;
-/**
- * @minimum 0
- */
-offset?: number;
+  board_id?: string | null;
+  item_type?: string | null;
+  status?: string | null;
+  /**
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /**
+   * @minimum 0
+   */
+  offset?: number;
 };

@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { GatewayHealthLayers } from './gatewayHealthLayers';
+import type { GatewayHealthLayers } from "./gatewayHealthLayers";
 
 /**
  * Aggregated gateway status response including session metadata.

@@ -61,8 +61,12 @@ class FieldMapper:
                     value = ", ".join(str(v) for v in value)
 
             if isinstance(value, dict):
-                # Rich text fields
-                value = value.get("text", str(value))
+                # Rich text fields OR single-select fields
+                # Single-select might have "name" key
+                if "name" in value:
+                    value = value.get("name")
+                else:
+                    value = value.get("text", str(value))
 
             if mc_key == "status":
                 value = STATUS_FROM_FEISHU.get(str(value), "inbox")

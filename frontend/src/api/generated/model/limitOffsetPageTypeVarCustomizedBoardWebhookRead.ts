@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { BoardWebhookRead } from './boardWebhookRead';
+import type { BoardWebhookRead } from "./boardWebhookRead";
 
 export interface LimitOffsetPageTypeVarCustomizedBoardWebhookRead {
   items: BoardWebhookRead[];

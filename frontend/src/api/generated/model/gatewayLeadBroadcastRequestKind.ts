@@ -8,10 +8,10 @@
 /**
  * Broadcast intent. `question` asks for responses; `handoff` requests transfer.
  */
-export type GatewayLeadBroadcastRequestKind = typeof GatewayLeadBroadcastRequestKind[keyof typeof GatewayLeadBroadcastRequestKind];
-
+export type GatewayLeadBroadcastRequestKind =
+  (typeof GatewayLeadBroadcastRequestKind)[keyof typeof GatewayLeadBroadcastRequestKind];
 
 export const GatewayLeadBroadcastRequestKind = {
-  question: 'question',
-  handoff: 'handoff',
+  question: "question",
+  handoff: "handoff",
 } as const;

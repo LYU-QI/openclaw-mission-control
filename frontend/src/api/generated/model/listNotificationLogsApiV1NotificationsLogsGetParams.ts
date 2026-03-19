@@ -6,7 +6,7 @@
  */
 
 export type ListNotificationLogsApiV1NotificationsLogsGetParams = {
-config_id?: string | null;
-event_type?: string | null;
-limit?: number;
+  config_id?: string | null;
+  event_type?: string | null;
+  limit?: number;
 };

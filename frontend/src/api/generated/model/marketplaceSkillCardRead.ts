@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { MarketplaceSkillCardReadMetadata } from './marketplaceSkillCardReadMetadata';
+import type { MarketplaceSkillCardReadMetadata } from "./marketplaceSkillCardReadMetadata";
 
 /**
  * Marketplace card payload with gateway-specific install state.

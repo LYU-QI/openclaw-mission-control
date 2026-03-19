@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TagRead } from './tagRead';
+import type { TagRead } from "./tagRead";
 
 export interface LimitOffsetPageTypeVarCustomizedTagRead {
   items: TagRead[];

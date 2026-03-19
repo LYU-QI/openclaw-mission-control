@@ -21,5 +21,8 @@ def build_decompose_prompt(*, mission: Mission, context: list[ContextChunk]) -> 
         f"Mission constraints: {constraints}\n"
         f"Context count: {len(context)}\n"
         f"Context preview:\n{context_preview}\n"
+        "IMPORTANT: You MUST include a final 'Execute' subtask that actually performs the work to achieve the goal.\n"
+        "The Execute subtask should use appropriate tools (e.g., context_loader, http_requests, file_operations) to generate the actual output.\n"
+        "Subtask order: 1) Gather Facts, 2) Analyze Options, 3) Prepare Execution Plan, 4) Execute (required!)\n"
         "Ensure subtasks are ordered logically and concise."
     )

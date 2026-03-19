@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TaskCreateCustomFieldValues } from './taskCreateCustomFieldValues';
-import type { TaskCreateStatus } from './taskCreateStatus';
+import type { TaskCreateCustomFieldValues } from "./taskCreateCustomFieldValues";
+import type { TaskCreateStatus } from "./taskCreateStatus";
 
 /**
  * Payload for creating a task.

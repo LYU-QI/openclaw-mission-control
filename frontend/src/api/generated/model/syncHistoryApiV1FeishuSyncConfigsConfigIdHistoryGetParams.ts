@@ -6,5 +6,5 @@
  */
 
 export type SyncHistoryApiV1FeishuSyncConfigsConfigIdHistoryGetParams = {
-limit?: number;
+  limit?: number;
 };

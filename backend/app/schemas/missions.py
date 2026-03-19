@@ -101,6 +101,16 @@ class SubtaskUpdate(SQLModel):
     assigned_subagent_id: str | None = None
 
 
+class LeadAuditCallback(SQLModel):
+    """Payload for Lead Agent audit callback."""
+
+    status: Literal["approved", "changes_requested"]
+    decision: Literal["approve", "request_changes"]
+    summary: str | None = None
+    reason: str | None = None
+    suggestions: list[str] | None = None
+
+
 class SubtaskRead(SQLModel):
     """Subtask payload returned from read endpoints."""
 

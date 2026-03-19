@@ -32,15 +32,22 @@ def _string_field(payload: dict[str, Any], key: str) -> str | None:
 
 def _build_context_lines(payload: dict[str, Any]) -> list[str]:
     lines: list[str] = []
-    for label, key in (
-        ("Mission", "mission_id"),
-        ("Task", "task_id"),
-        ("Board", "board_id"),
-        ("Approval", "approval_id"),
-    ):
-        value = _string_field(payload, key)
-        if value:
-            lines.append(f"**{label}**: `{value}`")
+
+    # 使用中文任务标题替代 ID
+    task_title = _string_field(payload, "task_title")
+    if task_title:
+        lines.append(f"**关联任务**: {task_title}")
+
+    # 如果没有标题才降级显示 ID，或者根据需要隐藏
+    # for label, key in (
+    #     ("Mission", "mission_id"),
+    #     ("Task", "task_id"),
+    #     ("Board", "board_id"),
+    #     ("Approval", "approval_id"),
+    # ):
+    #     value = _string_field(payload, key)
+    #     if value:
+    #         lines.append(f"**{label}**: `{value}`")
 
     status = _string_field(payload, "status")
     if status:
@@ -50,9 +57,10 @@ def _build_context_lines(payload: dict[str, Any]) -> list[str]:
     if risk:
         lines.append(f"**风险**: {risk}")
 
-    next_action = _string_field(payload, "next_action")
-    if next_action:
-        lines.append(f"**下一步**: {next_action}")
+    # 添加 Subtask 执行结果（实际内容）
+    subtask_results = _string_field(payload, "subtask_results")
+    if subtask_results:
+        lines.append(f"\n**执行详情**:\n{subtask_results}")
 
     return lines
 

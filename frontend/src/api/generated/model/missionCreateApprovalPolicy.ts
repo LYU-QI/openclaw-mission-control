@@ -5,11 +5,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type MissionCreateApprovalPolicy = typeof MissionCreateApprovalPolicy[keyof typeof MissionCreateApprovalPolicy];
-
+export type MissionCreateApprovalPolicy =
+  (typeof MissionCreateApprovalPolicy)[keyof typeof MissionCreateApprovalPolicy];
 
 export const MissionCreateApprovalPolicy = {
-  auto: 'auto',
-  pre_approve: 'pre_approve',
-  post_review: 'post_review',
+  auto: "auto",
+  pre_approve: "pre_approve",
+  post_review: "post_review",
 } as const;

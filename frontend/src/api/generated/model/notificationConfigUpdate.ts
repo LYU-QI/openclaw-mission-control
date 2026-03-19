@@ -4,13 +4,14 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { NotificationConfigUpdateChannelConfig } from './notificationConfigUpdateChannelConfig';
+import type { NotificationConfigUpdateChannelConfig } from "./notificationConfigUpdateChannelConfig";
 
 /**
  * Payload for updating a notification configuration.
  */
 export interface NotificationConfigUpdate {
   board_id?: string | null;
+  name?: string | null;
   channel_type?: string | null;
   channel_config?: NotificationConfigUpdateChannelConfig;
   notify_on_events?: string[] | null;

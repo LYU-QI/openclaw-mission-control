@@ -5,14 +5,18 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
-from typing import Any
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-from sqlmodel import select
+from jinja2 import Environment, FileSystemLoader
+from sqlmodel import col, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.core.config import settings
 from app.core.secrets import decrypt_secret
 from app.core.time import utcnow
+from app.models.agents import Agent
 from app.models.feishu_sync import FeishuSyncConfig, FeishuTaskMapping
 from app.models.tasks import Task
 from app.services.activity_log import record_activity
@@ -20,7 +24,22 @@ from app.services.feishu.client import FeishuClient
 from app.services.feishu.conflict_resolver import ConflictResolver, SyncSideState
 from app.services.feishu.field_mapper import FieldMapper
 
+if TYPE_CHECKING:
+    from app.services.openclaw.agent_invoker import AgentInvoker
+
 logger = logging.getLogger(__name__)
+
+
+def _templates_root() -> Path:
+    return Path(__file__).resolve().parents[3] / "templates"
+
+
+def _template_env() -> Environment:
+    return Environment(
+        loader=FileSystemLoader(_templates_root()),
+        autoescape=False,
+        keep_trailing_newline=True,
+    )
 
 
 def _compute_hash(fields: dict[str, Any]) -> str:
@@ -37,6 +56,136 @@ class SyncService:
         self.client = FeishuClient(config.app_id, decrypt_secret(config.app_secret_encrypted))
         self.mapper = FieldMapper(config.field_mapping)
         self.conflict_resolver = ConflictResolver()
+        self.board_mapping = config.board_mapping or {}
+
+    def _get_board_id_for_task(self, feishu_fields: dict[str, Any]) -> UUID | None:
+        """Determine the board_id for a task based on Feishu fields and board_mapping."""
+        # First, check if field_mapping contains a board field (e.g., "看板" -> "board")
+        board_field_key = None
+        for feishu_key, mc_key in self.mapper.mapping.items():
+            if mc_key == "board":
+                board_field_key = feishu_key
+                break
+
+        if board_field_key:
+            board_name = feishu_fields.get(board_field_key)
+            if board_name and board_name in self.board_mapping:
+                return UUID(self.board_mapping[board_name])
+
+        # Fall back to default board_id from config
+        return self.config.board_id
+
+    async def _assign_review_task_to_lead(self, task: Task) -> None:
+        """Assign a review-status task to the board's lead agent."""
+        if task.status != "review" or task.board_id is None:
+            return
+        await self._assign_task_to_orchestrator(task)
+
+    async def _assign_task_to_orchestrator(self, task: Task) -> None:
+        """Assign a task to the Orchestrator agent (not Lead Agent)."""
+        if task.board_id is None:
+            return
+
+        # First try to find Orchestrator by system_role (not board-specific)
+        # System role agents have board_id=None but have system_role set
+        result = await self.session.exec(
+            select(Agent)
+            .where(Agent.system_role == "orchestrator")
+            .where(Agent.gateway_id.in_(
+                select(Agent.gateway_id).where(Agent.board_id == task.board_id)
+            ))
+        )
+        orchestrator = result.first()
+
+        # Fallback: find Orchestrator by name pattern (board-specific)
+        if not orchestrator:
+            result = await self.session.exec(
+                select(Agent)
+                .where(col(Agent.board_id) == task.board_id)
+                .where(Agent.name.ilike("%Orchestrator%"))
+            )
+            orchestrator = result.first()
+
+        if orchestrator:
+            task.assigned_agent_id = orchestrator.id
+            logger.info(
+                "feishu.sync.assign_to_orchestrator task_id=%s orchestrator_id=%s",
+                task.id,
+                orchestrator.id,
+            )
+        else:
+            # Fallback to Lead Agent if no Orchestrator found
+            result = await self.session.exec(
+                select(Agent)
+                .where(col(Agent.board_id) == task.board_id)
+                .where(col(Agent.is_board_lead) == True)
+            )
+            lead = result.first()
+            if lead:
+                task.assigned_agent_id = lead.id
+                logger.warning(
+                    "feishu.sync.assign_fallback_to_lead task_id=%s lead_id=%s (no orchestrator found)",
+                    task.id,
+                    lead.id,
+                )
+
+    async def _auto_create_and_dispatch_mission(self, task: Task) -> None:
+        """Auto-create and dispatch a mission for a newly synced task."""
+        if not self.config.auto_dispatch:
+            return
+
+        # Lazy import to avoid circular dependency
+        from app.services.missions.orchestrator import MissionOrchestrator
+
+        if task.board_id is None:
+            logger.warning(
+                "feishu.sync.auto_dispatch.skip no_board task_id=%s",
+                task.id,
+            )
+            return
+
+        # Assign task to Orchestrator if not already assigned
+        if task.assigned_agent_id is None:
+            await self._assign_task_to_orchestrator(task)
+            self.session.add(task)
+            await self.session.flush()
+
+        try:
+            orchestrator = MissionOrchestrator(self.session)
+            approval_policy = getattr(self.config, "default_approval_policy", "auto") or "auto"
+            mission = await orchestrator.create_mission(
+                task_id=task.id,
+                board_id=task.board_id,
+                agent_id=task.assigned_agent_id,
+                goal=task.description or f"处理任务: {task.title}",
+                approval_policy=approval_policy,
+            )
+            await orchestrator.dispatch_mission(mission.id)
+            logger.info(
+                "feishu.sync.auto_dispatch.success task_id=%s mission_id=%s",
+                task.id,
+                mission.id,
+            )
+            record_activity(
+                self.session,
+                event_type="feishu_sync_auto_dispatch",
+                message=f"自动为任务创建并下发 Mission: {task.title}",
+                task_id=task.id,
+                board_id=task.board_id,
+            )
+        except Exception as exc:
+            logger.error(
+                "feishu.sync.auto_dispatch.failed task_id=%s error=%s",
+                task.id,
+                str(exc),
+            )
+            record_activity(
+                self.session,
+                event_type="feishu_sync_auto_dispatch_failed",
+                message=f"自动下发 Mission 失败: {str(exc)[:100]}",
+                task_id=task.id,
+                board_id=task.board_id,
+            )
 
     def _has_local_conflict(self, *, mapping: FeishuTaskMapping, task: Task, new_hash: str) -> bool:
         if mapping.sync_hash == new_hash:
@@ -208,8 +357,9 @@ class SyncService:
 
                 if mapping is None:
                     # Create new task
+                    board_id = self._get_board_id_for_task(fields)
                     task = Task(
-                        board_id=self.config.board_id,
+                        board_id=board_id,
                         title=task_data.get("title", "Untitled"),
                         description=task_data.get("description"),
                         status=task_data.get("status", "inbox"),
@@ -231,6 +381,13 @@ class SyncService:
                     )
                     self.session.add(new_mapping)
                     stats["created"] += 1
+
+                    # Assign to lead if task starts in review
+                    await self._assign_review_task_to_lead(task)
+
+                    # Auto-create and dispatch mission if enabled
+                    if self.config.auto_dispatch:
+                        await self._auto_create_and_dispatch_mission(task)
                 elif mapping.sync_hash == new_hash:
                     stats["skipped"] += 1
                 elif mapping.sync_hash != new_hash:
@@ -320,3 +477,86 @@ class SyncService:
 
         await self.session.commit()
         return True
+
+    async def _invoke_sync_agent(
+        self,
+        operation: str,
+        records: list[dict[str, Any]] | None = None,
+        tasks: list[Task] | None = None,
+    ) -> dict[str, Any]:
+        """Invoke Sync Agent to perform sync operations via Gateway RPC.
+
+        This is an alternative to direct sync - it calls the Sync Agent
+        which then performs the sync operations.
+
+        Args:
+            operation: The operation to perform (pull, push)
+            records: For pull operations, the Feishu records to process
+            tasks: For push operations, the tasks to push to Feishu
+
+        Returns:
+            Dict with keys: success (bool), result (dict), error (str)
+        """
+        # Check if agent-based sync is enabled
+        if not settings.enable_agent_sync:
+            return {
+                "success": False,
+                "result": None,
+                "error": "Agent-based sync is disabled (ENABLE_AGENT_SYNC=false)",
+            }
+
+        try:
+            from app.services.openclaw.agent_invoker import AgentInvoker
+
+            invoker = AgentInvoker(self.session)
+
+            # Render the task instruction template
+            template = _template_env().get_template("agent_tasks/sync_agent_task.md.j2")
+
+            # Build template context
+            context = {
+                "operation": operation,
+                "config_id": str(self.config.id),
+                "feishu_app_token": self.config.app_id,
+                "bitable_table_id": self.config.bitable_table_id,
+            }
+
+            if operation == "pull" and records:
+                context["records_count"] = len(records)
+
+            if operation == "push" and tasks:
+                context["tasks"] = [
+                    {
+                        "id": str(t.id),
+                        "title": t.title,
+                        "status": t.status,
+                        "result_summary": t.result_summary or "",
+                        "result_risk": t.result_risk or "",
+                        "result_next_action": t.result_next_action or "",
+                    }
+                    for t in tasks
+                ]
+
+            instruction = template.render(**context)
+
+            # Invoke the Sync Agent
+            result = await invoker.invoke_system_agent(
+                organization_id=self.config.organization_id,
+                system_role="sync_agent",
+                instruction=instruction,
+            )
+
+            if result.get("success"):
+                logger.info("sync_agent.operation_completed operation=%s", operation)
+                return {"success": True, "result": result, "error": None}
+            else:
+                logger.warning(
+                    "sync_agent.operation_failed operation=%s error=%s",
+                    operation,
+                    result.get("error"),
+                )
+                return {"success": False, "result": None, "error": result.get("error")}
+
+        except Exception as e:
+            logger.exception("Failed to invoke Sync Agent: %s", e)
+            return {"success": False, "result": None, "error": str(e)}

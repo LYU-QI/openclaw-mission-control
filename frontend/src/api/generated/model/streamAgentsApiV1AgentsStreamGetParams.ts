@@ -6,6 +6,6 @@
  */
 
 export type StreamAgentsApiV1AgentsStreamGetParams = {
-board_id?: string | null;
-since?: string | null;
+  board_id?: string | null;
+  since?: string | null;
 };

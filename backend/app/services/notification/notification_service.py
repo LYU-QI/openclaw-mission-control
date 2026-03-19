@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
+from jinja2 import Environment, FileSystemLoader
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -14,7 +15,23 @@ from app.models.notifications import NotificationConfig, NotificationLog
 from app.services.notification.feishu_bot import send_feishu_webhook
 from app.services.notification.templates import build_feishu_card_payload
 
+if TYPE_CHECKING:
+    from app.services.openclaw.agent_invoker import AgentInvoker
+
 logger = logging.getLogger(__name__)
+
+# Templates root for agent tasks
+def _templates_root():
+    from pathlib import Path
+    return Path(__file__).resolve().parents[3] / "templates"
+
+
+def _template_env():
+    return Environment(
+        loader=FileSystemLoader(_templates_root()),
+        autoescape=False,
+        keep_trailing_newline=True,
+    )
 
 
 class NotificationService:
@@ -76,9 +93,40 @@ class NotificationService:
         response: dict[str, Any] | None = None
         error_message: str | None = None
 
+        # Check if we should use Agent-based notification
+        # This can be enabled via environment variable ENABLE_AGENT_NOTIFICATIONS
+        use_agent_notification = settings.enable_agent_notifications
+
+        logger.info(
+            "notification.dispatch_check event_type=%s use_agent=%s org_id=%s",
+            event_type,
+            use_agent_notification,
+            config.organization_id,
+        )
+
         try:
             if config.channel_type == "feishu_bot":
-                response = self._send_feishu_bot(config.channel_config, payload)
+                # Try Agent-based notification if enabled
+                if use_agent_notification and config.organization_id:
+                    agent_result = await self._invoke_comms_agent(
+                        config.organization_id,
+                        event_type,
+                        payload,
+                    )
+                    if agent_result.get("sent"):
+                        # Agent handled it successfully
+                        response = agent_result
+                    else:
+                        # Fall back to direct webhook
+                        logger.info(
+                            "notification.agent_fallback event_type=%s error=%s",
+                            event_type,
+                            agent_result.get("error"),
+                        )
+                        response = self._send_feishu_bot(config.channel_config, payload)
+                else:
+                    # Direct webhook (default)
+                    response = self._send_feishu_bot(config.channel_config, payload)
             elif config.channel_type == "webhook":
                 response = self._send_webhook(config.channel_config, payload)
             else:
@@ -150,6 +198,68 @@ class NotificationService:
         req = Request(url, data=data, headers=headers, method="POST")
         with urlopen(req, timeout=10) as resp:  # noqa: S310
             return _json.loads(resp.read())  # type: ignore[no-any-return]
+
+    async def _invoke_comms_agent(
+        self,
+        organization_id: UUID,
+        event_type: str,
+        payload: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Invoke Comms Agent to send notification via Gateway RPC.
+
+        This is an alternative to direct webhook sending - it calls the Comms Agent
+        which then sends the message to the Feishu group.
+        """
+        try:
+            # Import here to avoid circular imports
+            from app.services.openclaw.agent_invoker import AgentInvoker
+
+            invoker = AgentInvoker(self.session)
+
+            # Render the task instruction template
+            template = _template_env().get_template("agent_tasks/comms_agent_task.md.j2")
+
+            # Extract relevant fields for the template
+            instruction = template.render(
+                event_type=event_type,
+                task_title=payload.get("task_title", ""),
+                mission_id=payload.get("mission_id", ""),
+                result_summary=payload.get("result_summary", ""),
+                risk=payload.get("risk", ""),
+                next_action=payload.get("next_action", ""),
+                subtask_results=payload.get("subtask_results", ""),
+                error_message=payload.get("error_message", ""),
+                approval_type=payload.get("approval_type", ""),
+                approval_content=payload.get("approval_content", ""),
+                approval_url=payload.get("approval_url", ""),
+                due_date=payload.get("due_date", ""),
+                overdue_days=payload.get("overdue_days", ""),
+                reminder_content=payload.get("reminder_content", ""),
+                # Format artifact links as a list
+                artifact_links=payload.get("artifact_links", []),
+            )
+
+            # Invoke the Comms Agent
+            result = await invoker.invoke_system_agent(
+                organization_id=organization_id,
+                system_role="comms_agent",
+                instruction=instruction,
+            )
+
+            if result.get("success"):
+                logger.info("comms_agent.notification_sent event_type=%s", event_type)
+                return {"sent": True, "agent_response": result.get("response")}
+            else:
+                logger.warning(
+                    "comms_agent.notification_failed event_type=%s error=%s",
+                    event_type,
+                    result.get("error"),
+                )
+                return {"sent": False, "error": result.get("error")}
+
+        except Exception as e:
+            logger.exception("Failed to invoke Comms Agent: %s", e)
+            return {"sent": False, "error": str(e)}
 
     async def test_notification(self, config_id: UUID) -> dict[str, Any]:
         """Send a test notification to verify channel configuration."""

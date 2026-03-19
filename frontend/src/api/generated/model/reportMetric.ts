@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { ReportMetricTone } from './reportMetricTone';
+import type { ReportMetricTone } from "./reportMetricTone";
 
 /**
  * 报告中的单个指标。

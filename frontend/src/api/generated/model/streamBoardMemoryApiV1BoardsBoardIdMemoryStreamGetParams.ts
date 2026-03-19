@@ -6,6 +6,6 @@
  */
 
 export type StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams = {
-since?: string | null;
-is_chat?: boolean | null;
+  since?: string | null;
+  is_chat?: boolean | null;
 };

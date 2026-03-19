@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/feishu-sync", tags=["feishu-sync"])
+router = APIRouter(prefix="/feishu-sync", tags=["feishu-sync", "agent-sync-agent"])
 
 
 async def _latest_conflict_events(
@@ -118,8 +118,10 @@ async def create_sync_config(
         bitable_app_token=payload.bitable_app_token,
         bitable_table_id=payload.bitable_table_id,
         field_mapping=payload.field_mapping,
+        board_mapping=payload.board_mapping,
         sync_direction=payload.sync_direction,
         sync_interval_minutes=payload.sync_interval_minutes,
+        auto_dispatch=payload.auto_dispatch,
     )
     session.add(config)
     await session.commit()
@@ -199,6 +201,8 @@ async def trigger_sync(
     auth: AuthContext = AUTH_DEP,
 ) -> FeishuSyncTriggerResponse:
     """Manually trigger a Feishu sync."""
+    from app.core.config import settings
+
     config = await FeishuSyncConfig.objects.by_id(config_id).first(session)
     if config is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -211,10 +215,36 @@ async def trigger_sync(
 
     try:
         sync_svc = SyncService(session, config)
-        stats = await sync_svc.pull_from_feishu()
+
+        # Use Sync Agent if enabled
+        if settings.enable_agent_sync:
+            # Invoke Sync Agent to perform the sync
+            agent_result = await sync_svc._invoke_sync_agent(
+                operation="pull",
+                records=None,  # Agent will fetch from Feishu
+            )
+            if agent_result.get("success"):
+                # Agent completed successfully, use its result
+                stats = agent_result.get("result", {}).get("stats", {
+                    "processed": 0, "created": 0, "updated": 0, "skipped": 0, "conflicts": 0
+                })
+                message = "Sync completed by Sync Agent"
+            else:
+                # Agent failed, fall back to direct sync
+                logger.warning(
+                    "feishu.sync.agent_failed falling_back error=%s",
+                    agent_result.get("error"),
+                )
+                stats = await sync_svc.pull_from_feishu()
+                message = "Sync completed (agent failed, used fallback)"
+        else:
+            # Direct sync (default)
+            stats = await sync_svc.pull_from_feishu()
+            message = "Sync completed"
+
         return FeishuSyncTriggerResponse(
             ok=True,
-            message="Sync completed",
+            message=message,
             records_processed=stats["processed"],
             records_created=stats["created"],
             records_updated=stats["updated"],

@@ -6,14 +6,14 @@
  */
 
 export type ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams = {
-is_chat?: boolean | null;
-/**
- * @minimum 1
- * @maximum 200
- */
-limit?: number;
-/**
- * @minimum 0
- */
-offset?: number;
+  is_chat?: boolean | null;
+  /**
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /**
+   * @minimum 0
+   */
+  offset?: number;
 };

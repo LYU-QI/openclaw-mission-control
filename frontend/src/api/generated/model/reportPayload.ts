@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { ReportPayloadReportType } from './reportPayloadReportType';
-import type { ReportSection } from './reportSection';
+import type { ReportPayloadReportType } from "./reportPayloadReportType";
+import type { ReportSection } from "./reportSection";
 
 /**
  * 完整的日报/周报响应体。

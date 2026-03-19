@@ -4,10 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -20,8 +17,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   BoardMemoryCreate,
@@ -29,370 +26,668 @@ import type {
   HTTPValidationError,
   LimitOffsetPageTypeVarCustomizedBoardMemoryRead,
   ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,
-  StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams
-} from '.././model';
+  StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,
+} from ".././model";
 
-import { customFetch } from '../../mutator';
-
+import { customFetch } from "../../mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
 
 /**
  * List board memory entries, optionally filtering chat entries.
  * @summary List Board Memory
  */
 export type listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse200 = {
-  data: LimitOffsetPageTypeVarCustomizedBoardMemoryRead
-  status: 200
-}
+  data: LimitOffsetPageTypeVarCustomizedBoardMemoryRead;
+  status: 200;
+};
 
 export type listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type listBoardMemoryApiV1BoardsBoardIdMemoryGetResponseSuccess = (listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse200) & {
-  headers: Headers;
-};
-export type listBoardMemoryApiV1BoardsBoardIdMemoryGetResponseError = (listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse = (listBoardMemoryApiV1BoardsBoardIdMemoryGetResponseSuccess | listBoardMemoryApiV1BoardsBoardIdMemoryGetResponseError)
+export type listBoardMemoryApiV1BoardsBoardIdMemoryGetResponseSuccess =
+  listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse200 & {
+    headers: Headers;
+  };
+export type listBoardMemoryApiV1BoardsBoardIdMemoryGetResponseError =
+  listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse422 & {
+    headers: Headers;
+  };
 
-export const getListBoardMemoryApiV1BoardsBoardIdMemoryGetUrl = (boardId: string,
-    params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,) => {
+export type listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse =
+  | listBoardMemoryApiV1BoardsBoardIdMemoryGetResponseSuccess
+  | listBoardMemoryApiV1BoardsBoardIdMemoryGetResponseError;
+
+export const getListBoardMemoryApiV1BoardsBoardIdMemoryGetUrl = (
+  boardId: string,
+  params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/boards/${boardId}/memory?${stringifiedParams}` : `/api/v1/boards/${boardId}/memory`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/boards/${boardId}/memory?${stringifiedParams}`
+    : `/api/v1/boards/${boardId}/memory`;
+};
 
-export const listBoardMemoryApiV1BoardsBoardIdMemoryGet = async (boardId: string,
-    params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams, options?: RequestInit): Promise<listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse> => {
-  
-  return customFetch<listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse>(getListBoardMemoryApiV1BoardsBoardIdMemoryGetUrl(boardId,params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
+export const listBoardMemoryApiV1BoardsBoardIdMemoryGet = async (
+  boardId: string,
+  params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,
+  options?: RequestInit,
+): Promise<listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse> => {
+  return customFetch<listBoardMemoryApiV1BoardsBoardIdMemoryGetResponse>(
+    getListBoardMemoryApiV1BoardsBoardIdMemoryGetUrl(boardId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
-
-
-
-
-export const getListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryKey = (boardId: string,
-    params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,) => {
-    return [
-    `/api/v1/boards/${boardId}/memory`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-    
-export const getListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryOptions = <TData = Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError = HTTPValidationError>(boardId: string,
-    params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryKey = (
+  boardId: string,
+  params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,
 ) => {
+  return [
+    `/api/v1/boards/${boardId}/memory`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryOptions = <
+  TData = Awaited<
+    ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>
+  >,
+  TError = HTTPValidationError,
+>(
+  boardId: string,
+  params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryKey(boardId,params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryKey(boardId, params);
 
-  
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>
+  > = ({ signal }) =>
+    listBoardMemoryApiV1BoardsBoardIdMemoryGet(boardId, params, {
+      signal,
+      ...requestOptions,
+    });
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>> = ({ signal }) => listBoardMemoryApiV1BoardsBoardIdMemoryGet(boardId,params, { signal, ...requestOptions });
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!boardId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      
+export type ListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>
+>;
+export type ListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryError =
+  HTTPValidationError;
 
-      
-
-   return  { queryKey, queryFn, enabled: !!(boardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryResult = NonNullable<Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>>
-export type ListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryError = HTTPValidationError
-
-
-export function useListBoardMemoryApiV1BoardsBoardIdMemoryGet<TData = Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError = HTTPValidationError>(
- boardId: string,
-    params: undefined |  ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError, TData>> & Pick<
+export function useListBoardMemoryApiV1BoardsBoardIdMemoryGet<
+  TData = Awaited<
+    ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>
+  >,
+  TError = HTTPValidationError,
+>(
+  boardId: string,
+  params: undefined | ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>,
+          Awaited<
+            ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>
+          >,
           TError,
           Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListBoardMemoryApiV1BoardsBoardIdMemoryGet<TData = Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError = HTTPValidationError>(
- boardId: string,
-    params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListBoardMemoryApiV1BoardsBoardIdMemoryGet<
+  TData = Awaited<
+    ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>
+  >,
+  TError = HTTPValidationError,
+>(
+  boardId: string,
+  params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>,
+          Awaited<
+            ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>
+          >,
           TError,
           Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListBoardMemoryApiV1BoardsBoardIdMemoryGet<TData = Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError = HTTPValidationError>(
- boardId: string,
-    params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListBoardMemoryApiV1BoardsBoardIdMemoryGet<
+  TData = Awaited<
+    ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>
+  >,
+  TError = HTTPValidationError,
+>(
+  boardId: string,
+  params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List Board Memory
  */
 
-export function useListBoardMemoryApiV1BoardsBoardIdMemoryGet<TData = Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError = HTTPValidationError>(
- boardId: string,
-    params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useListBoardMemoryApiV1BoardsBoardIdMemoryGet<
+  TData = Awaited<
+    ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>
+  >,
+  TError = HTTPValidationError,
+>(
+  boardId: string,
+  params?: ListBoardMemoryApiV1BoardsBoardIdMemoryGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listBoardMemoryApiV1BoardsBoardIdMemoryGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryOptions(
+      boardId,
+      params,
+      options,
+    );
 
-  const queryOptions = getListBoardMemoryApiV1BoardsBoardIdMemoryGetQueryOptions(boardId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
 
 /**
  * Create a board memory entry and notify chat targets when needed.
  * @summary Create Board Memory
  */
 export type createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse200 = {
-  data: BoardMemoryRead
-  status: 200
-}
+  data: BoardMemoryRead;
+  status: 200;
+};
 
 export type createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type createBoardMemoryApiV1BoardsBoardIdMemoryPostResponseSuccess = (createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse200) & {
-  headers: Headers;
-};
-export type createBoardMemoryApiV1BoardsBoardIdMemoryPostResponseError = (createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse = (createBoardMemoryApiV1BoardsBoardIdMemoryPostResponseSuccess | createBoardMemoryApiV1BoardsBoardIdMemoryPostResponseError)
+export type createBoardMemoryApiV1BoardsBoardIdMemoryPostResponseSuccess =
+  createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse200 & {
+    headers: Headers;
+  };
+export type createBoardMemoryApiV1BoardsBoardIdMemoryPostResponseError =
+  createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse422 & {
+    headers: Headers;
+  };
 
-export const getCreateBoardMemoryApiV1BoardsBoardIdMemoryPostUrl = (boardId: string,) => {
+export type createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse =
+  | createBoardMemoryApiV1BoardsBoardIdMemoryPostResponseSuccess
+  | createBoardMemoryApiV1BoardsBoardIdMemoryPostResponseError;
 
+export const getCreateBoardMemoryApiV1BoardsBoardIdMemoryPostUrl = (
+  boardId: string,
+) => {
+  return `/api/v1/boards/${boardId}/memory`;
+};
 
-  
+export const createBoardMemoryApiV1BoardsBoardIdMemoryPost = async (
+  boardId: string,
+  boardMemoryCreate: BoardMemoryCreate,
+  options?: RequestInit,
+): Promise<createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse> => {
+  return customFetch<createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse>(
+    getCreateBoardMemoryApiV1BoardsBoardIdMemoryPostUrl(boardId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(boardMemoryCreate),
+    },
+  );
+};
 
-  return `/api/v1/boards/${boardId}/memory`
-}
+export const getCreateBoardMemoryApiV1BoardsBoardIdMemoryPostMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>,
+    TError,
+    { boardId: string; data: BoardMemoryCreate },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>,
+  TError,
+  { boardId: string; data: BoardMemoryCreate },
+  TContext
+> => {
+  const mutationKey = ["createBoardMemoryApiV1BoardsBoardIdMemoryPost"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const createBoardMemoryApiV1BoardsBoardIdMemoryPost = async (boardId: string,
-    boardMemoryCreate: BoardMemoryCreate, options?: RequestInit): Promise<createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse> => {
-  
-  return customFetch<createBoardMemoryApiV1BoardsBoardIdMemoryPostResponse>(getCreateBoardMemoryApiV1BoardsBoardIdMemoryPostUrl(boardId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      boardMemoryCreate,)
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>,
+    { boardId: string; data: BoardMemoryCreate }
+  > = (props) => {
+    const { boardId, data } = props ?? {};
 
+    return createBoardMemoryApiV1BoardsBoardIdMemoryPost(
+      boardId,
+      data,
+      requestOptions,
+    );
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type CreateBoardMemoryApiV1BoardsBoardIdMemoryPostMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>
+  >;
+export type CreateBoardMemoryApiV1BoardsBoardIdMemoryPostMutationBody =
+  BoardMemoryCreate;
+export type CreateBoardMemoryApiV1BoardsBoardIdMemoryPostMutationError =
+  HTTPValidationError;
 
-export const getCreateBoardMemoryApiV1BoardsBoardIdMemoryPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>, TError,{boardId: string;data: BoardMemoryCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>, TError,{boardId: string;data: BoardMemoryCreate}, TContext> => {
-
-const mutationKey = ['createBoardMemoryApiV1BoardsBoardIdMemoryPost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>, {boardId: string;data: BoardMemoryCreate}> = (props) => {
-          const {boardId,data} = props ?? {};
-
-          return  createBoardMemoryApiV1BoardsBoardIdMemoryPost(boardId,data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateBoardMemoryApiV1BoardsBoardIdMemoryPostMutationResult = NonNullable<Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>>
-    export type CreateBoardMemoryApiV1BoardsBoardIdMemoryPostMutationBody = BoardMemoryCreate
-    export type CreateBoardMemoryApiV1BoardsBoardIdMemoryPostMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Create Board Memory
  */
-export const useCreateBoardMemoryApiV1BoardsBoardIdMemoryPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>, TError,{boardId: string;data: BoardMemoryCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>,
-        TError,
-        {boardId: string;data: BoardMemoryCreate},
-        TContext
-      > => {
-      return useMutation(getCreateBoardMemoryApiV1BoardsBoardIdMemoryPostMutationOptions(options), queryClient);
-    }
-    /**
+export const useCreateBoardMemoryApiV1BoardsBoardIdMemoryPost = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>,
+      TError,
+      { boardId: string; data: BoardMemoryCreate },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createBoardMemoryApiV1BoardsBoardIdMemoryPost>>,
+  TError,
+  { boardId: string; data: BoardMemoryCreate },
+  TContext
+> => {
+  return useMutation(
+    getCreateBoardMemoryApiV1BoardsBoardIdMemoryPostMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * Stream board memory events over server-sent events.
  * @summary Stream Board Memory
  */
 export type streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse200 = {
-  data: unknown
-  status: 200
-}
+  data: unknown;
+  status: 200;
+};
 
 export type streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponseSuccess = (streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse200) & {
-  headers: Headers;
-};
-export type streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponseError = (streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse = (streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponseSuccess | streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponseError)
+export type streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponseSuccess =
+  streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse200 & {
+    headers: Headers;
+  };
+export type streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponseError =
+  streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse422 & {
+    headers: Headers;
+  };
 
-export const getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetUrl = (boardId: string,
-    params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,) => {
+export type streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse =
+  | streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponseSuccess
+  | streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponseError;
+
+export const getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetUrl = (
+  boardId: string,
+  params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/boards/${boardId}/memory/stream?${stringifiedParams}` : `/api/v1/boards/${boardId}/memory/stream`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/boards/${boardId}/memory/stream?${stringifiedParams}`
+    : `/api/v1/boards/${boardId}/memory/stream`;
+};
 
-export const streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet = async (boardId: string,
-    params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams, options?: RequestInit): Promise<streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse> => {
-  
-  return customFetch<streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse>(getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetUrl(boardId,params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
+export const streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet = async (
+  boardId: string,
+  params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,
+  options?: RequestInit,
+): Promise<streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse> => {
+  return customFetch<streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetResponse>(
+    getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetUrl(boardId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
-
-
-
-
-export const getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryKey = (boardId: string,
-    params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,) => {
-    return [
-    `/api/v1/boards/${boardId}/memory/stream`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-    
-export const getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryOptions = <TData = Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError = HTTPValidationError>(boardId: string,
-    params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryKey = (
+  boardId: string,
+  params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,
 ) => {
+  return [
+    `/api/v1/boards/${boardId}/memory/stream`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryOptions =
+  <
+    TData = Awaited<
+      ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+    >,
+    TError = HTTPValidationError,
+  >(
+    boardId: string,
+    params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,
+    options?: {
+      query?: Partial<
+        UseQueryOptions<
+          Awaited<
+            ReturnType<
+              typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet
+            >
+          >,
+          TError,
+          TData
+        >
+      >;
+      request?: SecondParameter<typeof customFetch>;
+    },
+  ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryKey(boardId,params);
+    const queryKey =
+      queryOptions?.queryKey ??
+      getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryKey(
+        boardId,
+        params,
+      );
 
-  
+    const queryFn: QueryFunction<
+      Awaited<
+        ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+      >
+    > = ({ signal }) =>
+      streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet(boardId, params, {
+        signal,
+        ...requestOptions,
+      });
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>> = ({ signal }) => streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet(boardId,params, { signal, ...requestOptions });
+    return {
+      queryKey,
+      queryFn,
+      enabled: !!boardId,
+      ...queryOptions,
+    } as UseQueryOptions<
+      Awaited<
+        ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+      >,
+      TError,
+      TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+  };
 
-      
+export type StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryResult =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+    >
+  >;
+export type StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryError =
+  HTTPValidationError;
 
-      
-
-   return  { queryKey, queryFn, enabled: !!(boardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryResult = NonNullable<Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>>
-export type StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryError = HTTPValidationError
-
-
-export function useStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet<TData = Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError = HTTPValidationError>(
- boardId: string,
-    params: undefined |  StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError, TData>> & Pick<
+export function useStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet<
+  TData = Awaited<
+    ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+  >,
+  TError = HTTPValidationError,
+>(
+  boardId: string,
+  params: undefined | StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>,
+          Awaited<
+            ReturnType<
+              typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet
+            >
+          >,
           TError,
-          Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet<TData = Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError = HTTPValidationError>(
- boardId: string,
-    params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError, TData>> & Pick<
+          Awaited<
+            ReturnType<
+              typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet
+            >
+          >
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet<
+  TData = Awaited<
+    ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+  >,
+  TError = HTTPValidationError,
+>(
+  boardId: string,
+  params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>,
+          Awaited<
+            ReturnType<
+              typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet
+            >
+          >,
           TError,
-          Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet<TData = Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError = HTTPValidationError>(
- boardId: string,
-    params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+          Awaited<
+            ReturnType<
+              typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet
+            >
+          >
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet<
+  TData = Awaited<
+    ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+  >,
+  TError = HTTPValidationError,
+>(
+  boardId: string,
+  params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Stream Board Memory
  */
 
-export function useStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet<TData = Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError = HTTPValidationError>(
- boardId: string,
-    params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet<
+  TData = Awaited<
+    ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+  >,
+  TError = HTTPValidationError,
+>(
+  boardId: string,
+  params?: StreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof streamBoardMemoryApiV1BoardsBoardIdMemoryStreamGet>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryOptions(
+      boardId,
+      params,
+      options,
+    );
 
-  const queryOptions = getStreamBoardMemoryApiV1BoardsBoardIdMemoryStreamGetQueryOptions(boardId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-

@@ -1251,7 +1251,14 @@ class AgentLifecycleService(OpenClawDBService):
                 )
             updates["gateway_id"] = board.gateway_id
         for key, value in updates.items():
-            setattr(agent, key, value)
+            # Handle system_role specially - it's allowed to be set directly
+            if key == "system_role":
+                self.logger.info("DEBUG: Setting system_role to %s", value)
+                agent.system_role = value
+                self.logger.info("DEBUG: After set, agent.system_role = %s", agent.system_role)
+            else:
+                setattr(agent, key, value)
+        self.logger.info("DEBUG: Before commit, agent.system_role = %s", agent.system_role)
 
         if make_main is None and main_gateway is not None:
             agent.board_id = None
@@ -1634,6 +1641,7 @@ class AgentLifecycleService(OpenClawDBService):
         self.session.add(agent)
         await self.session.commit()
         await self.session.refresh(agent)
+        self.logger.info("DEBUG: After refresh before provisioning, agent.system_role = %s", agent.system_role)
         provision_request = AgentUpdateProvisionRequest(
             target=target,
             raw_token=raw_token,
@@ -1644,6 +1652,7 @@ class AgentLifecycleService(OpenClawDBService):
             agent=agent,
             request=provision_request,
         )
+        self.logger.info("DEBUG: After provisioning, agent.system_role = %s", agent.system_role)
         self.logger.info("agent.update.success agent_id=%s", agent.id)
         return self.to_agent_read(self.with_computed_status(agent))
 

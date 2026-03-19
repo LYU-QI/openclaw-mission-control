@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { MissionCreateApprovalPolicy } from './missionCreateApprovalPolicy';
-import type { MissionCreateConstraints } from './missionCreateConstraints';
+import type { MissionCreateApprovalPolicy } from "./missionCreateApprovalPolicy";
+import type { MissionCreateConstraints } from "./missionCreateConstraints";
 
 /**
  * Payload for creating a mission from a task.

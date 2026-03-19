@@ -66,7 +66,7 @@ export function FieldMappingEditor({ mapping, onSave, isSaving = false }: Props)
             />
             <input
               className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-0"
-              placeholder="Mission Control 字段名"
+              placeholder="Mission Control 字段名 (如: title, board, status)"
               value={row.target}
               onChange={(event) => {
                 const value = event.target.value;

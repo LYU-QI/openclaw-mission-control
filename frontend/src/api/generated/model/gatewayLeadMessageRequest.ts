@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { GatewayLeadMessageRequestKind } from './gatewayLeadMessageRequestKind';
+import type { GatewayLeadMessageRequestKind } from "./gatewayLeadMessageRequestKind";
 
 /**
  * Request payload for sending a message to a board lead agent.

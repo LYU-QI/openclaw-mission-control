@@ -6,6 +6,6 @@
  */
 
 export type WeeklyReportApiV1ReportsWeeklyGetParams = {
-board_id?: string | null;
-group_id?: string | null;
+  board_id?: string | null;
+  group_id?: string | null;
 };

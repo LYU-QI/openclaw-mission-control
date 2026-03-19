@@ -42,7 +42,7 @@ class NotificationConfigRead(SQLModel):
     id: UUID
     organization_id: UUID
     board_id: UUID | None
-    name: str
+    name: str | None = None
     channel_type: str
     channel_config: dict[str, Any]
     notify_on_events: list[str]

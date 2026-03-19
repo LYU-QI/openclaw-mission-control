@@ -4,9 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import {
-  useQuery
-} from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -16,271 +14,449 @@ import type {
   QueryKey,
   UndefinedInitialDataOptions,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   AttentionSnapshot,
   AttentionSnapshotApiV1MetricsAttentionGetParams,
   DashboardMetrics,
   DashboardMetricsApiV1MetricsDashboardGetParams,
-  HTTPValidationError
-} from '.././model';
+  HTTPValidationError,
+} from ".././model";
 
-import { customFetch } from '../../mutator';
-
+import { customFetch } from "../../mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
 
 /**
  * Return dashboard KPIs and time-series data for accessible boards.
  * @summary Dashboard Metrics
  */
 export type dashboardMetricsApiV1MetricsDashboardGetResponse200 = {
-  data: DashboardMetrics
-  status: 200
-}
+  data: DashboardMetrics;
+  status: 200;
+};
 
 export type dashboardMetricsApiV1MetricsDashboardGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type dashboardMetricsApiV1MetricsDashboardGetResponseSuccess = (dashboardMetricsApiV1MetricsDashboardGetResponse200) & {
-  headers: Headers;
-};
-export type dashboardMetricsApiV1MetricsDashboardGetResponseError = (dashboardMetricsApiV1MetricsDashboardGetResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type dashboardMetricsApiV1MetricsDashboardGetResponse = (dashboardMetricsApiV1MetricsDashboardGetResponseSuccess | dashboardMetricsApiV1MetricsDashboardGetResponseError)
+export type dashboardMetricsApiV1MetricsDashboardGetResponseSuccess =
+  dashboardMetricsApiV1MetricsDashboardGetResponse200 & {
+    headers: Headers;
+  };
+export type dashboardMetricsApiV1MetricsDashboardGetResponseError =
+  dashboardMetricsApiV1MetricsDashboardGetResponse422 & {
+    headers: Headers;
+  };
 
-export const getDashboardMetricsApiV1MetricsDashboardGetUrl = (params?: DashboardMetricsApiV1MetricsDashboardGetParams,) => {
+export type dashboardMetricsApiV1MetricsDashboardGetResponse =
+  | dashboardMetricsApiV1MetricsDashboardGetResponseSuccess
+  | dashboardMetricsApiV1MetricsDashboardGetResponseError;
+
+export const getDashboardMetricsApiV1MetricsDashboardGetUrl = (
+  params?: DashboardMetricsApiV1MetricsDashboardGetParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/metrics/dashboard?${stringifiedParams}` : `/api/v1/metrics/dashboard`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/metrics/dashboard?${stringifiedParams}`
+    : `/api/v1/metrics/dashboard`;
+};
 
-export const dashboardMetricsApiV1MetricsDashboardGet = async (params?: DashboardMetricsApiV1MetricsDashboardGetParams, options?: RequestInit): Promise<dashboardMetricsApiV1MetricsDashboardGetResponse> => {
-  
-  return customFetch<dashboardMetricsApiV1MetricsDashboardGetResponse>(getDashboardMetricsApiV1MetricsDashboardGetUrl(params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
+export const dashboardMetricsApiV1MetricsDashboardGet = async (
+  params?: DashboardMetricsApiV1MetricsDashboardGetParams,
+  options?: RequestInit,
+): Promise<dashboardMetricsApiV1MetricsDashboardGetResponse> => {
+  return customFetch<dashboardMetricsApiV1MetricsDashboardGetResponse>(
+    getDashboardMetricsApiV1MetricsDashboardGetUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
-
-
-
-
-export const getDashboardMetricsApiV1MetricsDashboardGetQueryKey = (params?: DashboardMetricsApiV1MetricsDashboardGetParams,) => {
-    return [
-    `/api/v1/metrics/dashboard`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-    
-export const getDashboardMetricsApiV1MetricsDashboardGetQueryOptions = <TData = Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError = HTTPValidationError>(params?: DashboardMetricsApiV1MetricsDashboardGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getDashboardMetricsApiV1MetricsDashboardGetQueryKey = (
+  params?: DashboardMetricsApiV1MetricsDashboardGetParams,
 ) => {
+  return [`/api/v1/metrics/dashboard`, ...(params ? [params] : [])] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getDashboardMetricsApiV1MetricsDashboardGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: DashboardMetricsApiV1MetricsDashboardGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getDashboardMetricsApiV1MetricsDashboardGetQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getDashboardMetricsApiV1MetricsDashboardGetQueryKey(params);
 
-  
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>
+  > = ({ signal }) =>
+    dashboardMetricsApiV1MetricsDashboardGet(params, {
+      signal,
+      ...requestOptions,
+    });
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>> = ({ signal }) => dashboardMetricsApiV1MetricsDashboardGet(params, { signal, ...requestOptions });
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      
+export type DashboardMetricsApiV1MetricsDashboardGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>
+>;
+export type DashboardMetricsApiV1MetricsDashboardGetQueryError =
+  HTTPValidationError;
 
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type DashboardMetricsApiV1MetricsDashboardGetQueryResult = NonNullable<Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>>
-export type DashboardMetricsApiV1MetricsDashboardGetQueryError = HTTPValidationError
-
-
-export function useDashboardMetricsApiV1MetricsDashboardGet<TData = Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError = HTTPValidationError>(
- params: undefined |  DashboardMetricsApiV1MetricsDashboardGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError, TData>> & Pick<
+export function useDashboardMetricsApiV1MetricsDashboardGet<
+  TData = Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+  TError = HTTPValidationError,
+>(
+  params: undefined | DashboardMetricsApiV1MetricsDashboardGetParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
           TError,
           Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDashboardMetricsApiV1MetricsDashboardGet<TData = Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError = HTTPValidationError>(
- params?: DashboardMetricsApiV1MetricsDashboardGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDashboardMetricsApiV1MetricsDashboardGet<
+  TData = Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: DashboardMetricsApiV1MetricsDashboardGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
           TError,
           Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDashboardMetricsApiV1MetricsDashboardGet<TData = Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError = HTTPValidationError>(
- params?: DashboardMetricsApiV1MetricsDashboardGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDashboardMetricsApiV1MetricsDashboardGet<
+  TData = Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: DashboardMetricsApiV1MetricsDashboardGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Dashboard Metrics
  */
 
-export function useDashboardMetricsApiV1MetricsDashboardGet<TData = Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError = HTTPValidationError>(
- params?: DashboardMetricsApiV1MetricsDashboardGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useDashboardMetricsApiV1MetricsDashboardGet<
+  TData = Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: DashboardMetricsApiV1MetricsDashboardGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof dashboardMetricsApiV1MetricsDashboardGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getDashboardMetricsApiV1MetricsDashboardGetQueryOptions(
+    params,
+    options,
+  );
 
-  const queryOptions = getDashboardMetricsApiV1MetricsDashboardGetQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
 
 /**
  * 返回统一的 attention 快照，聚合失败子任务、超时子任务、停滞 mission 和待审批等异常。
  * @summary Attention Snapshot
  */
 export type attentionSnapshotApiV1MetricsAttentionGetResponse200 = {
-  data: AttentionSnapshot
-  status: 200
-}
+  data: AttentionSnapshot;
+  status: 200;
+};
 
 export type attentionSnapshotApiV1MetricsAttentionGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type attentionSnapshotApiV1MetricsAttentionGetResponseSuccess = (attentionSnapshotApiV1MetricsAttentionGetResponse200) & {
-  headers: Headers;
-};
-export type attentionSnapshotApiV1MetricsAttentionGetResponseError = (attentionSnapshotApiV1MetricsAttentionGetResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type attentionSnapshotApiV1MetricsAttentionGetResponse = (attentionSnapshotApiV1MetricsAttentionGetResponseSuccess | attentionSnapshotApiV1MetricsAttentionGetResponseError)
+export type attentionSnapshotApiV1MetricsAttentionGetResponseSuccess =
+  attentionSnapshotApiV1MetricsAttentionGetResponse200 & {
+    headers: Headers;
+  };
+export type attentionSnapshotApiV1MetricsAttentionGetResponseError =
+  attentionSnapshotApiV1MetricsAttentionGetResponse422 & {
+    headers: Headers;
+  };
 
-export const getAttentionSnapshotApiV1MetricsAttentionGetUrl = (params?: AttentionSnapshotApiV1MetricsAttentionGetParams,) => {
+export type attentionSnapshotApiV1MetricsAttentionGetResponse =
+  | attentionSnapshotApiV1MetricsAttentionGetResponseSuccess
+  | attentionSnapshotApiV1MetricsAttentionGetResponseError;
+
+export const getAttentionSnapshotApiV1MetricsAttentionGetUrl = (
+  params?: AttentionSnapshotApiV1MetricsAttentionGetParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/metrics/attention?${stringifiedParams}` : `/api/v1/metrics/attention`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/metrics/attention?${stringifiedParams}`
+    : `/api/v1/metrics/attention`;
+};
 
-export const attentionSnapshotApiV1MetricsAttentionGet = async (params?: AttentionSnapshotApiV1MetricsAttentionGetParams, options?: RequestInit): Promise<attentionSnapshotApiV1MetricsAttentionGetResponse> => {
-  
-  return customFetch<attentionSnapshotApiV1MetricsAttentionGetResponse>(getAttentionSnapshotApiV1MetricsAttentionGetUrl(params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
+export const attentionSnapshotApiV1MetricsAttentionGet = async (
+  params?: AttentionSnapshotApiV1MetricsAttentionGetParams,
+  options?: RequestInit,
+): Promise<attentionSnapshotApiV1MetricsAttentionGetResponse> => {
+  return customFetch<attentionSnapshotApiV1MetricsAttentionGetResponse>(
+    getAttentionSnapshotApiV1MetricsAttentionGetUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
-
-
-
-
-export const getAttentionSnapshotApiV1MetricsAttentionGetQueryKey = (params?: AttentionSnapshotApiV1MetricsAttentionGetParams,) => {
-    return [
-    `/api/v1/metrics/attention`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-    
-export const getAttentionSnapshotApiV1MetricsAttentionGetQueryOptions = <TData = Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError = HTTPValidationError>(params?: AttentionSnapshotApiV1MetricsAttentionGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getAttentionSnapshotApiV1MetricsAttentionGetQueryKey = (
+  params?: AttentionSnapshotApiV1MetricsAttentionGetParams,
 ) => {
+  return [`/api/v1/metrics/attention`, ...(params ? [params] : [])] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getAttentionSnapshotApiV1MetricsAttentionGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: AttentionSnapshotApiV1MetricsAttentionGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAttentionSnapshotApiV1MetricsAttentionGetQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getAttentionSnapshotApiV1MetricsAttentionGetQueryKey(params);
 
-  
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>
+  > = ({ signal }) =>
+    attentionSnapshotApiV1MetricsAttentionGet(params, {
+      signal,
+      ...requestOptions,
+    });
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>> = ({ signal }) => attentionSnapshotApiV1MetricsAttentionGet(params, { signal, ...requestOptions });
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      
+export type AttentionSnapshotApiV1MetricsAttentionGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>
+>;
+export type AttentionSnapshotApiV1MetricsAttentionGetQueryError =
+  HTTPValidationError;
 
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AttentionSnapshotApiV1MetricsAttentionGetQueryResult = NonNullable<Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>>
-export type AttentionSnapshotApiV1MetricsAttentionGetQueryError = HTTPValidationError
-
-
-export function useAttentionSnapshotApiV1MetricsAttentionGet<TData = Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError = HTTPValidationError>(
- params: undefined |  AttentionSnapshotApiV1MetricsAttentionGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError, TData>> & Pick<
+export function useAttentionSnapshotApiV1MetricsAttentionGet<
+  TData = Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+  TError = HTTPValidationError,
+>(
+  params: undefined | AttentionSnapshotApiV1MetricsAttentionGetParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
           TError,
           Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAttentionSnapshotApiV1MetricsAttentionGet<TData = Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError = HTTPValidationError>(
- params?: AttentionSnapshotApiV1MetricsAttentionGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAttentionSnapshotApiV1MetricsAttentionGet<
+  TData = Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: AttentionSnapshotApiV1MetricsAttentionGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
           TError,
           Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAttentionSnapshotApiV1MetricsAttentionGet<TData = Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError = HTTPValidationError>(
- params?: AttentionSnapshotApiV1MetricsAttentionGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAttentionSnapshotApiV1MetricsAttentionGet<
+  TData = Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: AttentionSnapshotApiV1MetricsAttentionGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Attention Snapshot
  */
 
-export function useAttentionSnapshotApiV1MetricsAttentionGet<TData = Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError = HTTPValidationError>(
- params?: AttentionSnapshotApiV1MetricsAttentionGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAttentionSnapshotApiV1MetricsAttentionGet<
+  TData = Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: AttentionSnapshotApiV1MetricsAttentionGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof attentionSnapshotApiV1MetricsAttentionGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getAttentionSnapshotApiV1MetricsAttentionGetQueryOptions(
+    params,
+    options,
+  );
 
-  const queryOptions = getAttentionSnapshotApiV1MetricsAttentionGetQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-

@@ -117,10 +117,12 @@ async def build_board_snapshot(session: AsyncSession, board: Board) -> BoardSnap
     )
 
     agents = (
-        await Agent.objects.filter_by(board_id=board.id)
-        .order_by(col(Agent.created_at).desc())
-        .all(session)
-    )
+        await session.exec(
+            select(Agent)
+            .where((Agent.board_id == board.id) | (Agent.board_id.is_(None)))
+            .order_by(col(Agent.created_at).desc())
+        )
+    ).all()
     agent_reads = [
         AgentLifecycleService.to_agent_read(AgentLifecycleService.with_computed_status(agent))
         for agent in agents

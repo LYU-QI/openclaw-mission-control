@@ -4,9 +4,9 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { TagRef } from './tagRef';
-import type { TaskReadCustomFieldValues } from './taskReadCustomFieldValues';
-import type { TaskReadStatus } from './taskReadStatus';
+import type { TagRef } from "./tagRef";
+import type { TaskReadCustomFieldValues } from "./taskReadCustomFieldValues";
+import type { TaskReadStatus } from "./taskReadStatus";
 
 /**
  * Task payload returned from read endpoints.

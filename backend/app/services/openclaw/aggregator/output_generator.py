@@ -20,7 +20,8 @@ def _compute_next_action(*, failed: int, pending: int, approval_required: bool) 
         return "Await human review and approval before executing follow-up actions."
     if pending > 0:
         return "Complete remaining subtasks before final handoff."
-    return "Proceed to delivery and close the task."
+    # When all subtasks completed successfully, remind user to check group for results
+    return "请在群里查看执行结果"
 
 
 def generate_output(

@@ -1,0 +1,26 @@
+# Lead Agent - 任务完成评论生成
+
+## 任务信息
+- **任务标题**: {{ task_title }}
+- **任务目标**: {{ mission_goal }}
+- **执行结果摘要**: {{ result_summary }}
+- **风险等级**: {{ result_risk }}
+- **下一步行动**: {{ next_action }}
+
+## 子任务执行结果
+{% for subtask in subtask_results %}
+### {{ subtask.label }}
+- **状态**: {{ subtask.status }}
+- **结果**: {{ subtask.result_summary[:200] if subtask.result_summary else 'N/A' }}
+- **风险**: {{ subtask.result_risk }}
+{% endfor %}
+
+## 生成评论要求
+请生成一条简洁的中文评论，总结任务执行结果。要求：
+1. 总结任务完成情况
+2. 提及关键成果
+3. 给出下一步建议
+4. 语言自然、专业
+5. 长度控制在 100-200 字
+
+请直接输出评论内容，不要包含任何格式标记。

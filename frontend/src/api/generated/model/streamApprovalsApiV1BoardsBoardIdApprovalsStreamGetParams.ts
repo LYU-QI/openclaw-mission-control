@@ -6,5 +6,5 @@
  */
 
 export type StreamApprovalsApiV1BoardsBoardIdApprovalsStreamGetParams = {
-since?: string | null;
+  since?: string | null;
 };

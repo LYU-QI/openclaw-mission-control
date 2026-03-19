@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { AgentRead } from './agentRead';
+import type { AgentRead } from "./agentRead";
 
 export interface LimitOffsetPageTypeVarCustomizedAgentRead {
   items: AgentRead[];

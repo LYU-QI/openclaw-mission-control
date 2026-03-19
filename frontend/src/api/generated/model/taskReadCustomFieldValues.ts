@@ -5,4 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TaskReadCustomFieldValues = {[key: string]: unknown | null} | null;
+export type TaskReadCustomFieldValues = {
+  [key: string]: unknown | null;
+} | null;

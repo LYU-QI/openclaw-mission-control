@@ -34,7 +34,7 @@ type Board = {
   name: string;
 };
 
-const DEMO_ORG_ID = "3a9ff3b7-7f21-4e68-8c01-0919db770bcd"; // Personal organization
+const DEMO_ORG_ID = "ee32b8b7-fe7a-49bd-881d-b69b8dcc9a4e"; // RQI organization
 
 export default function NotificationsPage() {
   const queryClient = useQueryClient();

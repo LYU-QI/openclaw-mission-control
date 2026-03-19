@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { OrganizationBoardAccessSpec } from './organizationBoardAccessSpec';
+import type { OrganizationBoardAccessSpec } from "./organizationBoardAccessSpec";
 
 /**
  * Payload for replacing organization member access permissions.

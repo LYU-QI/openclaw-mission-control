@@ -4,7 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { ActivityEventRead } from './activityEventRead';
+import type { ActivityEventRead } from "./activityEventRead";
 
 export interface LimitOffsetPageTypeVarCustomizedActivityEventRead {
   items: ActivityEventRead[];

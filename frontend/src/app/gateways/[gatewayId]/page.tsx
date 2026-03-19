@@ -170,7 +170,7 @@ export default function GatewayDetailPage() {
 
   const status =
     statusQuery.data?.status === 200 && statusQuery.data.data
-      ? (statusQuery.data.data as typeof statusQuery.data.data & {
+      ? (statusQuery.data.data as NonNullable<typeof statusQuery.data>["data"] & {
         layers?: GatewayHealthLayers | null;
       })
       : null;

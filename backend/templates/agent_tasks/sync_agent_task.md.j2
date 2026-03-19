@@ -1,0 +1,66 @@
+# 同步任务：{{ operation }}
+
+{% if operation == "pull" %}
+## 任务：从飞书多维表格拉取任务
+
+### 配置信息
+- Feishu App Token: `{{ feishu_app_token }}`
+- Bitable Table ID: `{{ bitable_table_id }}`
+- 同步配置 ID: `{{ config_id }}`
+
+### 任务要求
+1. 调用 Mission Control API 获取当前已同步的任务列表
+2. 从飞书多维表格拉取最新记录
+3. 对比找出新增或变更的任务
+4. 将新任务创建到 Mission Control
+5. 更新已存在任务的状态（如果飞书有变化）
+6. 返回同步结果摘要
+
+### 输出格式
+请返回以下格式的 JSON：
+```json
+{
+  "synced_count": 5,
+  "new_tasks": ["task_id_1", "task_id_2"],
+  "updated_tasks": ["task_id_3"],
+  "errors": []
+}
+```
+
+{% elif operation == "push" %}
+## 任务：回写任务结果到飞书多维表格
+
+### 配置信息
+- Feishu App Token: `{{ feishu_app_token }}`
+- Bitable Table ID: `{{ bitable_table_id }}`
+- 同步配置 ID: `{{ config_id }}`
+
+### 需要回写的任务
+{% for task in tasks %}
+- Task ID: {{ task.id }}
+  - 标题: {{ task.title }}
+  - 状态: {{ task.status }}
+  - 结果摘要: {{ task.result_summary }}
+  - 风险等级: {{ task.result_risk }}
+  - 下一步: {{ task.result_next_action }}
+{% endfor %}
+
+### 任务要求
+1. 对于每个任务，更新飞书多维表格中对应记录的以下字段：
+   - 状态 → 结果摘要
+   - 风险等级
+   - 下一步
+   - 完成时间
+2. 确保回写的准确性
+3. 返回回写结果
+
+### 输出格式
+请返回以下格式的 JSON：
+```json
+{
+  "pushed_count": 3,
+  "success": ["task_id_1", "task_id_2"],
+  "failed": []
+}
+```
+{% endif %}

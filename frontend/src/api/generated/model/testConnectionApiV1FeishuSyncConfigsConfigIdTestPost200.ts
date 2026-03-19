@@ -5,4 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TestConnectionApiV1FeishuSyncConfigsConfigIdTestPost200 = { [key: string]: unknown };
+export type TestConnectionApiV1FeishuSyncConfigsConfigIdTestPost200 = {
+  [key: string]: unknown;
+};

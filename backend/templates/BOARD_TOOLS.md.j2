@@ -1,5 +1,6 @@
 {% set is_main = (is_main_agent | default(false) | string | lower) in ["true", "1", "yes"] %}
 {% set is_lead = (is_board_lead | default(false) | string | lower) in ["true", "1", "yes"] %}
+{% set is_system = (system_role | default("") | length) > 0 %}
 # TOOLS.md
 
 - `BASE_URL={{ base_url }}`
@@ -13,9 +14,13 @@
 {% if workspace_path is defined %}
 - `WORKSPACE_PATH={{ workspace_path }}`
 {% endif %}
+- `ARTIFACTS_URL={{ artifacts_url }}`
 - Required tools: `curl`, `jq`
 
-{% if is_main %}
+{% if is_system %}
+{# System agents (orchestrator, sync_agent, comms_agent) use role_tag from context #}
+{% set role_tag = role_tag | default("agent-worker") %}
+{% elif is_main %}
 {% set role_tag = "agent-main" %}
 {% elif is_lead %}
 {% set role_tag = "agent-lead" %}

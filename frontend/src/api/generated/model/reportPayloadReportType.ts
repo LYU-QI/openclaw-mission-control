@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ReportPayloadReportType = typeof ReportPayloadReportType[keyof typeof ReportPayloadReportType];
-
+export type ReportPayloadReportType =
+  (typeof ReportPayloadReportType)[keyof typeof ReportPayloadReportType];
 
 export const ReportPayloadReportType = {
-  daily: 'daily',
-  weekly: 'weekly',
+  daily: "daily",
+  weekly: "weekly",
 } as const;

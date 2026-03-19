@@ -6,5 +6,5 @@
  */
 
 export type ListSyncConfigsApiV1FeishuSyncConfigsGetParams = {
-organization_id?: string | null;
+  organization_id?: string | null;
 };

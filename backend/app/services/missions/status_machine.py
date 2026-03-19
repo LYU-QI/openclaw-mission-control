@@ -73,6 +73,7 @@ MISSION_ALLOWED_TRANSITIONS: Final[dict[str, frozenset[str]]] = {
     MISSION_STATUS_PENDING_APPROVAL: frozenset(
         {
             MISSION_STATUS_PENDING,
+            MISSION_STATUS_RUNNING,
             MISSION_STATUS_COMPLETED,
             MISSION_STATUS_FAILED,
             MISSION_STATUS_CANCELLED,

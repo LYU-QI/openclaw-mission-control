@@ -5,11 +5,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TaskCustomFieldDefinitionCreateUiVisibility = typeof TaskCustomFieldDefinitionCreateUiVisibility[keyof typeof TaskCustomFieldDefinitionCreateUiVisibility];
-
+export type TaskCustomFieldDefinitionCreateUiVisibility =
+  (typeof TaskCustomFieldDefinitionCreateUiVisibility)[keyof typeof TaskCustomFieldDefinitionCreateUiVisibility];
 
 export const TaskCustomFieldDefinitionCreateUiVisibility = {
-  always: 'always',
-  if_set: 'if_set',
-  hidden: 'hidden',
+  always: "always",
+  if_set: "if_set",
+  hidden: "hidden",
 } as const;

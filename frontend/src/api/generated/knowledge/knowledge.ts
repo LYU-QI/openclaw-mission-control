@@ -4,10 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -20,8 +17,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   DeleteKnowledgeItemApiV1KnowledgeItemIdDelete200,
@@ -30,527 +27,802 @@ import type {
   KnowledgeItemRead,
   KnowledgeItemUpdate,
   LimitOffsetPageTypeVarCustomizedKnowledgeItemRead,
-  ListKnowledgeItemsApiV1KnowledgeGetParams
-} from '.././model';
+  ListKnowledgeItemsApiV1KnowledgeGetParams,
+} from ".././model";
 
-import { customFetch } from '../../mutator';
-
+import { customFetch } from "../../mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
 
 /**
  * List knowledge items.
  * @summary List Knowledge Items
  */
 export type listKnowledgeItemsApiV1KnowledgeGetResponse200 = {
-  data: LimitOffsetPageTypeVarCustomizedKnowledgeItemRead
-  status: 200
-}
+  data: LimitOffsetPageTypeVarCustomizedKnowledgeItemRead;
+  status: 200;
+};
 
 export type listKnowledgeItemsApiV1KnowledgeGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type listKnowledgeItemsApiV1KnowledgeGetResponseSuccess = (listKnowledgeItemsApiV1KnowledgeGetResponse200) & {
-  headers: Headers;
-};
-export type listKnowledgeItemsApiV1KnowledgeGetResponseError = (listKnowledgeItemsApiV1KnowledgeGetResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type listKnowledgeItemsApiV1KnowledgeGetResponse = (listKnowledgeItemsApiV1KnowledgeGetResponseSuccess | listKnowledgeItemsApiV1KnowledgeGetResponseError)
+export type listKnowledgeItemsApiV1KnowledgeGetResponseSuccess =
+  listKnowledgeItemsApiV1KnowledgeGetResponse200 & {
+    headers: Headers;
+  };
+export type listKnowledgeItemsApiV1KnowledgeGetResponseError =
+  listKnowledgeItemsApiV1KnowledgeGetResponse422 & {
+    headers: Headers;
+  };
 
-export const getListKnowledgeItemsApiV1KnowledgeGetUrl = (params?: ListKnowledgeItemsApiV1KnowledgeGetParams,) => {
+export type listKnowledgeItemsApiV1KnowledgeGetResponse =
+  | listKnowledgeItemsApiV1KnowledgeGetResponseSuccess
+  | listKnowledgeItemsApiV1KnowledgeGetResponseError;
+
+export const getListKnowledgeItemsApiV1KnowledgeGetUrl = (
+  params?: ListKnowledgeItemsApiV1KnowledgeGetParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/knowledge?${stringifiedParams}` : `/api/v1/knowledge`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/knowledge?${stringifiedParams}`
+    : `/api/v1/knowledge`;
+};
 
-export const listKnowledgeItemsApiV1KnowledgeGet = async (params?: ListKnowledgeItemsApiV1KnowledgeGetParams, options?: RequestInit): Promise<listKnowledgeItemsApiV1KnowledgeGetResponse> => {
-  
-  return customFetch<listKnowledgeItemsApiV1KnowledgeGetResponse>(getListKnowledgeItemsApiV1KnowledgeGetUrl(params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
+export const listKnowledgeItemsApiV1KnowledgeGet = async (
+  params?: ListKnowledgeItemsApiV1KnowledgeGetParams,
+  options?: RequestInit,
+): Promise<listKnowledgeItemsApiV1KnowledgeGetResponse> => {
+  return customFetch<listKnowledgeItemsApiV1KnowledgeGetResponse>(
+    getListKnowledgeItemsApiV1KnowledgeGetUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
-
-
-
-
-export const getListKnowledgeItemsApiV1KnowledgeGetQueryKey = (params?: ListKnowledgeItemsApiV1KnowledgeGetParams,) => {
-    return [
-    `/api/v1/knowledge`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-    
-export const getListKnowledgeItemsApiV1KnowledgeGetQueryOptions = <TData = Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError = HTTPValidationError>(params?: ListKnowledgeItemsApiV1KnowledgeGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getListKnowledgeItemsApiV1KnowledgeGetQueryKey = (
+  params?: ListKnowledgeItemsApiV1KnowledgeGetParams,
 ) => {
+  return [`/api/v1/knowledge`, ...(params ? [params] : [])] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getListKnowledgeItemsApiV1KnowledgeGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: ListKnowledgeItemsApiV1KnowledgeGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListKnowledgeItemsApiV1KnowledgeGetQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getListKnowledgeItemsApiV1KnowledgeGetQueryKey(params);
 
-  
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>
+  > = ({ signal }) =>
+    listKnowledgeItemsApiV1KnowledgeGet(params, { signal, ...requestOptions });
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>> = ({ signal }) => listKnowledgeItemsApiV1KnowledgeGet(params, { signal, ...requestOptions });
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      
+export type ListKnowledgeItemsApiV1KnowledgeGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>
+>;
+export type ListKnowledgeItemsApiV1KnowledgeGetQueryError = HTTPValidationError;
 
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ListKnowledgeItemsApiV1KnowledgeGetQueryResult = NonNullable<Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>>
-export type ListKnowledgeItemsApiV1KnowledgeGetQueryError = HTTPValidationError
-
-
-export function useListKnowledgeItemsApiV1KnowledgeGet<TData = Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError = HTTPValidationError>(
- params: undefined |  ListKnowledgeItemsApiV1KnowledgeGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError, TData>> & Pick<
+export function useListKnowledgeItemsApiV1KnowledgeGet<
+  TData = Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+  TError = HTTPValidationError,
+>(
+  params: undefined | ListKnowledgeItemsApiV1KnowledgeGetParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
           TError,
           Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListKnowledgeItemsApiV1KnowledgeGet<TData = Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError = HTTPValidationError>(
- params?: ListKnowledgeItemsApiV1KnowledgeGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListKnowledgeItemsApiV1KnowledgeGet<
+  TData = Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: ListKnowledgeItemsApiV1KnowledgeGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
           TError,
           Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListKnowledgeItemsApiV1KnowledgeGet<TData = Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError = HTTPValidationError>(
- params?: ListKnowledgeItemsApiV1KnowledgeGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListKnowledgeItemsApiV1KnowledgeGet<
+  TData = Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: ListKnowledgeItemsApiV1KnowledgeGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List Knowledge Items
  */
 
-export function useListKnowledgeItemsApiV1KnowledgeGet<TData = Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError = HTTPValidationError>(
- params?: ListKnowledgeItemsApiV1KnowledgeGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useListKnowledgeItemsApiV1KnowledgeGet<
+  TData = Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+  TError = HTTPValidationError,
+>(
+  params?: ListKnowledgeItemsApiV1KnowledgeGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listKnowledgeItemsApiV1KnowledgeGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListKnowledgeItemsApiV1KnowledgeGetQueryOptions(
+    params,
+    options,
+  );
 
-  const queryOptions = getListKnowledgeItemsApiV1KnowledgeGetQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
 
 /**
  * Create a new knowledge item.
  * @summary Create Knowledge Item
  */
 export type createKnowledgeItemApiV1KnowledgePostResponse201 = {
-  data: KnowledgeItemRead
-  status: 201
-}
+  data: KnowledgeItemRead;
+  status: 201;
+};
 
 export type createKnowledgeItemApiV1KnowledgePostResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type createKnowledgeItemApiV1KnowledgePostResponseSuccess = (createKnowledgeItemApiV1KnowledgePostResponse201) & {
-  headers: Headers;
-};
-export type createKnowledgeItemApiV1KnowledgePostResponseError = (createKnowledgeItemApiV1KnowledgePostResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type createKnowledgeItemApiV1KnowledgePostResponse = (createKnowledgeItemApiV1KnowledgePostResponseSuccess | createKnowledgeItemApiV1KnowledgePostResponseError)
+export type createKnowledgeItemApiV1KnowledgePostResponseSuccess =
+  createKnowledgeItemApiV1KnowledgePostResponse201 & {
+    headers: Headers;
+  };
+export type createKnowledgeItemApiV1KnowledgePostResponseError =
+  createKnowledgeItemApiV1KnowledgePostResponse422 & {
+    headers: Headers;
+  };
+
+export type createKnowledgeItemApiV1KnowledgePostResponse =
+  | createKnowledgeItemApiV1KnowledgePostResponseSuccess
+  | createKnowledgeItemApiV1KnowledgePostResponseError;
 
 export const getCreateKnowledgeItemApiV1KnowledgePostUrl = () => {
+  return `/api/v1/knowledge`;
+};
 
+export const createKnowledgeItemApiV1KnowledgePost = async (
+  knowledgeItemCreate: KnowledgeItemCreate,
+  options?: RequestInit,
+): Promise<createKnowledgeItemApiV1KnowledgePostResponse> => {
+  return customFetch<createKnowledgeItemApiV1KnowledgePostResponse>(
+    getCreateKnowledgeItemApiV1KnowledgePostUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(knowledgeItemCreate),
+    },
+  );
+};
 
-  
+export const getCreateKnowledgeItemApiV1KnowledgePostMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>,
+    TError,
+    { data: KnowledgeItemCreate },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>,
+  TError,
+  { data: KnowledgeItemCreate },
+  TContext
+> => {
+  const mutationKey = ["createKnowledgeItemApiV1KnowledgePost"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-  return `/api/v1/knowledge`
-}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>,
+    { data: KnowledgeItemCreate }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const createKnowledgeItemApiV1KnowledgePost = async (knowledgeItemCreate: KnowledgeItemCreate, options?: RequestInit): Promise<createKnowledgeItemApiV1KnowledgePostResponse> => {
-  
-  return customFetch<createKnowledgeItemApiV1KnowledgePostResponse>(getCreateKnowledgeItemApiV1KnowledgePostUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      knowledgeItemCreate,)
-  }
-);}
+    return createKnowledgeItemApiV1KnowledgePost(data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type CreateKnowledgeItemApiV1KnowledgePostMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>
+>;
+export type CreateKnowledgeItemApiV1KnowledgePostMutationBody =
+  KnowledgeItemCreate;
+export type CreateKnowledgeItemApiV1KnowledgePostMutationError =
+  HTTPValidationError;
 
-
-export const getCreateKnowledgeItemApiV1KnowledgePostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>, TError,{data: KnowledgeItemCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>, TError,{data: KnowledgeItemCreate}, TContext> => {
-
-const mutationKey = ['createKnowledgeItemApiV1KnowledgePost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>, {data: KnowledgeItemCreate}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createKnowledgeItemApiV1KnowledgePost(data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateKnowledgeItemApiV1KnowledgePostMutationResult = NonNullable<Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>>
-    export type CreateKnowledgeItemApiV1KnowledgePostMutationBody = KnowledgeItemCreate
-    export type CreateKnowledgeItemApiV1KnowledgePostMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Create Knowledge Item
  */
-export const useCreateKnowledgeItemApiV1KnowledgePost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>, TError,{data: KnowledgeItemCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>,
-        TError,
-        {data: KnowledgeItemCreate},
-        TContext
-      > => {
-      return useMutation(getCreateKnowledgeItemApiV1KnowledgePostMutationOptions(options), queryClient);
-    }
-    /**
+export const useCreateKnowledgeItemApiV1KnowledgePost = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>,
+      TError,
+      { data: KnowledgeItemCreate },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createKnowledgeItemApiV1KnowledgePost>>,
+  TError,
+  { data: KnowledgeItemCreate },
+  TContext
+> => {
+  return useMutation(
+    getCreateKnowledgeItemApiV1KnowledgePostMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * Get a knowledge item by ID.
  * @summary Get Knowledge Item
  */
 export type getKnowledgeItemApiV1KnowledgeItemIdGetResponse200 = {
-  data: KnowledgeItemRead
-  status: 200
-}
+  data: KnowledgeItemRead;
+  status: 200;
+};
 
 export type getKnowledgeItemApiV1KnowledgeItemIdGetResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type getKnowledgeItemApiV1KnowledgeItemIdGetResponseSuccess = (getKnowledgeItemApiV1KnowledgeItemIdGetResponse200) & {
-  headers: Headers;
-};
-export type getKnowledgeItemApiV1KnowledgeItemIdGetResponseError = (getKnowledgeItemApiV1KnowledgeItemIdGetResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type getKnowledgeItemApiV1KnowledgeItemIdGetResponse = (getKnowledgeItemApiV1KnowledgeItemIdGetResponseSuccess | getKnowledgeItemApiV1KnowledgeItemIdGetResponseError)
+export type getKnowledgeItemApiV1KnowledgeItemIdGetResponseSuccess =
+  getKnowledgeItemApiV1KnowledgeItemIdGetResponse200 & {
+    headers: Headers;
+  };
+export type getKnowledgeItemApiV1KnowledgeItemIdGetResponseError =
+  getKnowledgeItemApiV1KnowledgeItemIdGetResponse422 & {
+    headers: Headers;
+  };
 
-export const getGetKnowledgeItemApiV1KnowledgeItemIdGetUrl = (itemId: string,) => {
+export type getKnowledgeItemApiV1KnowledgeItemIdGetResponse =
+  | getKnowledgeItemApiV1KnowledgeItemIdGetResponseSuccess
+  | getKnowledgeItemApiV1KnowledgeItemIdGetResponseError;
 
-
-  
-
-  return `/api/v1/knowledge/${itemId}`
-}
-
-export const getKnowledgeItemApiV1KnowledgeItemIdGet = async (itemId: string, options?: RequestInit): Promise<getKnowledgeItemApiV1KnowledgeItemIdGetResponse> => {
-  
-  return customFetch<getKnowledgeItemApiV1KnowledgeItemIdGetResponse>(getGetKnowledgeItemApiV1KnowledgeItemIdGetUrl(itemId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getGetKnowledgeItemApiV1KnowledgeItemIdGetQueryKey = (itemId: string,) => {
-    return [
-    `/api/v1/knowledge/${itemId}`
-    ] as const;
-    }
-
-    
-export const getGetKnowledgeItemApiV1KnowledgeItemIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError = HTTPValidationError>(itemId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetKnowledgeItemApiV1KnowledgeItemIdGetUrl = (
+  itemId: string,
 ) => {
+  return `/api/v1/knowledge/${itemId}`;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getKnowledgeItemApiV1KnowledgeItemIdGet = async (
+  itemId: string,
+  options?: RequestInit,
+): Promise<getKnowledgeItemApiV1KnowledgeItemIdGetResponse> => {
+  return customFetch<getKnowledgeItemApiV1KnowledgeItemIdGetResponse>(
+    getGetKnowledgeItemApiV1KnowledgeItemIdGetUrl(itemId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetKnowledgeItemApiV1KnowledgeItemIdGetQueryKey(itemId);
+export const getGetKnowledgeItemApiV1KnowledgeItemIdGetQueryKey = (
+  itemId: string,
+) => {
+  return [`/api/v1/knowledge/${itemId}`] as const;
+};
 
-  
+export const getGetKnowledgeItemApiV1KnowledgeItemIdGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+  TError = HTTPValidationError,
+>(
+  itemId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>> = ({ signal }) => getKnowledgeItemApiV1KnowledgeItemIdGet(itemId, { signal, ...requestOptions });
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetKnowledgeItemApiV1KnowledgeItemIdGetQueryKey(itemId);
 
-      
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>
+  > = ({ signal }) =>
+    getKnowledgeItemApiV1KnowledgeItemIdGet(itemId, {
+      signal,
+      ...requestOptions,
+    });
 
-      
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!itemId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-   return  { queryKey, queryFn, enabled: !!(itemId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
+export type GetKnowledgeItemApiV1KnowledgeItemIdGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>
+>;
+export type GetKnowledgeItemApiV1KnowledgeItemIdGetQueryError =
+  HTTPValidationError;
 
-export type GetKnowledgeItemApiV1KnowledgeItemIdGetQueryResult = NonNullable<Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>>
-export type GetKnowledgeItemApiV1KnowledgeItemIdGetQueryError = HTTPValidationError
-
-
-export function useGetKnowledgeItemApiV1KnowledgeItemIdGet<TData = Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError = HTTPValidationError>(
- itemId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError, TData>> & Pick<
+export function useGetKnowledgeItemApiV1KnowledgeItemIdGet<
+  TData = Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+  TError = HTTPValidationError,
+>(
+  itemId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
           TError,
           Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetKnowledgeItemApiV1KnowledgeItemIdGet<TData = Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError = HTTPValidationError>(
- itemId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetKnowledgeItemApiV1KnowledgeItemIdGet<
+  TData = Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+  TError = HTTPValidationError,
+>(
+  itemId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
           TError,
           Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetKnowledgeItemApiV1KnowledgeItemIdGet<TData = Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError = HTTPValidationError>(
- itemId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetKnowledgeItemApiV1KnowledgeItemIdGet<
+  TData = Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+  TError = HTTPValidationError,
+>(
+  itemId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Knowledge Item
  */
 
-export function useGetKnowledgeItemApiV1KnowledgeItemIdGet<TData = Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError = HTTPValidationError>(
- itemId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetKnowledgeItemApiV1KnowledgeItemIdGet<
+  TData = Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+  TError = HTTPValidationError,
+>(
+  itemId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getKnowledgeItemApiV1KnowledgeItemIdGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetKnowledgeItemApiV1KnowledgeItemIdGetQueryOptions(
+    itemId,
+    options,
+  );
 
-  const queryOptions = getGetKnowledgeItemApiV1KnowledgeItemIdGetQueryOptions(itemId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
 
 /**
  * Update a knowledge item.
  * @summary Update Knowledge Item
  */
 export type updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse200 = {
-  data: KnowledgeItemRead
-  status: 200
-}
+  data: KnowledgeItemRead;
+  status: 200;
+};
 
 export type updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type updateKnowledgeItemApiV1KnowledgeItemIdPatchResponseSuccess = (updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse200) & {
-  headers: Headers;
-};
-export type updateKnowledgeItemApiV1KnowledgeItemIdPatchResponseError = (updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse = (updateKnowledgeItemApiV1KnowledgeItemIdPatchResponseSuccess | updateKnowledgeItemApiV1KnowledgeItemIdPatchResponseError)
+export type updateKnowledgeItemApiV1KnowledgeItemIdPatchResponseSuccess =
+  updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse200 & {
+    headers: Headers;
+  };
+export type updateKnowledgeItemApiV1KnowledgeItemIdPatchResponseError =
+  updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse422 & {
+    headers: Headers;
+  };
 
-export const getUpdateKnowledgeItemApiV1KnowledgeItemIdPatchUrl = (itemId: string,) => {
+export type updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse =
+  | updateKnowledgeItemApiV1KnowledgeItemIdPatchResponseSuccess
+  | updateKnowledgeItemApiV1KnowledgeItemIdPatchResponseError;
 
+export const getUpdateKnowledgeItemApiV1KnowledgeItemIdPatchUrl = (
+  itemId: string,
+) => {
+  return `/api/v1/knowledge/${itemId}`;
+};
 
-  
+export const updateKnowledgeItemApiV1KnowledgeItemIdPatch = async (
+  itemId: string,
+  knowledgeItemUpdate: KnowledgeItemUpdate,
+  options?: RequestInit,
+): Promise<updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse> => {
+  return customFetch<updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse>(
+    getUpdateKnowledgeItemApiV1KnowledgeItemIdPatchUrl(itemId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(knowledgeItemUpdate),
+    },
+  );
+};
 
-  return `/api/v1/knowledge/${itemId}`
-}
+export const getUpdateKnowledgeItemApiV1KnowledgeItemIdPatchMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>,
+    TError,
+    { itemId: string; data: KnowledgeItemUpdate },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>,
+  TError,
+  { itemId: string; data: KnowledgeItemUpdate },
+  TContext
+> => {
+  const mutationKey = ["updateKnowledgeItemApiV1KnowledgeItemIdPatch"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const updateKnowledgeItemApiV1KnowledgeItemIdPatch = async (itemId: string,
-    knowledgeItemUpdate: KnowledgeItemUpdate, options?: RequestInit): Promise<updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse> => {
-  
-  return customFetch<updateKnowledgeItemApiV1KnowledgeItemIdPatchResponse>(getUpdateKnowledgeItemApiV1KnowledgeItemIdPatchUrl(itemId),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      knowledgeItemUpdate,)
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>,
+    { itemId: string; data: KnowledgeItemUpdate }
+  > = (props) => {
+    const { itemId, data } = props ?? {};
 
+    return updateKnowledgeItemApiV1KnowledgeItemIdPatch(
+      itemId,
+      data,
+      requestOptions,
+    );
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type UpdateKnowledgeItemApiV1KnowledgeItemIdPatchMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>
+  >;
+export type UpdateKnowledgeItemApiV1KnowledgeItemIdPatchMutationBody =
+  KnowledgeItemUpdate;
+export type UpdateKnowledgeItemApiV1KnowledgeItemIdPatchMutationError =
+  HTTPValidationError;
 
-export const getUpdateKnowledgeItemApiV1KnowledgeItemIdPatchMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>, TError,{itemId: string;data: KnowledgeItemUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>, TError,{itemId: string;data: KnowledgeItemUpdate}, TContext> => {
-
-const mutationKey = ['updateKnowledgeItemApiV1KnowledgeItemIdPatch'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>, {itemId: string;data: KnowledgeItemUpdate}> = (props) => {
-          const {itemId,data} = props ?? {};
-
-          return  updateKnowledgeItemApiV1KnowledgeItemIdPatch(itemId,data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateKnowledgeItemApiV1KnowledgeItemIdPatchMutationResult = NonNullable<Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>>
-    export type UpdateKnowledgeItemApiV1KnowledgeItemIdPatchMutationBody = KnowledgeItemUpdate
-    export type UpdateKnowledgeItemApiV1KnowledgeItemIdPatchMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Update Knowledge Item
  */
-export const useUpdateKnowledgeItemApiV1KnowledgeItemIdPatch = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>, TError,{itemId: string;data: KnowledgeItemUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>,
-        TError,
-        {itemId: string;data: KnowledgeItemUpdate},
-        TContext
-      > => {
-      return useMutation(getUpdateKnowledgeItemApiV1KnowledgeItemIdPatchMutationOptions(options), queryClient);
-    }
-    /**
+export const useUpdateKnowledgeItemApiV1KnowledgeItemIdPatch = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>,
+      TError,
+      { itemId: string; data: KnowledgeItemUpdate },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateKnowledgeItemApiV1KnowledgeItemIdPatch>>,
+  TError,
+  { itemId: string; data: KnowledgeItemUpdate },
+  TContext
+> => {
+  return useMutation(
+    getUpdateKnowledgeItemApiV1KnowledgeItemIdPatchMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * Delete a knowledge item.
  * @summary Delete Knowledge Item
  */
 export type deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse200 = {
-  data: DeleteKnowledgeItemApiV1KnowledgeItemIdDelete200
-  status: 200
-}
+  data: DeleteKnowledgeItemApiV1KnowledgeItemIdDelete200;
+  status: 200;
+};
 
 export type deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-    
-export type deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponseSuccess = (deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse200) & {
-  headers: Headers;
-};
-export type deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponseError = (deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse = (deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponseSuccess | deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponseError)
+export type deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponseSuccess =
+  deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse200 & {
+    headers: Headers;
+  };
+export type deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponseError =
+  deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse422 & {
+    headers: Headers;
+  };
 
-export const getDeleteKnowledgeItemApiV1KnowledgeItemIdDeleteUrl = (itemId: string,) => {
+export type deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse =
+  | deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponseSuccess
+  | deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponseError;
 
+export const getDeleteKnowledgeItemApiV1KnowledgeItemIdDeleteUrl = (
+  itemId: string,
+) => {
+  return `/api/v1/knowledge/${itemId}`;
+};
 
-  
+export const deleteKnowledgeItemApiV1KnowledgeItemIdDelete = async (
+  itemId: string,
+  options?: RequestInit,
+): Promise<deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse> => {
+  return customFetch<deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse>(
+    getDeleteKnowledgeItemApiV1KnowledgeItemIdDeleteUrl(itemId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
 
-  return `/api/v1/knowledge/${itemId}`
-}
+export const getDeleteKnowledgeItemApiV1KnowledgeItemIdDeleteMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>,
+    TError,
+    { itemId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>,
+  TError,
+  { itemId: string },
+  TContext
+> => {
+  const mutationKey = ["deleteKnowledgeItemApiV1KnowledgeItemIdDelete"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const deleteKnowledgeItemApiV1KnowledgeItemIdDelete = async (itemId: string, options?: RequestInit): Promise<deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse> => {
-  
-  return customFetch<deleteKnowledgeItemApiV1KnowledgeItemIdDeleteResponse>(getDeleteKnowledgeItemApiV1KnowledgeItemIdDeleteUrl(itemId),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>,
+    { itemId: string }
+  > = (props) => {
+    const { itemId } = props ?? {};
 
+    return deleteKnowledgeItemApiV1KnowledgeItemIdDelete(
+      itemId,
+      requestOptions,
+    );
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type DeleteKnowledgeItemApiV1KnowledgeItemIdDeleteMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>
+  >;
 
-export const getDeleteKnowledgeItemApiV1KnowledgeItemIdDeleteMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>, TError,{itemId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>, TError,{itemId: string}, TContext> => {
+export type DeleteKnowledgeItemApiV1KnowledgeItemIdDeleteMutationError =
+  HTTPValidationError;
 
-const mutationKey = ['deleteKnowledgeItemApiV1KnowledgeItemIdDelete'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>, {itemId: string}> = (props) => {
-          const {itemId} = props ?? {};
-
-          return  deleteKnowledgeItemApiV1KnowledgeItemIdDelete(itemId,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteKnowledgeItemApiV1KnowledgeItemIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>>
-    
-    export type DeleteKnowledgeItemApiV1KnowledgeItemIdDeleteMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Delete Knowledge Item
  */
-export const useDeleteKnowledgeItemApiV1KnowledgeItemIdDelete = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>, TError,{itemId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>,
-        TError,
-        {itemId: string},
-        TContext
-      > => {
-      return useMutation(getDeleteKnowledgeItemApiV1KnowledgeItemIdDeleteMutationOptions(options), queryClient);
-    }
-    
+export const useDeleteKnowledgeItemApiV1KnowledgeItemIdDelete = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>,
+      TError,
+      { itemId: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteKnowledgeItemApiV1KnowledgeItemIdDelete>>,
+  TError,
+  { itemId: string },
+  TContext
+> => {
+  return useMutation(
+    getDeleteKnowledgeItemApiV1KnowledgeItemIdDeleteMutationOptions(options),
+    queryClient,
+  );
+};

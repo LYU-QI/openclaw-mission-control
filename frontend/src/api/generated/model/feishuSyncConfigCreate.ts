@@ -4,6 +4,7 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
+import type { FeishuSyncConfigCreateBoardMapping } from "./feishuSyncConfigCreateBoardMapping";
 import type { FeishuSyncConfigCreateFieldMapping } from "./feishuSyncConfigCreateFieldMapping";
 
 /**
@@ -17,6 +18,8 @@ export interface FeishuSyncConfigCreate {
   bitable_app_token: string;
   bitable_table_id: string;
   field_mapping?: FeishuSyncConfigCreateFieldMapping;
+  board_mapping?: FeishuSyncConfigCreateBoardMapping;
   sync_direction?: string;
   sync_interval_minutes?: number;
+  auto_dispatch?: boolean;
 }

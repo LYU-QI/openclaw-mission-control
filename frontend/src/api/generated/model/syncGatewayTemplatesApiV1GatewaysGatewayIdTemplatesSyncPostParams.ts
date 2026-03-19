@@ -5,12 +5,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type SyncGatewayTemplatesApiV1GatewaysGatewayIdTemplatesSyncPostParams = {
-include_main?: boolean;
-lead_only?: boolean;
-reset_sessions?: boolean;
-rotate_tokens?: boolean;
-force_bootstrap?: boolean;
-overwrite?: boolean;
-board_id?: string | null;
-};
+export type SyncGatewayTemplatesApiV1GatewaysGatewayIdTemplatesSyncPostParams =
+  {
+    include_main?: boolean;
+    lead_only?: boolean;
+    reset_sessions?: boolean;
+    rotate_tokens?: boolean;
+    force_bootstrap?: boolean;
+    overwrite?: boolean;
+    board_id?: string | null;
+  };

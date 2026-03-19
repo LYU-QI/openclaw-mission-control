@@ -5,12 +5,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type SubtaskReadStatus = typeof SubtaskReadStatus[keyof typeof SubtaskReadStatus];
-
+export type SubtaskReadStatus =
+  (typeof SubtaskReadStatus)[keyof typeof SubtaskReadStatus];
 
 export const SubtaskReadStatus = {
-  pending: 'pending',
-  running: 'running',
-  completed: 'completed',
-  failed: 'failed',
+  pending: "pending",
+  running: "running",
+  completed: "completed",
+  failed: "failed",
 } as const;

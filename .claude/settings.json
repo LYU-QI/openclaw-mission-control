@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST -H \"Authorization: Bearer DBJ7Ydpg+SingbqK76UJ0rHLHAMccOfKrT4yLs3z3Ss=ExtraChars\" -H \"Content-Type: application/json\" \"http://localhost:8000/api/v1/missions/89afbb50-8a27-4547-904d-9abdff6c41bf/dispatch\" -d '{\"\"force\"\": false}')",
+      "Bash(curl -s -X POST -H \"Authorization: Bearer DBJ7Ydpg+SingbqK76UJ0rHLHAMccOfKrT4yLs3z3Ss=ExtraChars\" \"http://localhost:8000/api/v1/missions/89afbb50-8a27-4547-904d-9abdff6c41bf/start\")",
+      "Bash(curl -s -H \"Authorization: Bearer DBJ7Ydpg+SingbqK76UJ0rHLHAMccOfKrT4yLs3z3Ss=ExtraChars\" \"http://localhost:8000/api/v1/missions/89afbb50-8a27-4547-904d-9abdff6c41bf/subtasks\")",
+      "Bash(curl -s -X PATCH -H \"Authorization: Bearer DBJ7Ydpg+SingbqK76UJ0rHLHAMccOfKrT4yLs3z3Ss=ExtraChars\" -H \"Content-Type: application/json\" \"http://localhost:8000/api/v1/missions/subtasks/5bad21ec-a76e-444c-b358-cb3ff7e9cebb\" -d '{:*)",
+      "Bash(curl -s -X POST -H \"Authorization: Bearer DBJ7Ydpg+SingbqK76UJ0rHLHAMccOfKrT4yLs3z3Ss=ExtraChars\" -H \"Content-Type: application/json\" \"http://localhost:8000/api/v1/missions/89afbb50-8a27-4547-904d-9abdff6c41bf/complete\" -d '{:*)",
+      "Bash(curl -s -H 'Authorization: Bearer DBJ7Ydpg+SingbqK76UJ0rHLHAMccOfKrT4yLs3z3Ss=ExtraChars' http://localhost:8000/api/v1/agents?limit=20)",
+      "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\);:*)",
+      "Bash(curl -s http://localhost:8000/openapi.json)",
+      "Bash(python3 -c \":*)",
+      "Bash(ENABLE_AGENT_NOTIFICATIONS=true uv run python -c \":*)",
+      "Bash(python3 -c \"import sys,json; print\\(json.dumps\\(json.load\\(sys.stdin\\), indent=2, ensure_ascii=False\\)\\)\")",
+      "Bash(curl -s -H 'Authorization: Bearer DBJ7Ydpg+SingbqK76UJ0rHLHAMccOfKrT4yLs3z3Ss=ExtraChars' http://127.0.0.1:8000/api/v1/boards/3cfb3a71-1844-4169-a732-1d23503b1c30/tasks/7d80c586-97e4-42cd-b500-dbaa858c9f64/comments)",
+      "Bash(curl -s -H 'Authorization: Bearer DBJ7Ydpg+SingbqK76UJ0rHLHAMccOfKrT4yLs3z3Ss=ExtraChars' http://127.0.0.1:8000/api/v1/missions/35bb5416-1944-4dd9-bb5c-4ee1e3db51a6)",
+      "Bash(curl -s \"http://127.0.0.1:8000/openapi.json\")",
+      "Bash(jq -r \":*)",
+      "Bash(curl -s -X POST \"http://localhost:8000/api/v1/feishu-sync/configs/036e6cf0-3782-4c05-b371-1721212f624e/trigger\" -H \"Authorization: Bearer DBJ7Ydpg+SingbqK76UJ0rHLHAMccOfKrT4yLs3z3Ss=ExtraChars\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(grep -r \"turbopack\" package.json next.config.* tsconfig.json)"
+    ]
+  }
+}

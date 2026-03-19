@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import Any, Literal
 
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -32,6 +32,7 @@ class MissionApprovalDecision:
     status: Literal["completed", "pending_approval"]
     approval_required: bool
     reason: str
+    auditor_decision: dict[str, Any] | None = None  # LLM audit result if available
 
 
 class ApprovalGate:
@@ -73,13 +74,67 @@ class ApprovalGate:
         *,
         mission: Mission,
         aggregated: AggregatedResult,
+        task_title: str | None = None,
     ) -> MissionApprovalDecision:
-        # Default policy check
-        if mission.approval_policy == "post_review" and aggregated.anomalies:
+        # Try Lead Auditor for intelligent evaluation when post_review policy is set
+        auditor_decision = None
+        if mission.approval_policy == "post_review":
+            from app.services.openclaw.lead_auditor import LeadAuditor
+
+            auditor = LeadAuditor()
+            if auditor.is_enabled() and task_title:
+                audit_result = await auditor.audit(
+                    mission=mission,
+                    task_title=task_title,
+                    aggregated=aggregated,
+                )
+                if audit_result:
+                    auditor_decision = {
+                        "decision": audit_result.decision,
+                        "summary": audit_result.summary,
+                        "reason": audit_result.reason,
+                        "suggestions": audit_result.suggestions,
+                        "risk_confirmed": audit_result.risk_confirmed,
+                        "missing_items": audit_result.missing_items,
+                    }
+                    # Use LLM audit decision - always request approval for post_review policy
+                    # so humans can see what was approved
+                    if audit_result.decision == "request_changes":
+                        reason = f"[LLM Audit] {audit_result.reason}"
+                        if audit_result.suggestions:
+                            reason += "\n\nSuggestions:\n" + "\n".join(
+                                f"- {s}" for s in audit_result.suggestions
+                            )
+                        return MissionApprovalDecision(
+                            status="pending_approval",
+                            approval_required=True,
+                            reason=reason,
+                            auditor_decision=auditor_decision,
+                        )
+                    else:
+                        # Lead Auditor approved - still create approval for visibility/traceability
+                        return MissionApprovalDecision(
+                            status="pending_approval",
+                            approval_required=True,
+                            reason=f"[LLM Audit Approved] {audit_result.summary or 'Lead Auditor approved the results'}",
+                            auditor_decision=auditor_decision,
+                        )
+
+        # Default policy check - post_review always needs approval for visibility
+        if mission.approval_policy == "post_review":
+            if aggregated.anomalies:
+                return MissionApprovalDecision(
+                    status="pending_approval",
+                    approval_required=True,
+                    reason="Mission produced anomalies under post-review policy.",
+                    auditor_decision=auditor_decision,
+                )
+            # Even without anomalies, post_review policy requires approval for human visibility
             return MissionApprovalDecision(
                 status="pending_approval",
                 approval_required=True,
-                reason="Mission produced anomalies under post-review policy.",
+                reason="Post-review policy: mission completed, requires human acknowledgment.",
+                auditor_decision=auditor_decision,
             )
 
         # Check dynamic rules from DB if session is available
@@ -102,6 +157,7 @@ class ApprovalGate:
                             status="pending_approval",
                             approval_required=True,
                             reason=f"Triggered by rule '{rule.name}': High risk execution.",
+                            auditor_decision=auditor_decision,
                         )
                     if (
                         rule.trigger_on_tool_usage
@@ -116,12 +172,14 @@ class ApprovalGate:
                                     status="pending_approval",
                                     approval_required=True,
                                     reason=f"Triggered by rule '{rule.name}': Sensitive tool used ({tool.strip()}).",
+                                    auditor_decision=auditor_decision,
                                 )
 
         return MissionApprovalDecision(
             status="completed",
             approval_required=False,
             reason="Mission does not require result review after aggregation.",
+            auditor_decision=auditor_decision,
         )
 
     def _decision_for_policy(

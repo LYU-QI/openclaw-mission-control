@@ -36,6 +36,12 @@ class FeishuSyncConfig(QueryModel, table=True):
         sa_column=Column(JSON, nullable=False),
     )
 
+    # Board mapping: feishu_board_name -> mc_board_id (for per-task board assignment)
+    board_mapping: dict[str, str] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON, nullable=False),
+    )
+
     sync_direction: str = Field(default="bidirectional")  # pull_only / push_only / bidirectional
     sync_interval_minutes: int = Field(default=15)
     last_sync_at: datetime | None = None
@@ -43,6 +49,8 @@ class FeishuSyncConfig(QueryModel, table=True):
     last_error: str | None = Field(default=None, sa_column=Column(Text))
 
     enabled: bool = Field(default=True)
+    auto_dispatch: bool = Field(default=False)  # Auto-create and dispatch mission after sync
+    default_approval_policy: str = Field(default="auto")  # auto / pre_approve / post_review
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
 

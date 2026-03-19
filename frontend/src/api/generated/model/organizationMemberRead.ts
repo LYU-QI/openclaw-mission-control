@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { OrganizationBoardAccessRead } from './organizationBoardAccessRead';
-import type { OrganizationUserRead } from './organizationUserRead';
+import type { OrganizationBoardAccessRead } from "./organizationBoardAccessRead";
+import type { OrganizationUserRead } from "./organizationUserRead";
 
 /**
  * Organization member payload including board-level access overrides.

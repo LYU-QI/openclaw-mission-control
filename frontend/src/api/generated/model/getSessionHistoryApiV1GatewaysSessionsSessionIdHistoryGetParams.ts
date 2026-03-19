@@ -6,5 +6,5 @@
  */
 
 export type GetSessionHistoryApiV1GatewaysSessionsSessionIdHistoryGetParams = {
-board_id?: string | null;
+  board_id?: string | null;
 };

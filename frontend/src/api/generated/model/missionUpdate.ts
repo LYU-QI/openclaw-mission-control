@@ -4,8 +4,8 @@
  * Mission Control API
  * OpenAPI spec version: 0.1.0
  */
-import type { MissionUpdateConstraints } from './missionUpdateConstraints';
-import type { MissionUpdateResultEvidence } from './missionUpdateResultEvidence';
+import type { MissionUpdateConstraints } from "./missionUpdateConstraints";
+import type { MissionUpdateResultEvidence } from "./missionUpdateResultEvidence";
 
 /**
  * Payload for updating a mission.
@@ -14,8 +14,17 @@ export interface MissionUpdate {
   goal?: string | null;
   constraints?: MissionUpdateConstraints;
   context_refs?: string[] | null;
-  approval_policy?: 'auto' | 'pre_approve' | 'post_review' | null;
-  status?: 'pending' | 'dispatched' | 'running' | 'aggregating' | 'completed' | 'failed' | 'pending_approval' | 'cancelled' | null;
+  approval_policy?: "auto" | "pre_approve" | "post_review" | null;
+  status?:
+    | "pending"
+    | "dispatched"
+    | "running"
+    | "aggregating"
+    | "completed"
+    | "failed"
+    | "pending_approval"
+    | "cancelled"
+    | null;
   result_summary?: string | null;
   result_evidence?: MissionUpdateResultEvidence;
   result_risk?: string | null;
